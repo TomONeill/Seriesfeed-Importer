@@ -1,0 +1,4 @@
+Seriesfeed Import Changelog
+
+Version 0.1 (2 April 2016)
+First working draft

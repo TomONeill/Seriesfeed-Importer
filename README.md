@@ -1,4 +1,8 @@
 # Seriesfeed-Import
 Import your favourites or time wasted (soon) from other sites to Seriesfeed.com
+<BR/>
+Enjoy.
+<BR/><BR/>
+Version <strong>1.0</strong>
 
-Note: This only works with <a href="https://github.com/TomONeill/O-Neill-s-API">O'Neill's API</a>.
+<A HREF="https://raw.githubusercontent.com/TomONeill/Seriesfeed-Import/master/Changelog.txt">View changelog</A>

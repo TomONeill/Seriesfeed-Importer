@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Seriesfeed Import
 // @namespace    http://www.seriesfeed.com
-// @version      1.1
+// @version      1.0
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @match        http://www.seriesfeed.com/*
 // @run-at       document-start
@@ -21,22 +21,28 @@ $(function() {
     $('.nav .dropdown .dropdown-menu:eq(2)').append('<li><a href="/series/import/">Importeren</a></li>');
     
     if (window.location.href === "http://www.seriesfeed.com/series/import/") {
-		var wrapper   = $('.wrapper').addClass('bg').removeClass('show padding');
-		var container = $('.wrapper .container').html('').addClass("content");
-		var selector  = $(document.createElement("div")).addClass("platformSelector");
-		var card      = $(document.createElement("div")).addClass("wow fadeInUp cardStyle cardForm formBlock animated");
-        var head      = $(document.createElement("h2")).append('Series importeren');
-		var cardInner = $(document.createElement("div")).addClass("cardFormInner");
-		var p         = $(document.createElement("p")).append('Kies een platform:');
+		var wrapper   = $('.wrapper');
+		wrapper.removeClass('show padding');
 		
-		container.append(selector);
-		selector.append(card);
-		card.append(head);
-		card.append(cardInner);
-		cardInner.append(p);
+		var container = $('.wrapper .container').html('');
+		var row       = $(document.createElement("div"));
+		var col       = $(document.createElement("div"));
+        var head      = $(document.createElement("h1"));
+		var p         = $(document.createElement("p"));
 		
-		var bierdopje = platformFactory("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "bierdopje/", "#3399FE");
-		bierdopje.addClass('wow fadeInLeft cardStyle cardForm formBlock animated');
+		row.addClass("row");
+		col.addClass("col-md-12");
+		
+		container.append(row);
+		row.append(col);
+		col.append(head);
+		col.append(p);
+		
+		head.append('Series importeren');
+        p.append('Kies een platform:');
+		
+		var bierdopje = createPlatform("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "bierdopje/");
+		bierdopje.addClass('wow fadeInUp cardStyle cardForm formBlock animated');
 		p.after(bierdopje);
     }
 	
@@ -141,49 +147,21 @@ $(function() {
 		});
 	}
 	
-	function platformFactory(name, image, url, colour) {
-		// Element declaration
-		var portfolio = $(document.createElement("div"));
-		var a         = $(document.createElement("a"));
-		var wrapper   = $(document.createElement("div"));
-		var hover     = $(document.createElement("div"));
-		var img       = $(document.createElement("img"));
-		var info      = $(document.createElement("div"));
-		var title     = $(document.createElement("div"));
-		var h4        = $(document.createElement("h4"));
-		
-		// Adding classes
-		portfolio.addClass("portfolio mix_all");
-		wrapper.addClass("portfolio-wrapper cardStyle");
-		hover.addClass("portfolio-hover");
-		info.addClass("portfolio-info");
-		title.addClass("portfolio-title");
-		
-		// Styling
-		portfolio.css({
-			'display': 'inline-block',
-			'width': '100%'
-		});
-		hover.css({
-			'text-align': 'center',
-			'background': colour
-		});
-		
-		// Data binding
-		a.attr('href', url);
-		img.attr('src', image).attr('alt', name);
-		h4.append(name);
-		
-		// Element binding
-		portfolio.append(a);
-		a.append(wrapper);
-		wrapper.append(hover);
-		hover.append(img);
-		wrapper.append(info);
-		info.append(title);
-		title.append(h4);
-		
-		return portfolio;
+	function createPlatform(name, image, url) {
+		return $('<div class="portfolio mix_all" style="display: inline-block;  opacity: 1;">'
+				 + '<a href="' + url + '">'
+    		         + '<div class="portfolio-wrapper cardStyle">'
+	    			     + '<div class="portfolio-hover">'
+		    			     + '<img src="' + image + ' " alt="' + name + '">'
+			    	     + '</div>'
+				         + '<div class="portfolio-info">'
+					         + '<div class="portfolio-title">'
+				                 + '<h4>' + name + '</h4>'
+					         + '</div>'
+    				     + '</div>'
+	    		     + '</div>'
+				 + '</a>'
+		     + '</div>');
 	}
 	
 	function getCurrentUser() {

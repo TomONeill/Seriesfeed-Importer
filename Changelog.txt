@@ -1,8 +1,11 @@
 Seriesfeed Import Changelog
 
+Version 1.1 (3 April 2016)
+Updated UI of the platform selection screen.
+
 Version 1.0 (3 April 2016)
-Removed the need of an API
-Added UI
+Removed the need of an API.
+Added UI.
 
 Version 0.1 (2 April 2016)
-First working draft
+First working draft.

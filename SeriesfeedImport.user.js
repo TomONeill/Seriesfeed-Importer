@@ -14,37 +14,38 @@
 // @copyright    2016+, Tom
 // ==/UserScript==
 /* jshint -W097 */
+/* global $, GM_xmlhttpRequest */
 'use strict';
 
 $(function() {
-    // Add menu item to navigator.
-    $('.nav .dropdown .dropdown-menu:eq(2)').append('<li><a href="/series/import/">Importeren</a></li>');
-    
-    if (window.location.href === "http://www.seriesfeed.com/series/import/") {
-		var wrapper   = $('.wrapper').addClass('bg').removeClass('show padding');
-		var container = $('.wrapper .container').html('').addClass("content");
-		var selector  = $(document.createElement("div")).addClass("platformSelector");
-		var card      = $(document.createElement("div")).addClass("wow fadeInUp cardStyle cardForm formBlock animated");
-        var head      = $(document.createElement("h2")).append('Series importeren');
-		var cardInner = $(document.createElement("div")).addClass("cardFormInner");
-		var p         = $(document.createElement("p")).append('Kies een platform:');
-		
+	// Add menu item to navigator.
+	$('.nav .dropdown .dropdown-menu:eq(2)').append('<li><a href="/series/import/">Importeren</a></li>');
+
+	if (window.location.href === "http://www.seriesfeed.com/series/import/") {
+		var wrapper    = $('.wrapper').addClass('bg').removeClass('show padding');
+		var container  = $('.wrapper .container').html('').addClass("content");
+		var selector   = $(document.createElement("div")).addClass("platformSelector");
+		var card       = $(document.createElement("div")).addClass("wow fadeInUp cardStyle cardForm formBlock animated");
+		var importHead = $(document.createElement("h2")).append('Series importeren');
+		var cardInner  = $(document.createElement("div")).addClass("cardFormInner");
+		var platform   = $(document.createElement("p")).append('Kies een platform:');
+
 		container.append(selector);
 		selector.append(card);
-		card.append(head);
+		card.append(importHead);
 		card.append(cardInner);
-		cardInner.append(p);
-		
+		cardInner.append(platform);
+
 		var bierdopje = platformFactory("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "bierdopje/", "#3399FE");
 		bierdopje.addClass('wow fadeInLeft cardStyle cardForm formBlock animated');
-		p.after(bierdopje);
-    }
-	
+		platform.after(bierdopje);
+	}
+
 	if (window.location.href === "http://www.seriesfeed.com/series/import/bierdopje/") {
 		var currentUser = getCurrentUser();
-        var head = $('.col-md-12 h1').html('');
+		var head = $('.col-md-12 h1').html('');
 		var p    = $('.col-md-12 p').html('');
-		
+
 		var formElement   = $(document.createElement("div"));
 		var usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" value="' + currentUser + '" /></div>');
 		var submitInput   = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
@@ -53,7 +54,7 @@ $(function() {
 		var detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details" style="display: none;">');
 		var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Naam</th><th>Status</th></tr>');
 		var showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-		
+
 		formElement.addClass('blog-left wow fadeInUp cardStyle cardForm formBlock animated');
 		bottomPane.addClass('wow fadeInLeft cardStyle animated');
 		detailsTable.addClass('wow fadeInLeft cardStyle animated');
@@ -65,17 +66,17 @@ $(function() {
 			'height': '18px',
 			'width': '100%'
 		});
-		
+
 		head.append('Series importeren - Bierdopje.com');
-        p.append('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
-		
+		p.append('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
+
 		formElement.append(usernameInput);
 		formElement.append(submitInput);
 		p.after(formElement);
 		detailsTable.append(detailsHeader);
 		bottomPane.append(showDetails);
 		showDetails.append(detailsTable);
-		
+
 		$("#fav-import").click(function() {
 			var favImportBtn = $(this);
 			favImportBtn.prop('disabled', true);
@@ -85,11 +86,11 @@ $(function() {
 
 			var username = $('#username').val();
 			var favourites = $('#details');
-			
+
 			$("#show-details").click(function() {
 				detailsTable.toggle();
 			});
-			
+
 			GM_xmlhttpRequest({
 				method: "GET",
 				url: "http://www.bierdopje.com/users/" + username + "/shows",
@@ -99,23 +100,23 @@ $(function() {
 					var links   = div.find('.content').find('ul').find('li').find('a');
 					var length  = links.length;
 					var current = 1;
-					
+
 					links.each(function() {
 						var showName = cleanShowName($(this).html());
 						var showSlug = getShowSlugByShowName(showName);
-						
+
 						getShowIdByShowSlug(showSlug).success(function (result) {
 							var showId = result.id;
-							
+
 							addShowFavouriteByShowId(showId).success(function (result) {
 								var status = "-";
-								
+
 								if (showId === -1) {
 									showId = "Onbekend";
 								}
 
 								if (result.status === "success") {
-									status = "Toegevoegd als favoriet."
+									status = "Toegevoegd als favoriet.";
 								} else if (result.status === "failed" && showId === "Onbekend") {
 									status = '<a href="http://www.seriesfeed.com/series/voorstellen/">Deze serie staat nog niet op Seriesfeed.</a>';
 								} else {
@@ -140,7 +141,7 @@ $(function() {
 			});
 		});
 	}
-	
+
 	function platformFactory(name, image, url, colour) {
 		// Element declaration
 		var portfolio = $(document.createElement("div"));
@@ -151,14 +152,14 @@ $(function() {
 		var info      = $(document.createElement("div"));
 		var title     = $(document.createElement("div"));
 		var h4        = $(document.createElement("h4"));
-		
+
 		// Adding classes
 		portfolio.addClass("portfolio mix_all");
 		wrapper.addClass("portfolio-wrapper cardStyle");
 		hover.addClass("portfolio-hover");
 		info.addClass("portfolio-info");
 		title.addClass("portfolio-title");
-		
+
 		// Styling
 		portfolio.css({
 			'display': 'inline-block',
@@ -168,12 +169,12 @@ $(function() {
 			'text-align': 'center',
 			'background': colour
 		});
-		
+
 		// Data binding
 		a.attr('href', url);
 		img.attr('src', image).attr('alt', name);
 		h4.append(name);
-		
+
 		// Element binding
 		portfolio.append(a);
 		a.append(wrapper);
@@ -182,17 +183,17 @@ $(function() {
 		wrapper.append(info);
 		info.append(title);
 		title.append(h4);
-		
+
 		return portfolio;
 	}
-	
+
 	function getCurrentUser() {
 		var user = $('.nav .dropdown .dropdown-menu:eq(1) li a').attr('href').replace("/user/", "");
 		user = user.replace("/", "");
-		
+
 		return user;
 	}
-	
+
 	function cleanShowName(showName) {
 		showName = showName.replace("<del>", "");
 		showName = showName.replace("</del>", "");
@@ -219,7 +220,7 @@ $(function() {
 			dataType: "json"
 		});
 	}
-	
+
 	function addShowFavouriteByShowId(showId) {
 		return $.ajax({
 			type: "POST",

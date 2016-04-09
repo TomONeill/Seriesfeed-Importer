@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Seriesfeed Import
 // @namespace    http://www.seriesfeed.com
-// @version      1.1
+// @version      1.2
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @match        http://www.seriesfeed.com/*
 // @run-at       document-start
@@ -102,39 +102,47 @@ $(function() {
 					var current = 1;
 
 					links.each(function() {
-						var showName = cleanShowName($(this).html());
-						var showSlug = getShowSlugByShowName(showName);
+						GM_xmlhttpRequest({
+							method: "GET",
+							url: "http://www.bierdopje.com" + $(this).attr('href'),
+							onload: function(response) {
+								var showPage = $('<div></div>');
+								showPage.html(response.responseText);
+								var tvdbId = showPage.find('a[href^="http://www.thetvdb.com"]').html();
+								getShowIdByTVDb(tvdbId).success(function (result) {
+									var showId = result.id;
+									var showName = result.name;
+									var showSlug = result.slug;
 
-						getShowIdByShowSlug(showSlug).success(function (result) {
-							var showId = result.id;
+									addShowFavouriteByShowId(showId).success(function (result) {
+										var status = "-";
 
-							addShowFavouriteByShowId(showId).success(function (result) {
-								var status = "-";
+										if (showId === -1) {
+											showId = "Onbekend";
+										}
 
-								if (showId === -1) {
-									showId = "Onbekend";
-								}
+										if (result.status === "success") {
+											status = "Toegevoegd als favoriet.";
+										} else if (result.status === "failed" && showId === "Onbekend") {
+											status = '<a href="http://www.seriesfeed.com/series/voorstellen/">Deze serie staat nog niet op Seriesfeed.</a>';
+										} else {
+											status = "Deze serie kan niet toegevoegd worden. Mogelijk is deze serie al een favoriet.";
+										}
 
-								if (result.status === "success") {
-									status = "Toegevoegd als favoriet.";
-								} else if (result.status === "failed" && showId === "Onbekend") {
-									status = '<a href="http://www.seriesfeed.com/series/voorstellen/">Deze serie staat nog niet op Seriesfeed.</a>';
-								} else {
-									status = "Deze serie kan niet toegevoegd worden. Mogelijk is deze serie al een favoriet.";
-								}
+										var item = '<tr><td>' + showId + '</td><td><a href="http://www.seriesfeed.com/series/' + showSlug + '">' + showName + '</a></td><td>' + status + '</td></tr>';
+										favourites.append(item);
 
-								var item = '<tr><td>' + showId + '</td><td><a href="http://www.seriesfeed.com/series/' + showSlug + '">' + showName + '</a></td><td>' + status + '</td></tr>';
-								favourites.append(item);
+										var progress = (current/length) * 100;
+										progressBar.attr('value', Math.round(progress));
 
-								var progress = (current/length) * 100;
-								progressBar.attr('value', Math.round(progress));
-
-								if (current++ === length) {
-									favImportBtn.prop('disabled', false);
-									favImportBtn.attr('value', "Favorieten Importeren");
-									progressBar.replaceWith("Importeren voltooid.");
-								}
-							});
+										if (current++ === length) {
+											favImportBtn.prop('disabled', false);
+											favImportBtn.attr('value', "Favorieten Importeren");
+											progressBar.replaceWith("Importeren voltooid.");
+										}
+									});
+								});
+							}
 						});
 					});
 				}
@@ -194,29 +202,11 @@ $(function() {
 		return user;
 	}
 
-	function cleanShowName(showName) {
-		showName = showName.replace("<del>", "");
-		showName = showName.replace("</del>", "");
-
-		return showName;
-	}
-
-	function getShowSlugByShowName(showName) {
-		showName = showName.toLowerCase();
-		showName = showName.replace(/\&/g, "and");                 // Convert & to and.
-		showName = showName.replace(/ \([0-9]+\)/g, "");           // Trim space ( ) (year).
-		showName = showName.replace(/([0-9])\.([0-9])/g, "$1-$2"); // Replace . with - only when surrounded by numbers.
-		showName = showName.replace(/ /g, "-");                    // Replace space ( ) with -
-		showName = showName.replace(/[^a-z0-9\-]/g, "");           // Trim special chars like ! and ', but not -.
-
-		return showName;
-	}
-
-	function getShowIdByShowSlug(showSlug) {
+	function getShowIdByTVDb(tvdbId){
 		return $.ajax({
 			type: "POST",
 			url: "/ajax.php?action=getShowId",
-			data: {slug: showSlug},
+			data: {tvdb_id: tvdbId},
 			dataType: "json"
 		});
 	}

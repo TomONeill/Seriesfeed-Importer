@@ -1,5 +1,11 @@
 Seriesfeed Import Changelog
 
+Version 1.2 (10 April 2016)
+Replaces the name/slug search by TVDb matching.
+Fixed some jshint errors.
+Fixed indentation.
+Adds gitignore.
+
 Version 1.1 (3 April 2016)
 Updated UI of the platform selection screen.
 

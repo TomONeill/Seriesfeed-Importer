@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Seriesfeed Importer
+// @name         Seriesfeed Import
 // @namespace    http://www.seriesfeed.com
-// @version      1.3
+// @version      1.2
 // @description  Allows you to import your favourites from Bierdopje.com.
-// @match        http://*.seriesfeed.com/*
+// @match        http://www.seriesfeed.com/*
 // @run-at       document-start
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
@@ -51,8 +51,8 @@ $(function() {
 		var submitInput   = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
 		var progressBar   = $('<progress value="0" max="100"></progress>');
 		var bottomPane    = $('<div class="blog-left"></div>');
-		var detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-		var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
+		var detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details" style="display: none;">');
+		var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Naam</th><th>Status</th></tr>');
 		var showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
 
 		formElement.addClass('blog-left wow fadeInUp cardStyle cardForm formBlock animated');
@@ -101,7 +101,7 @@ $(function() {
 					var length  = links.length;
 					var current = 1;
 
-					links.each(function(i) {
+					links.each(function() {
 						GM_xmlhttpRequest({
 							method: "GET",
 							url: "http://www.bierdopje.com" + $(this).attr('href'),
@@ -112,7 +112,7 @@ $(function() {
 								getShowIdByTVDb(tvdbId).success(function (result) {
 									var showId = result.id;
 									var showName = result.name;
-									var showSlug = 'http://www.seriesfeed.com/series/' + result.slug;
+									var showSlug = result.slug;
 
 									addShowFavouriteByShowId(showId).success(function (result) {
 										var status = "-";
@@ -120,21 +120,16 @@ $(function() {
 										if (showId === -1) {
 											showId = "Onbekend";
 										}
-										
-										if (!showName) {
-											showSlug = 'http://www.bierdopje.com' + $(links[i]).attr('href');
-											showName = $(links[i]).html();
-										}
 
 										if (result.status === "success") {
 											status = "Toegevoegd als favoriet.";
 										} else if (result.status === "failed" && showId === "Onbekend") {
-											status = '<a href="http://www.seriesfeed.com/series/voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
+											status = '<a href="http://www.seriesfeed.com/series/voorstellen/">Deze serie staat nog niet op Seriesfeed.</a>';
 										} else {
 											status = "Deze serie kan niet toegevoegd worden. Mogelijk is deze serie al een favoriet.";
 										}
 
-										var item = '<tr><td>' + showId + '</td><td><a href="' + showSlug + '" target="_blank">' + showName + '</a></td><td>' + status + '</td></tr>';
+										var item = '<tr><td>' + showId + '</td><td><a href="http://www.seriesfeed.com/series/' + showSlug + '">' + showName + '</a></td><td>' + status + '</td></tr>';
 										favourites.append(item);
 
 										var progress = (current/length) * 100;

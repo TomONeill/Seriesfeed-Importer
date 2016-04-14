@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Seriesfeed Importer
 // @namespace    http://www.seriesfeed.com
-// @version      1.3
+// @version      2.0
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @match        http://*.seriesfeed.com/*
 // @run-at       document-start
@@ -42,30 +42,34 @@ $(function() {
 	}
 
 	if (window.location.href === "http://www.seriesfeed.com/series/import/bierdopje/") {
-		var currentUser = getCurrentUser();
 		var head = $('.col-md-12 h1').html('');
 		var p    = $('.col-md-12 p').html('');
+		
+		var css = '<style>'
+		        + '    .progress {'
+		        + '        margin-top: 10px;'
+		        + '        margin-bottom: 0px;'
+		        + '    }'
+		        + '    '
+		        + '    .progress-bar {'
+                + '        background: #447C6F;'
+		        + '    }'
+		        + '</style>';
+		$('body').append(css);
 
 		var formElement   = $(document.createElement("div"));
-		var usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" value="' + currentUser + '" /></div>');
+		var usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
 		var submitInput   = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
-		var progressBar   = $('<progress value="0" max="100"></progress>');
 		var bottomPane    = $('<div class="blog-left"></div>');
 		var detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
+		var colGroup      = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
 		var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
 		var showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-
+		
 		formElement.addClass('blog-left wow fadeInUp cardStyle cardForm formBlock animated');
 		bottomPane.addClass('wow fadeInLeft cardStyle animated');
 		detailsTable.addClass('wow fadeInLeft cardStyle animated');
 		formElement.css('padding', '10px');
-		progressBar.css({
-			'margin-top': '15px',
-			'background-color': '#f3f3f3',
-			'border': '0',
-			'height': '18px',
-			'width': '100%'
-		});
 
 		head.append('Series importeren - Bierdopje.com');
 		p.append('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
@@ -73,15 +77,23 @@ $(function() {
 		formElement.append(usernameInput);
 		formElement.append(submitInput);
 		p.after(formElement);
+		detailsTable.append(colGroup);
 		detailsTable.append(detailsHeader);
 		bottomPane.append(showDetails);
 		showDetails.append(detailsTable);
+		
+		getCurrentBierdopjeUser().then(function(user) {
+			$('#username').attr('value', user);
+		});
 
 		$("#fav-import").click(function() {
 			var favImportBtn = $(this);
-			favImportBtn.prop('disabled', true);
-			favImportBtn.attr('value', "Bezig met importeren...");
-			formElement.append(progressBar);
+			var outerProgress = $('<div class="progress"></div>');
+			var progressBar   = $('<div class="progress-bar progress-bar-striped active"></div>');
+			
+			favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
+			outerProgress.append(progressBar);
+			formElement.append(outerProgress);
 			formElement.after(bottomPane);
 
 			var username = $('#username').val();
@@ -90,66 +102,99 @@ $(function() {
 			$("#show-details").click(function() {
 				detailsTable.toggle();
 			});
+			
+			getAllBierdopjeFavouritesByUsername(username).then(function(bdFavouritesPageData) {
+				var bdFavouritesData = $('<div></div>').html(bdFavouritesPageData.responseText);
+				var bdFavouriteLinks = bdFavouritesData.find('.content').find('ul').find('li').find('a');
+				var bdFavouritesLength = bdFavouriteLinks.length;
 
-			GM_xmlhttpRequest({
-				method: "GET",
-				url: "http://www.bierdopje.com/users/" + username + "/shows",
-				onload: function(response) {
-					var div     = $('<div></div>');
-					div.html(response.responseText);
-					var links   = div.find('.content').find('ul').find('li').find('a');
-					var length  = links.length;
-					var current = 1;
+				function getBierdopjeFavourite(index) {
+					return new Promise(function(resolve) {
+						var bdShowName = $(bdFavouriteLinks[index]).text();
+						var bdShowSlug = $(bdFavouriteLinks[index]).attr('href');
+						var bdShowUrl = 'http://www.bierdopje.com/shows';
 
-					links.each(function(i) {
-						GM_xmlhttpRequest({
-							method: "GET",
-							url: "http://www.bierdopje.com" + $(this).attr('href'),
-							onload: function(response) {
-								var showPage = $('<div></div>');
-								showPage.html(response.responseText);
-								var tvdbId = showPage.find('a[href^="http://www.thetvdb.com"]').html();
-								getShowIdByTVDb(tvdbId).success(function (result) {
-									var showId = result.id;
-									var showName = result.name;
-									var showSlug = 'http://www.seriesfeed.com/series/' + result.slug;
+						getBierdopjeShowPageDataByShowSlug(bdShowSlug).then(function(bdFavouritePageData) {
+							var bdFavouriteData = $('<div></div>').html(bdFavouritePageData.responseText);
+							var tvdbId = bdFavouriteData.find('a[href^="http://www.thetvdb.com"]').html();
 
-									addShowFavouriteByShowId(showId).success(function (result) {
-										var status = "-";
+							getSeriesfeedShowDataByTVDBId(tvdbId).success(function(sfShowData) {
+								var showId = sfShowData.id;
+								var showName = sfShowData.name;
+								var sfShowSlug = sfShowData.slug;
+								var sfShowUrl = 'http://www.seriesfeed.com/series/';
 
-										if (showId === -1) {
-											showId = "Onbekend";
-										}
-										
-										if (!showName) {
-											showSlug = 'http://www.bierdopje.com' + $(links[i]).attr('href');
-											showName = $(links[i]).html();
-										}
+								addSeriesfeedFavouriteByShowId(showId).success(function(result) {
+									var resultStatus = result.status;
+									var status = "-";
+									var showUrl = sfShowUrl + sfShowSlug;
+									
+									if (showId === -1) {
+										showId = "Onbekend";
+									}
+									
+									if (!showName) {
+										showUrl = bdShowUrl + bdShowSlug;
+										showName = bdShowName;
+									}
 
-										if (result.status === "success") {
-											status = "Toegevoegd als favoriet.";
-										} else if (result.status === "failed" && showId === "Onbekend") {
-											status = '<a href="http://www.seriesfeed.com/series/voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-										} else {
-											status = "Deze serie kan niet toegevoegd worden. Mogelijk is deze serie al een favoriet.";
-										}
+									if (resultStatus === "success") {
+										status = "Toegevoegd als favoriet.";
+									} else if (resultStatus === "failed" && showId === "Onbekend") {
+										status = '<a href="' + sfShowUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
+									} else {
+										status = "Deze serie kan niet toegevoegd worden. Mogelijk is deze serie al een favoriet.";
+									}
 
-										var item = '<tr><td>' + showId + '</td><td><a href="' + showSlug + '" target="_blank">' + showName + '</a></td><td>' + status + '</td></tr>';
-										favourites.append(item);
+									var item = '<tr><td>' + showId + '</td><td><a href="' + showUrl + '" target="_blank">' + showName + '</a></td><td>' + status + '</td></tr>';
+									favourites.append(item);
 
-										var progress = (current/length) * 100;
-										progressBar.attr('value', Math.round(progress));
+									var progress = (index/bdFavouritesLength) * 100;
+									progressBar.css('width', Math.round(progress) + "%");
 
-										if (current++ === length) {
-											favImportBtn.prop('disabled', false);
-											favImportBtn.attr('value', "Favorieten Importeren");
-											progressBar.replaceWith("Importeren voltooid.");
-										}
-									});
+									resolve();
+								}).error(function(error) {
+									console.log("Could not connect to Seriesfeed to favourite show " + showName + " with id " + showId + ".");
 								});
-							}
+							}).error(function(error) {
+								console.log("Could not connect to Seriesfeed to convert TVDB id " + tvdbId + ".");
+							});
+						}, function(error) {
+							console.log("Could not connect to Bierdopje to get " + bdShowName + ".");
 						});
 					});
+				}
+				
+				Promise.resolve(0).then(function loop(i) {
+					if (i < bdFavouritesLength) {
+						return getBierdopjeFavourite(i).thenReturn(i + 1).then(loop);
+					}
+				}).then(function() {
+					favImportBtn.prop('disabled', false);
+					favImportBtn.attr('value', "Favorieten Importeren");
+					outerProgress.removeClass('progress');
+					progressBar.replaceWith("Importeren voltooid.");
+				}).catch(function(error) {
+					console.log("Unknown error: ", error);
+				});
+			}, function(error) {
+                console.log("Could not connect to Bierdopje to get your favourites.");
+			});
+		});
+	}
+
+	function getCurrentBierdopjeUser() {
+		return new Promise(function(resolve, reject) {
+			GM_xmlhttpRequest({
+				method: "GET",
+				url: "http://www.bierdopje.com/stats",
+				onload: function(bdStatsPageData) {
+					var bdStatsData  = $('<div></div>').html(bdStatsPageData.responseText);
+					var user = bdStatsData.find('#userbox_loggedin').find('h4').html();
+					resolve(user);
+				},
+				onerror: function(error) {
+				    reject(error);
 				}
 			});
 		});
@@ -199,24 +244,47 @@ $(function() {
 
 		return portfolio;
 	}
-
-	function getCurrentUser() {
-		var user = $('.nav .dropdown .dropdown-menu:eq(1) li a').attr('href').replace("/user/", "");
-		user = user.replace("/", "");
-
-		return user;
+	
+	function getAllBierdopjeFavouritesByUsername(username) {
+		return new Promise(function(resolve, reject) {
+			GM_xmlhttpRequest({
+				method: "GET",
+				url: "http://www.bierdopje.com/users/" + username + "/shows",
+				onload: function(response) {
+                    resolve(response);
+				},
+				onerror: function(error) {
+				    reject(error);
+				}
+			});
+		});
+	}
+	
+	function getBierdopjeShowPageDataByShowSlug(showSlug) {
+		return new Promise(function(resolve, reject) {
+			GM_xmlhttpRequest({
+				method: "GET",
+				url: "http://www.bierdopje.com" + showSlug,
+				onload: function(response) {
+                    resolve(response);
+				},
+				onerror: function(error) {
+				    reject(error);
+				}
+			});
+		});
 	}
 
-	function getShowIdByTVDb(tvdbId){
+	function getSeriesfeedShowDataByTVDBId(tvdbId) {
 		return $.ajax({
 			type: "POST",
 			url: "/ajax.php?action=getShowId",
-			data: {tvdb_id: tvdbId},
+			data: { tvdb_id: tvdbId },
 			dataType: "json"
 		});
 	}
 
-	function addShowFavouriteByShowId(showId) {
+	function addSeriesfeedFavouriteByShowId(showId) {
 		return $.ajax({
 			type: "POST",
 			url: "/ajax.php?action=updateFavourite",
@@ -228,4 +296,10 @@ $(function() {
 			dataType: "json"
 		});
 	}
+
+	Promise.prototype.thenReturn = function(value) {
+		return this.then(function() {
+			return value; 
+		});
+	};
 });

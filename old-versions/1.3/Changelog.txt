@@ -1,12 +1,5 @@
 Seriesfeed Importer Changelog
 
-Version 2.0 (14 April 2016)
-Synchronously adding favourites instead of mass-requesting favourites (fixes sudden freeze).
-Replaced HTML5 progress-bar with Bootstrap's version.
-Fixed table-jumping by introducing colgroup.
-Auto-get Bierdopje username.
-Rewritten a lot of code.
-
 Version 1.3 (10 April 2016)
 Namechange: Seriesfeed Import -> Seriesfeed Importer.
 Fixed: Unknown series results in empty series name.

@@ -1,8 +1,5 @@
 Seriesfeed Importer Changelog
 
-Version 2.1 (17 April 2016)
-Created a queueing type of requesting mechanism.
-
 Version 2.0 (14 April 2016)
 Synchronously adding favourites instead of mass-requesting favourites (fixes sudden freeze).
 Replaced HTML5 progress-bar with Bootstrap's version.

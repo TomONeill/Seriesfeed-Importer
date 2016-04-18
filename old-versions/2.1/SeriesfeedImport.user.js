@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Seriesfeed Importer
 // @namespace    http://www.seriesfeed.com
-// @version      2.1.1
+// @version      2.1
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @match        http://*.seriesfeed.com/*
 // @run-at       document-start
@@ -162,7 +162,7 @@ $(function() {
 					});
 				}
 				
-				var MAX_ASYNC_CALLS = 5;
+				var MAX_ASYNC_CALLS = 20;
 				var current_async_calls = 0;
 
 				Promise.resolve(1).then(function loop(i) {

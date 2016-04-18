@@ -1,8 +1,5 @@
 Seriesfeed Importer Changelog
 
-Version 2.1.1 (18 April 2016)
-Eased down the queueing mechanism.
-
 Version 2.1 (17 April 2016)
 Created a queueing type of requesting mechanism.
 

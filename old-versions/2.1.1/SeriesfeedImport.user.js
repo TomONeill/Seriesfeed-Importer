@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Seriesfeed Importer
 // @namespace    http://www.seriesfeed.com
-// @version      2.2
+// @version      2.1.1
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @match        http://*.seriesfeed.com/*
 // @run-at       document-start
@@ -53,18 +53,6 @@ $(function() {
 		        + '    '
 		        + '    .progress-bar {'
                 + '        background: #447C6F;'
-		        + '    }'
-                + '    '
-		        + '    tr.row-error {'
-		        + '        background-color: rgba(255, 0, 0, 0.15);'
-		        + '    }'
-                + '    '
-		        + '    tr.row-warning {'
-		        + '        background-color: rgba(255, 231, 150, 0.43);'
-		        + '    }'
-                + '    '
-		        + '    tr.row-info {'
-		        + '        background-color: rgba(240, 248, 255, 1.00);'
 		        + '    }'
 		        + '</style>';
 		$('body').append(css);
@@ -135,7 +123,6 @@ $(function() {
 
 								addSeriesfeedFavouriteByShowId(sfSeriesId).success(function(result) {
 									var resultStatus = result.status;
-									var item = "<tr></tr>";
 									var status = "-";
 									var showUrl = sfSeriesUrl + sfSeriesSlug;
 									
@@ -150,15 +137,13 @@ $(function() {
 
 									if (resultStatus === "success") {
 										status = "Toegevoegd als favoriet.";
-										item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
 									} else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
 										status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-										item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
 									} else {
-										status = "Deze serie is mogelijk al een favoriet en is dus ongewijzigd.";
-										item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+										status = "Deze serie kan niet toegevoegd worden. Mogelijk is deze serie al een favoriet.";
 									}
-									
+
+									var item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
 									favourites.append(item);
 
 									var progress = (index/bdFavouritesLength) * 100;
@@ -167,41 +152,17 @@ $(function() {
 									resolve();
 								}).error(function(error) {
 									console.log("Could not connect to Seriesfeed to favourite series " + sfSeriesName + " with id " + sfSeriesId + ".");
-									var status = "Kon deze serie niet als favoriet instellen.";
-									var item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-									favourites.append(item);
-
-									var progress = (index/bdFavouritesLength) * 100;
-									progressBar.css('width', Math.round(progress) + "%");
-									
-									resolve();
 								});
 							}).error(function(error) {
 								console.log("Could not connect to Seriesfeed to convert TVDB id " + tvdbId + ".");
-								var status = 'Kon geen verbinding met Seriesfeed maken om het id op te halen.</a>';
-								var item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-								favourites.append(item);
-
-								var progress = (index/bdFavouritesLength) * 100;
-								progressBar.css('width', Math.round(progress) + "%");
-
-								resolve();
 							});
 						}, function(error) {
 							console.log("Could not connect to Bierdopje to get the TVDB of " + bdShowName + ".");
-							var status = 'Deze serie kan niet gevonden worden op Bierdopje.';
-							var item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-							favourites.append(item);
-
-							var progress = (index/bdFavouritesLength) * 100;
-							progressBar.css('width', Math.round(progress) + "%");
-
-							resolve();
 						});
 					});
 				}
 				
-				var MAX_ASYNC_CALLS = 3;
+				var MAX_ASYNC_CALLS = 5;
 				var current_async_calls = 0;
 
 				Promise.resolve(1).then(function loop(i) {
@@ -238,7 +199,6 @@ $(function() {
 				});
 			}, function(error) {
                 console.log("Could not connect to Bierdopje to get your favourites.");
-				window.alert('Kan geen favorieten vinden voor ' + username + '. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.');
 			});
 		});
 	}

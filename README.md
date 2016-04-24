@@ -11,7 +11,7 @@ Your username will be filled in automatically if you are logged onto Bierdopje.c
 
 # Screenshots
 <img src="https://raw.githubusercontent.com/TomONeill/Seriesfeed-Importer/master/Screenshots/v1.1-1.png" alt="Version 2.2" width="250px" />
-![Version 2.2](https://raw.githubusercontent.com/TomONeill/Seriesfeed-Importer/master/Screenshots/v2.0-2.png "Version 2.2")
+<img src="https://raw.githubusercontent.com/TomONeill/Seriesfeed-Importer/master/Screenshots/v2.0-2.png" alt="Version 2.2" width="250px" />
 
 # Changelog
 <A HREF="https://raw.githubusercontent.com/TomONeill/Seriesfeed-Importer/master/Changelog.txt">View changelog</A>

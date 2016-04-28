@@ -21,6 +21,7 @@ Check out other userscripts for Seriesfeed by me:<BR/>
 <ul>
     <li><A HREF="https://github.com/TomONeill/Seriesfeed-Import-Time-Wasted">Import Time Wasted</A></li>
     <li><A HREF="https://github.com/TomONeill/Seriesfeed-Move">Move cards on frontpage</A></li>
+    <li><A HREF="https://github.com/TomONeill/Seriesfeed-Season-Separator">Season Separator</A></li>
 </ul>
 
 # About userscripts

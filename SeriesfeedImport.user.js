@@ -3,6 +3,7 @@
 // @namespace    http://www.seriesfeed.com
 // @version      2.2
 // @description  Allows you to import your favourites from Bierdopje.com.
+// @updateURL 	 https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js
 // @match        http://*.seriesfeed.com/*
 // @run-at       document-start
 // @grant        unsafeWindow

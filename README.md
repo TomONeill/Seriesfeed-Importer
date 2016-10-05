@@ -5,6 +5,8 @@ Enjoy.
 <BR/><BR/>
 Version <strong>2.2</strong>
 
+<A HREF="https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js">INSTALL</A>
+
 # Information
 With this userscript, you can import your favourites from Bierdopje.com to Seriesfeed.com.<BR />
 Your username will be filled in automatically if you are logged onto Bierdopje.com. You can use any username you like, however. After clicking the Import button, your favourites are being imported into Seriesfeed. In the Details table, rows are being given a colour if there is something about that series. Blue rows will indicate you most likely already have that series as a favourite on Seriesfeed. Yellow ones indicate the series does not exist on Seriesfeed yet and red ones indicate that an error has happened while connecting Bierdopje or Seriesfeed. You can always try again to see if it works the second time.

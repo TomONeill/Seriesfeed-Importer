@@ -1,0 +1,8 @@
+{
+  "name": "Seriesfeed Importer",
+  "resolution": "src/typings",
+  "globalDependencies": {
+    "jquery": "github:DefinitelyTyped/DefinitelyTyped/jquery/index.d.ts",
+    "greasemonkey": "github:DefinitelyTyped/DefinitelyTyped/greasemonkey/index.d.ts"
+  }
+}

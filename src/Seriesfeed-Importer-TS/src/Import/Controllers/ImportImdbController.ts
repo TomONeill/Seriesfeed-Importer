@@ -5,6 +5,7 @@ module SeriesfeedImporter.Controllers {
         private _userId: string;
         private _username: string;
         private _selectedLists: any[];
+        private _selectedSeries: any[];
         
         private col: JQuery;
         private head: JQuery;
@@ -16,6 +17,7 @@ module SeriesfeedImporter.Controllers {
 
         constructor() {
             this._selectedLists = [];
+            this._selectedSeries = [];
 
             this.initialise();
         }
@@ -90,7 +92,7 @@ module SeriesfeedImporter.Controllers {
                 'min-height': '425px'
             });
 
-            var steps = this.stepFactory(3);
+            var steps = this.stepFactory(4);
 
             var importLink = $(document.createElement("a")).attr("href", "/series/import/");
             var imdbLink = $(document.createElement("a")).attr("href", "http://www.imdb.com/").attr("target", "_blank");
@@ -102,11 +104,14 @@ module SeriesfeedImporter.Controllers {
             this.head.append(" - ");
             this.head.append(imdbLink);
 
-            this.col.replaceWith(this.head);
+            //this.col.replaceWith(this.head);
+            this.col.html(<any>this.head);
             this.head.after(steps);
             this.col.after(this.cardHolder);
-            this.cardHolder.replaceWith(this.card);
-            this.card.replaceWith(this.content);
+            //this.cardHolder.replaceWith(this.card);
+            this.cardHolder.html(<any>this.card);
+            //this.card.replaceWith(this.content);
+            this.card.html(<any>this.content);
 
             this.stepOne();
         }
@@ -123,7 +128,8 @@ module SeriesfeedImporter.Controllers {
 
             this.stepTitle.html(titleCardText);
             this.stepcontent.html(innerCardText);
-            this.content.replaceWith(this.stepTitle);
+            //this.content.replaceWith(this.stepTitle);
+            this.content.html(<any>this.stepTitle);
             this.stepTitle.after(this.stepcontent);
             this.stepcontent.after(userProfile);
 
@@ -144,7 +150,8 @@ module SeriesfeedImporter.Controllers {
                             }
 
                             const profile = this.userFactory(this._username, avatarUrl);
-                            userProfile.replaceWith(profile);
+                            //userProfile.replaceWith(profile);
+                            userProfile.html(<any>profile);
 
                             if (userProfile.find(".user-name").html() !== login) {
                                 const nextStep = this.nextStepFactory("Doorgaan", "step-2");
@@ -170,7 +177,8 @@ module SeriesfeedImporter.Controllers {
 
             this.stepTitle.html(titleCardText);
             this.stepcontent.html(innerCardText);
-            this.content.replaceWith(this.stepTitle);
+            //this.content.replaceWith(this.stepTitle);
+            this.content.html(<any>this.stepTitle);
 
             var listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
             var checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
@@ -179,7 +187,8 @@ module SeriesfeedImporter.Controllers {
 
             this.stepTitle.html(titleCardText);
             this.stepcontent.html(innerCardText);
-            this.content.replaceWith(this.stepTitle);
+            //this.content.replaceWith(this.stepTitle);
+            this.content.html(<any>this.stepTitle);
             this.stepTitle.after(this.stepcontent);
 
             this.stepcontent.after(loadingData);
@@ -198,7 +207,8 @@ module SeriesfeedImporter.Controllers {
                         tableHeader.after(item);
                     });
 
-                    loadingData.replaceWith(listsTable);
+                    //loadingData.replaceWith(listsTable);
+                    loadingData.html(<any>listsTable);
 
                     const nextStep = this.nextStepFactory("Doorgaan", "step-3");
                     nextStep.hide();
@@ -244,7 +254,8 @@ module SeriesfeedImporter.Controllers {
 
             this.stepTitle.html(titleCardText);
             this.stepcontent.html(innerCardText);
-            this.content.replaceWith(this.stepTitle);
+            //this.content.replaceWith(this.stepTitle);
+            this.content.html(<any>this.stepTitle);
 
             const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
             const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
@@ -253,7 +264,8 @@ module SeriesfeedImporter.Controllers {
 
             this.stepTitle.html(titleCardText);
             this.stepcontent.html(innerCardText);
-            this.content.replaceWith(this.stepTitle);
+            //this.content.replaceWith(this.stepTitle);
+            this.content.html(<any>this.stepTitle);
             this.stepTitle.after(this.stepcontent);
 
             this.stepcontent.after(loadingData);
@@ -286,10 +298,49 @@ module SeriesfeedImporter.Controllers {
                             const progress = (index / (this._selectedLists.length - 1)) * 100;
                             progressBar.css('width', Math.round(progress) + "%");
                         });
+
+                        //loadingData.replaceWith(listsTable);
+                        loadingData.html(<any>listsTable);
                     });
             });
 
-            loadingData.replaceWith(listsTable);
+            const nextStep = this.nextStepFactory("Importeren", "step-4");
+            nextStep.hide();
+            listsTable.append(nextStep);
+
+            $('.checkbox-label').on('click', (event) => {
+                const checkbox = $(event.currentTarget).find(".check");
+
+                if (!checkbox.hasClass("checked")) {
+                    const seriesItem = {
+                        id: checkbox.data("series-id"),
+                        name: checkbox.data("series-name"),
+                        url: checkbox.data("series-url")
+                    };
+
+                    this._selectedSeries.push(seriesItem);
+
+                    checkbox.addClass("checked");
+                } else {
+                    const pos = this._selectedSeries.map((list: any) => list.id).indexOf(checkbox.data("series-id"));
+                    this._selectedSeries.splice(pos, 1);
+                    checkbox.removeClass("checked");
+                }
+
+                if (this._selectedSeries.length > 0) {
+                    nextStep.show();
+                } else {
+                    nextStep.hide();
+                }
+            });
+
+            $("#step-4").on('click', () => this.stepFour());
+        }
+
+        private stepFour(): void {
+            this.selectStep(4);
+
+            console.log(this._selectedSeries);
         }
 
         private stepFactory(steps: number): JQuery {

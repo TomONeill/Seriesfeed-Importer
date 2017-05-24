@@ -261,6 +261,7 @@ var SeriesfeedImporter;
         class ImportImdbController {
             constructor() {
                 this._selectedLists = [];
+                this._selectedSeries = [];
                 this.initialise();
             }
             initialise() {
@@ -329,7 +330,7 @@ var SeriesfeedImporter;
                 this.content.css({
                     'min-height': '425px'
                 });
-                var steps = this.stepFactory(3);
+                var steps = this.stepFactory(4);
                 var importLink = $(document.createElement("a")).attr("href", "/series/import/");
                 var imdbLink = $(document.createElement("a")).attr("href", "http://www.imdb.com/").attr("target", "_blank");
                 importLink.append("Favorieten importeren");
@@ -337,11 +338,14 @@ var SeriesfeedImporter;
                 this.head.append(importLink);
                 this.head.append(" - ");
                 this.head.append(imdbLink);
-                this.col.replaceWith(this.head);
+                //this.col.replaceWith(this.head);
+                this.col.html(this.head);
                 this.head.after(steps);
                 this.col.after(this.cardHolder);
-                this.cardHolder.replaceWith(this.card);
-                this.card.replaceWith(this.content);
+                //this.cardHolder.replaceWith(this.card);
+                this.cardHolder.html(this.card);
+                //this.card.replaceWith(this.content);
+                this.card.html(this.content);
                 this.stepOne();
             }
             stepOne() {
@@ -354,7 +358,8 @@ var SeriesfeedImporter;
                 var userProfile = this.userFactory("Laden...", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg");
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                this.content.replaceWith(this.stepTitle);
+                //this.content.replaceWith(this.stepTitle);
+                this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepcontent);
                 this.stepcontent.after(userProfile);
                 SeriesfeedImporter.Services.ImdbService.getUser()
@@ -371,7 +376,8 @@ var SeriesfeedImporter;
                             this._username = login;
                         }
                         const profile = this.userFactory(this._username, avatarUrl);
-                        userProfile.replaceWith(profile);
+                        //userProfile.replaceWith(profile);
+                        userProfile.html(profile);
                         if (userProfile.find(".user-name").html() !== login) {
                             const nextStep = this.nextStepFactory("Doorgaan", "step-2");
                             userProfile.after(nextStep);
@@ -392,14 +398,16 @@ var SeriesfeedImporter;
                 var innerCardText = 'Vink de lijsten aan met series die je als favoriet wilt toevoegen.';
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                this.content.replaceWith(this.stepTitle);
+                //this.content.replaceWith(this.stepTitle);
+                this.content.html(this.stepTitle);
                 var listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
                 var checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
                 var tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
                 var loadingData = $('<div><h4 style="margin-bottom: 15px;">Lijsten ophalen...</h4></div>');
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                this.content.replaceWith(this.stepTitle);
+                //this.content.replaceWith(this.stepTitle);
+                this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepcontent);
                 this.stepcontent.after(loadingData);
                 listsTable.append(tableHeader);
@@ -413,7 +421,8 @@ var SeriesfeedImporter;
                         const item = '<tr><td>' + checkbox + '</td><td><a href="' + listUrl + '" target="_blank">' + listName + '</a></td></tr>';
                         tableHeader.after(item);
                     });
-                    loadingData.replaceWith(listsTable);
+                    //loadingData.replaceWith(listsTable);
+                    loadingData.html(listsTable);
                     const nextStep = this.nextStepFactory("Doorgaan", "step-3");
                     nextStep.hide();
                     listsTable.append(nextStep);
@@ -450,14 +459,16 @@ var SeriesfeedImporter;
                 const innerCardText = 'Vink de series aan die je als favoriet wilt toevoegen.';
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                this.content.replaceWith(this.stepTitle);
+                //this.content.replaceWith(this.stepTitle);
+                this.content.html(this.stepTitle);
                 const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
                 const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
                 const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Serie</th><th>Type</th><th>Lijst</th></tr>');
                 const loadingData = $('<div><h4 style="margin-bottom: 15px;">Series ophalen...</h4></div>');
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                this.content.replaceWith(this.stepTitle);
+                //this.content.replaceWith(this.stepTitle);
+                this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepcontent);
                 this.stepcontent.after(loadingData);
                 listsTable.append(tableHeader);
@@ -485,9 +496,41 @@ var SeriesfeedImporter;
                             const progress = (index / (this._selectedLists.length - 1)) * 100;
                             progressBar.css('width', Math.round(progress) + "%");
                         });
+                        //loadingData.replaceWith(listsTable);
+                        loadingData.html(listsTable);
                     });
                 });
-                loadingData.replaceWith(listsTable);
+                const nextStep = this.nextStepFactory("Importeren", "step-4");
+                nextStep.hide();
+                listsTable.append(nextStep);
+                $('.checkbox-label').on('click', (event) => {
+                    const checkbox = $(event.currentTarget).find(".check");
+                    if (!checkbox.hasClass("checked")) {
+                        const seriesItem = {
+                            id: checkbox.data("series-id"),
+                            name: checkbox.data("series-name"),
+                            url: checkbox.data("series-url")
+                        };
+                        this._selectedSeries.push(seriesItem);
+                        checkbox.addClass("checked");
+                    }
+                    else {
+                        const pos = this._selectedSeries.map((list) => list.id).indexOf(checkbox.data("series-id"));
+                        this._selectedSeries.splice(pos, 1);
+                        checkbox.removeClass("checked");
+                    }
+                    if (this._selectedSeries.length > 0) {
+                        nextStep.show();
+                    }
+                    else {
+                        nextStep.hide();
+                    }
+                });
+                $("#step-4").on('click', () => this.stepFour());
+            }
+            stepFour() {
+                this.selectStep(4);
+                console.log(this._selectedSeries);
             }
             stepFactory(steps) {
                 const stepList = $('<div></div>');

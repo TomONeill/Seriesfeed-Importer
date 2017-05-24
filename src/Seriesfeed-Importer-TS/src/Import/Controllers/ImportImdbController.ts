@@ -6,7 +6,7 @@ module SeriesfeedImporter.Controllers {
         private _username: string;
         private _selectedLists: any[];
         private _selectedSeries: any[];
-        
+
         private col: JQuery;
         private head: JQuery;
         private cardHolder: JQuery;
@@ -301,40 +301,42 @@ module SeriesfeedImporter.Controllers {
 
                         //loadingData.replaceWith(listsTable);
                         loadingData.html(<any>listsTable);
+
+                        const nextStep = this.nextStepFactory("Importeren", "step-4");
+                        nextStep.hide();
+                        listsTable.append(nextStep);
+
+                        $('#select-all').on('click', () => this.toggleAllCheckboxes());
+
+                        $('.checkbox-label').on('click', (event) => {
+                            const checkbox = $(event.currentTarget).find(".check");
+
+                            if (!checkbox.hasClass("checked")) {
+                                const seriesItem = {
+                                    id: checkbox.data("series-id"),
+                                    name: checkbox.data("series-name"),
+                                    url: checkbox.data("series-url")
+                                };
+
+                                this._selectedSeries.push(seriesItem);
+
+                                checkbox.addClass("checked");
+                            } else {
+                                const pos = this._selectedSeries.map((list: any) => list.id).indexOf(checkbox.data("series-id"));
+                                this._selectedSeries.splice(pos, 1);
+                                checkbox.removeClass("checked");
+                            }
+
+                            if (this._selectedSeries.length > 0) {
+                                nextStep.show();
+                            } else {
+                                nextStep.hide();
+                            }
+                        });
+
+                        $("#step-4").on('click', () => this.stepFour());
                     });
             });
-
-            const nextStep = this.nextStepFactory("Importeren", "step-4");
-            nextStep.hide();
-            listsTable.append(nextStep);
-
-            $('.checkbox-label').on('click', (event) => {
-                const checkbox = $(event.currentTarget).find(".check");
-
-                if (!checkbox.hasClass("checked")) {
-                    const seriesItem = {
-                        id: checkbox.data("series-id"),
-                        name: checkbox.data("series-name"),
-                        url: checkbox.data("series-url")
-                    };
-
-                    this._selectedSeries.push(seriesItem);
-
-                    checkbox.addClass("checked");
-                } else {
-                    const pos = this._selectedSeries.map((list: any) => list.id).indexOf(checkbox.data("series-id"));
-                    this._selectedSeries.splice(pos, 1);
-                    checkbox.removeClass("checked");
-                }
-
-                if (this._selectedSeries.length > 0) {
-                    nextStep.show();
-                } else {
-                    nextStep.hide();
-                }
-            });
-
-            $("#step-4").on('click', () => this.stepFour());
         }
 
         private stepFour(): void {

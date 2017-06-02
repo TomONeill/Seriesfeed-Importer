@@ -3,6 +3,7 @@
     "module": "none",
     "noImplicitAny": true,
     "target": "es6",
-    "outFile": "./SeriesfeedImport.user.js"
+    "outFile": "./SeriesfeedImport.user.js",
+    "removeComments": true
   }
 }

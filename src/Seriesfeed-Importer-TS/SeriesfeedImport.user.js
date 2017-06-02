@@ -1,4 +1,3 @@
-/// <reference path="./typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     class App {
@@ -14,7 +13,6 @@ var SeriesfeedImporter;
     }
     App.main();
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Config;
@@ -23,7 +21,6 @@ var SeriesfeedImporter;
         Config.MaxAsyncCalls = 3;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -223,7 +220,6 @@ var SeriesfeedImporter;
         Controllers.ImportBierdopjeController = ImportBierdopjeController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -253,7 +249,6 @@ var SeriesfeedImporter;
         Controllers.ImportController = ImportController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -338,13 +333,10 @@ var SeriesfeedImporter;
                 this.head.append(importLink);
                 this.head.append(" - ");
                 this.head.append(imdbLink);
-                //this.col.replaceWith(this.head);
                 this.col.html(this.head);
                 this.head.after(steps);
                 this.col.after(this.cardHolder);
-                //this.cardHolder.replaceWith(this.card);
                 this.cardHolder.html(this.card);
-                //this.card.replaceWith(this.content);
                 this.card.html(this.content);
                 this.stepOne();
             }
@@ -358,7 +350,6 @@ var SeriesfeedImporter;
                 var userProfile = this.userFactory("Laden...", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg");
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                //this.content.replaceWith(this.stepTitle);
                 this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepcontent);
                 this.stepcontent.after(userProfile);
@@ -376,7 +367,6 @@ var SeriesfeedImporter;
                             this._username = login;
                         }
                         const profile = this.userFactory(this._username, avatarUrl);
-                        //userProfile.replaceWith(profile);
                         userProfile.html(profile);
                         if (userProfile.find(".user-name").html() !== login) {
                             const nextStep = this.nextStepFactory("Doorgaan", "step-2");
@@ -398,7 +388,6 @@ var SeriesfeedImporter;
                 var innerCardText = 'Vink de lijsten aan met series die je als favoriet wilt toevoegen.';
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                //this.content.replaceWith(this.stepTitle);
                 this.content.html(this.stepTitle);
                 var listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
                 var checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
@@ -406,7 +395,6 @@ var SeriesfeedImporter;
                 var loadingData = $('<div><h4 style="margin-bottom: 15px;">Lijsten ophalen...</h4></div>');
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                //this.content.replaceWith(this.stepTitle);
                 this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepcontent);
                 this.stepcontent.after(loadingData);
@@ -421,7 +409,6 @@ var SeriesfeedImporter;
                         const item = '<tr><td>' + checkbox + '</td><td><a href="' + listUrl + '" target="_blank">' + listName + '</a></td></tr>';
                         tableHeader.after(item);
                     });
-                    //loadingData.replaceWith(listsTable);
                     loadingData.html(listsTable);
                     const nextStep = this.nextStepFactory("Doorgaan", "step-3");
                     nextStep.hide();
@@ -459,7 +446,6 @@ var SeriesfeedImporter;
                 const innerCardText = 'Vink de series aan die je als favoriet wilt toevoegen.';
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                //this.content.replaceWith(this.stepTitle);
                 this.content.html(this.stepTitle);
                 const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
                 const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
@@ -467,7 +453,6 @@ var SeriesfeedImporter;
                 const loadingData = $('<div><h4 style="margin-bottom: 15px;">Series ophalen...</h4></div>');
                 this.stepTitle.html(titleCardText);
                 this.stepcontent.html(innerCardText);
-                //this.content.replaceWith(this.stepTitle);
                 this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepcontent);
                 this.stepcontent.after(loadingData);
@@ -496,7 +481,6 @@ var SeriesfeedImporter;
                             const progress = (index / (this._selectedLists.length - 1)) * 100;
                             progressBar.css('width', Math.round(progress) + "%");
                         });
-                        //loadingData.replaceWith(listsTable);
                         loadingData.html(listsTable);
                         const nextStep = this.nextStepFactory("Importeren", "step-4");
                         nextStep.hide();
@@ -604,7 +588,6 @@ var SeriesfeedImporter;
         Controllers.ImportImdbController = ImportImdbController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -647,7 +630,6 @@ var SeriesfeedImporter;
         Services.BierdopjeService = BierdopjeService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -703,7 +685,6 @@ var SeriesfeedImporter;
         Services.ImdbService = ImdbService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -730,7 +711,6 @@ var SeriesfeedImporter;
         Services.SeriesfeedService = SeriesfeedService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -743,7 +723,6 @@ var SeriesfeedImporter;
         Controllers.NavigationController = NavigationController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -757,7 +736,6 @@ var SeriesfeedImporter;
         Services.NavigationService = NavigationService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -778,7 +756,6 @@ var SeriesfeedImporter;
         Controllers.RoutingController = RoutingController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -792,7 +769,6 @@ var SeriesfeedImporter;
         })(NavigationType = Enums.NavigationType || (Enums.NavigationType = {}));
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -804,7 +780,6 @@ var SeriesfeedImporter;
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -816,7 +791,6 @@ var SeriesfeedImporter;
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -854,14 +828,12 @@ var SeriesfeedImporter;
         Services.AjaxService = AjaxService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class PlatformService {
             static create(name, image, imageSize, url, colour) {
-                // Element declaration
                 var portfolio = $(document.createElement("div"));
                 var a = $(document.createElement("a"));
                 var wrapper = $(document.createElement("div"));
@@ -870,13 +842,11 @@ var SeriesfeedImporter;
                 var info = $(document.createElement("div"));
                 var title = $(document.createElement("div"));
                 var h4 = $(document.createElement("h4"));
-                // Adding classes
                 portfolio.addClass("portfolio mix_all");
                 wrapper.addClass("portfolio-wrapper cardStyle");
                 hover.addClass("portfolio-hover");
                 info.addClass("portfolio-info");
                 title.addClass("portfolio-title");
-                // Styling
                 portfolio.css({
                     'display': 'inline-block',
                     'width': '100%'
@@ -888,11 +858,9 @@ var SeriesfeedImporter;
                 img.css({
                     'max-width': imageSize
                 });
-                // Data binding
                 a.attr('href', url);
                 img.attr('src', image).attr('alt', name);
                 h4.append(name);
-                // Element binding
                 portfolio.append(a);
                 a.append(wrapper);
                 wrapper.append(hover);

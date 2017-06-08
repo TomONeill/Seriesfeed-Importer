@@ -430,7 +430,9 @@ module SeriesfeedImporter.Controllers {
         }
 
         private toggleAllCheckboxes(): void {
-            $('.check').each((i, checkbox) => $(checkbox).click());
+            $('.check').each((i, checkbox) => {
+                $(checkbox).click();
+            });
         }
     }
 }

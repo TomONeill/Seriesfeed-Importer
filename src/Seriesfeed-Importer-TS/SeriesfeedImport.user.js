@@ -582,7 +582,9 @@ var SeriesfeedImporter;
                 return div;
             }
             toggleAllCheckboxes() {
-                $('.check').each((i, checkbox) => $(checkbox).click());
+                $('.check').each((i, checkbox) => {
+                    $(checkbox).click();
+                });
             }
         }
         Controllers.ImportImdbController = ImportImdbController;

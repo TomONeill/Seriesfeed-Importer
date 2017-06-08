@@ -33,7 +33,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        public static getSeriesByListUrl(listUrl: string): Promise<JQuery> {
+        public static getSeriesByListUrl(listUrl: string): Promise<any[]> {
             const url = listUrl + "?view=compact";
 
             return Services.AjaxService.get(url)

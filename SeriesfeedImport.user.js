@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Seriesfeed Importer
-// @namespace    http://www.seriesfeed.com
-// @version      2.2
+// @namespace    https://www.seriesfeed.com
+// @version      2.3
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @updateURL 	 https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js
-// @match        http://*.seriesfeed.com/*
+// @match        https://*.seriesfeed.com/*
 // @run-at       document-start
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
@@ -20,31 +20,37 @@
 
 $(function() {
 	// Add menu item to navigator.
-	$('.nav .dropdown .dropdown-menu:eq(2)').append('<li><a href="/series/import/">Importeren</a></li>');
+	$('<li><a href="/series/import/">Importeren</a></li>').insertAfter($('li > a[href="/series/suggest"]').parent());
 
-	if (window.location.href === "http://www.seriesfeed.com/series/import/") {
-		var wrapper    = $('.wrapper').addClass('bg').removeClass('show padding');
-		var container  = $('.wrapper .container').html('').addClass("content");
+	if (window.location.href === "https://www.seriesfeed.com/series/import/") {
+		var wrapper    = $('<div></div>').addClass('wrapper dashboard bg');
+		var container  = $('<div></div>').addClass("container content");
 		var selector   = $(document.createElement("div")).addClass("platformSelector");
-		var card       = $(document.createElement("div")).addClass("wow fadeInUp cardStyle cardForm formBlock animated");
+		var card       = $(document.createElement("div")).addClass("cardStyle cardForm formBlock");
 		var importHead = $(document.createElement("h2")).append('Series importeren');
 		var cardInner  = $(document.createElement("div")).addClass("cardFormInner");
 		var platform   = $(document.createElement("p")).append('Kies een platform:');
 
+		$('.contentWrapper > div.container').replaceWith(wrapper);
+		wrapper.append(container);
 		container.append(selector);
 		selector.append(card);
 		card.append(importHead);
 		card.append(cardInner);
 		cardInner.append(platform);
 
-		var bierdopje = platformFactory("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "bierdopje/", "#3399FE");
+		var bierdopje = platformFactory("Bierdopje.com", "https://cdn.bierdopje.eu/g/layout/bierdopje.png", "bierdopje/", "#3399FE");
 		bierdopje.addClass('wow fadeInLeft cardStyle cardForm formBlock animated');
 		platform.after(bierdopje);
 	}
 
-	if (window.location.href === "http://www.seriesfeed.com/series/import/bierdopje/") {
-		var head = $('.col-md-12 h1').html('');
-		var p    = $('.col-md-12 p').html('');
+	if (window.location.href === "https://www.seriesfeed.com/series/import/bierdopje/") {
+		var wrapper    = $('<div></div>').addClass('wrapper dashboard bg');
+		var container  = $('<div></div>').addClass("container content");
+		$('.contentWrapper > div.container').replaceWith(wrapper);
+		var head = $('<h1>Series importeren - Bierdopje.com</h1>');
+		var p    = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
+		container.append(head);
 		
 		var css = '<style>'
 		        + '    .progress {'
@@ -70,7 +76,7 @@ $(function() {
 		        + '</style>';
 		$('body').append(css);
 
-		var formElement   = $(document.createElement("div"));
+		var formElement   = $('<div></div>');
 		var usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
 		var submitInput   = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
 		var bottomPane    = $('<div class="blog-left"></div>');
@@ -79,21 +85,22 @@ $(function() {
 		var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
 		var showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
 		
-		formElement.addClass('blog-left wow fadeInUp cardStyle cardForm formBlock animated');
-		bottomPane.addClass('wow fadeInLeft cardStyle animated');
-		detailsTable.addClass('wow fadeInLeft cardStyle animated');
+		container.append(formElement);
+		formElement.addClass('blog-left cardStyle cardForm formBlock');
+		bottomPane.addClass('cardStyle');
+		detailsTable.addClass('cardStyle');
 		formElement.css('padding', '10px');
-
-		head.append('Series importeren - Bierdopje.com');
-		p.append('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
 
 		formElement.append(usernameInput);
 		formElement.append(submitInput);
-		p.after(formElement);
 		detailsTable.append(colGroup);
 		detailsTable.append(detailsHeader);
 		bottomPane.append(showDetails);
 		showDetails.append(detailsTable);
+		
+		container.append(p);
+		wrapper.append(container);
+
 		
 		getCurrentBierdopjeUsername().then(function(username) {
 			$('#username').attr('value', username);
@@ -341,8 +348,11 @@ $(function() {
 	function getSeriesfeedShowDataByTVDBId(tvdbId) {
 		return $.ajax({
 			type: "POST",
-			url: "/ajax.php?action=getShowId",
-			data: { tvdb_id: tvdbId },
+			url: "/ajax/serie/find-by", // we should use SeriesFeed.ajaxEndPoints.getEndPoint('ajax.serie.find.by'); instead if available
+			data: {
+				type: 'tvdb_id',
+				data: tvdbId
+			},
 			dataType: "json"
 		});
 	}
@@ -350,7 +360,7 @@ $(function() {
 	function addSeriesfeedFavouriteByShowId(showId) {
 		return $.ajax({
 			type: "POST",
-			url: "/ajax.php?action=updateFavourite",
+			url: "/ajax/serie/favourite", // we should use SeriesFeed.ajaxEndPoints.getEndPoint('ajax.serie.favourite'); instead if available
 			data: {
 				series: showId,
 				type: 'favourite',

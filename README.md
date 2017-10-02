@@ -3,7 +3,7 @@ Import your favourites from other sites like Bierdopje.com to Seriesfeed.com
 <BR/>
 Enjoy.
 <BR/><BR/>
-Version <strong>2.2</strong>
+Version <strong>2.3</strong>
 
 <A HREF="https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js">INSTALL</A>
 

@@ -1,5 +1,8 @@
 Seriesfeed Importer Changelog
 
+Version 2.3 (2 October 2017)
+Added compatibility for Seriesfeed v2.5.
+
 Version 2.2 (20 April 2016)
 Added colours to identify the status of a request.
 Improved error handling which should fix the freezing bug.

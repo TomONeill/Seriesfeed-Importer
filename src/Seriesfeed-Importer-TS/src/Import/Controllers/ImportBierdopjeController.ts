@@ -3,64 +3,62 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
-            var head = $('.col-md-12 h1').html('');
-            var p = $('.col-md-12 p').html('');
-
-            var css = '<style>'
-                + '    .progress {'
-                + '        margin-top: 10px;'
-                + '        margin-bottom: 0px;'
-                + '    }'
-                + '    '
-                + '    .progress-bar {'
-                + '        background: #447C6F;'
-                + '    }'
-                + '    '
-                + '    tr.row-error {'
-                + '        background-color: rgba(255, 0, 0, 0.15);'
-                + '    }'
-                + '    '
-                + '    tr.row-warning {'
-                + '        background-color: rgba(255, 231, 150, 0.43);'
-                + '    }'
-                + '    '
-                + '    tr.row-info {'
-                + '        background-color: rgba(240, 248, 255, 1.00);'
-                + '    }'
-                + '</style>';
+            document.title = "Bierdopje series importeren | Seriesfeed";
+            const wrapper = $('<div></div>').addClass('wrapper dashboard bg');
+            const container = $('<div></div>').addClass("container content");
+            $('.contentWrapper > div.container').replaceWith(wrapper);
+            const head = $('<h1>Series importeren - Bierdopje.com</h1>');
+            const p = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
+            container.append(head);
+            
+            const css = '<style>'
+                    + '    .progress {'
+                    + '        margin-top: 10px;'
+                    + '        margin-bottom: 0px;'
+                    + '    }'
+                    + '    '
+                    + '    .progress-bar {'
+                    + '        background: #447C6F;'
+                    + '    }'
+                    + '    '
+                    + '    tr.row-error {'
+                    + '        background-color: rgba(255, 0, 0, 0.15);'
+                    + '    }'
+                    + '    '
+                    + '    tr.row-warning {'
+                    + '        background-color: rgba(255, 231, 150, 0.43);'
+                    + '    }'
+                    + '    '
+                    + '    tr.row-info {'
+                    + '        background-color: rgba(240, 248, 255, 1.00);'
+                    + '    }'
+                    + '</style>';
             $('body').append(css);
 
-            var formElement = $(document.createElement("div"));
-            var usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
-            var submitInput = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
-            var bottomPane = $('<div class="blog-left"></div>');
-            var detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-            var colGroup = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
-            var importLink = $(document.createElement("a")).attr("href", "/series/import/");
-            var bierdopjeLink = $(document.createElement("a")).attr("href", "http://www.bierdopje.com/").attr("target", "_blank");
-            var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
-            var showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-
-            formElement.addClass('blog-left wow fadeInUp cardStyle cardForm formBlock animated');
-            bottomPane.addClass('wow fadeInLeft cardStyle animated');
-            detailsTable.addClass('wow fadeInLeft cardStyle animated');
+            const formElement   = $('<div></div>');
+            const usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
+            const submitInput   = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
+            const bottomPane    = $('<div class="blog-left"></div>');
+            const detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
+            const colGroup      = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
+            const detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
+            const showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
+            
+            container.append(formElement);
+            formElement.addClass('blog-left cardStyle cardForm formBlock');
+            bottomPane.addClass('cardStyle');
+            detailsTable.addClass('cardStyle');
             formElement.css('padding', '10px');
-
-            importLink.append("Favorieten importeren");
-            bierdopjeLink.append("Bierdopje.com");
-
-            head.append(importLink);
-            head.append(" - ");
-            head.append(bierdopjeLink);
-            p.append('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
 
             formElement.append(usernameInput);
             formElement.append(submitInput);
-            p.after(formElement);
             detailsTable.append(colGroup);
             detailsTable.append(detailsHeader);
             bottomPane.append(showDetails);
             showDetails.append(detailsTable);
+            
+            container.append(p);
+            wrapper.append(container);
 
             Services.BierdopjeService.getUsername()
                 .then((username) => $('#username').attr('value', username));

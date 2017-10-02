@@ -9,7 +9,7 @@ module SeriesfeedImporter.Services {
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                 .catch((error) => {
-                    console.log("Could not get username from Bierdopje.com.", error);
+                    console.error("Could not get username from Bierdopje.com.", error);
                 });
         }
 
@@ -22,7 +22,7 @@ module SeriesfeedImporter.Services {
                     return data.find(".content").find("ul").find("li").find("a");
                 })
                 .catch((error) => {
-                    console.log("Could not get favourites from Bierdopje.com.", error);
+                    console.error("Could not get favourites from Bierdopje.com.", error);
                     window.alert('Kan geen favorieten vinden voor ' + username + '. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.');
                 });
         }
@@ -36,7 +36,7 @@ module SeriesfeedImporter.Services {
                     return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
                 })
                 .catch((error) => {
-                    console.log("Could not get the TVDB of " + showSlug + " from Bierdopje.com.", error);
+                    console.error("Could not get the TVDB of " + showSlug + " from Bierdopje.com.", error);
                 });
         }
     }

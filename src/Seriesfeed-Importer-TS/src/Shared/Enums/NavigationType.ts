@@ -2,9 +2,9 @@
 
 module SeriesfeedImporter.Enums {
     export enum NavigationType {
-        Algemeen = 1,
-        Series = 2,
-        Fora = 3,
-        Nieuws = 4
+        Series = 0,
+        Fora = 1,
+        Nieuws = 2,
+        Community = 3
     }
 }

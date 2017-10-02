@@ -27,9 +27,14 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
-                var head = $('.col-md-12 h1').html('');
-                var p = $('.col-md-12 p').html('');
-                var css = '<style>'
+                document.title = "Bierdopje series importeren | Seriesfeed";
+                const wrapper = $('<div></div>').addClass('wrapper dashboard bg');
+                const container = $('<div></div>').addClass("container content");
+                $('.contentWrapper > div.container').replaceWith(wrapper);
+                const head = $('<h1>Series importeren - Bierdopje.com</h1>');
+                const p = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
+                container.append(head);
+                const css = '<style>'
                     + '    .progress {'
                     + '        margin-top: 10px;'
                     + '        margin-bottom: 0px;'
@@ -52,33 +57,27 @@ var SeriesfeedImporter;
                     + '    }'
                     + '</style>';
                 $('body').append(css);
-                var formElement = $(document.createElement("div"));
-                var usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
-                var submitInput = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
-                var bottomPane = $('<div class="blog-left"></div>');
-                var detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-                var colGroup = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
-                var importLink = $(document.createElement("a")).attr("href", "/series/import/");
-                var bierdopjeLink = $(document.createElement("a")).attr("href", "http://www.bierdopje.com/").attr("target", "_blank");
-                var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
-                var showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-                formElement.addClass('blog-left wow fadeInUp cardStyle cardForm formBlock animated');
-                bottomPane.addClass('wow fadeInLeft cardStyle animated');
-                detailsTable.addClass('wow fadeInLeft cardStyle animated');
+                const formElement = $('<div></div>');
+                const usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
+                const submitInput = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
+                const bottomPane = $('<div class="blog-left"></div>');
+                const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
+                const colGroup = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
+                const detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
+                const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
+                container.append(formElement);
+                formElement.addClass('blog-left cardStyle cardForm formBlock');
+                bottomPane.addClass('cardStyle');
+                detailsTable.addClass('cardStyle');
                 formElement.css('padding', '10px');
-                importLink.append("Favorieten importeren");
-                bierdopjeLink.append("Bierdopje.com");
-                head.append(importLink);
-                head.append(" - ");
-                head.append(bierdopjeLink);
-                p.append('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
                 formElement.append(usernameInput);
                 formElement.append(submitInput);
-                p.after(formElement);
                 detailsTable.append(colGroup);
                 detailsTable.append(detailsHeader);
                 bottomPane.append(showDetails);
                 showDetails.append(detailsTable);
+                container.append(p);
+                wrapper.append(container);
                 SeriesfeedImporter.Services.BierdopjeService.getUsername()
                     .then((username) => $('#username').attr('value', username));
                 $("#fav-import").click((event) => {
@@ -226,23 +225,26 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportController {
             constructor() {
-                const wrapper = $('.wrapper').addClass('bg').removeClass('show padding');
-                const container = $('.wrapper .container').html('').addClass("content");
+                document.title = "Series importeren | Seriesfeed";
+                const wrapper = $('<div></div>').addClass('wrapper dashboard bg');
+                const container = $('<div></div>').addClass("container content");
                 const selector = $(document.createElement("div")).addClass("platformSelector");
-                const card = $(document.createElement("div")).addClass("wow fadeInUp cardStyle cardForm formBlock animated");
+                const card = $(document.createElement("div")).addClass("cardStyle cardForm formBlock");
                 const importHead = $(document.createElement("h2")).append('Series importeren');
                 const cardInner = $(document.createElement("div")).addClass("cardFormInner");
                 const platform = $(document.createElement("p")).append('Kies een platform:');
+                $('.contentWrapper > div.container').replaceWith(wrapper);
+                wrapper.append(container);
                 container.append(selector);
                 selector.append(card);
                 card.append(importHead);
                 card.append(cardInner);
                 cardInner.append(platform);
                 const bierdopje = SeriesfeedImporter.Services.PlatformService.create("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", "bierdopje/", "#3399FE");
-                bierdopje.addClass('wow fadeInLeft cardStyle cardForm formBlock animated');
+                bierdopje.addClass('cardStyle cardForm formBlock');
                 platform.after(bierdopje);
                 const imdb = SeriesfeedImporter.Services.PlatformService.create("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", "imdb/", "#313131");
-                imdb.addClass('wow fadeInLeft cardStyle cardForm formBlock animated');
+                imdb.addClass('cardStyle cardForm formBlock');
                 bierdopje.after(imdb);
             }
         }
@@ -602,7 +604,7 @@ var SeriesfeedImporter;
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                     .catch((error) => {
-                    console.log("Could not get username from Bierdopje.com.", error);
+                    console.error("Could not get username from Bierdopje.com.", error);
                 });
             }
             static getFavouritesByUsername(username) {
@@ -613,7 +615,7 @@ var SeriesfeedImporter;
                     return data.find(".content").find("ul").find("li").find("a");
                 })
                     .catch((error) => {
-                    console.log("Could not get favourites from Bierdopje.com.", error);
+                    console.error("Could not get favourites from Bierdopje.com.", error);
                     window.alert('Kan geen favorieten vinden voor ' + username + '. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.');
                 });
             }
@@ -625,7 +627,7 @@ var SeriesfeedImporter;
                     return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
                 })
                     .catch((error) => {
-                    console.log("Could not get the TVDB of " + showSlug + " from Bierdopje.com.", error);
+                    console.error("Could not get the TVDB of " + showSlug + " from Bierdopje.com.", error);
                 });
             }
         }
@@ -694,11 +696,12 @@ var SeriesfeedImporter;
         class SeriesfeedService {
             static getShowIdByTvdbId(tvdbId) {
                 const postData = {
-                    tvdb_id: tvdbId
+                    type: 'tvdb_id',
+                    data: tvdbId
                 };
-                return Services.AjaxService.post("/ajax.php?action=getShowId", postData)
+                return Services.AjaxService.post("/ajax/serie/find-by", postData)
                     .catch((error) => {
-                    console.log("Could not convert TVDB id " + tvdbId + " on Seriesfeed.com.", error);
+                    console.error("Could not convert TVDB id " + tvdbId + " on Seriesfeed.com.", error);
                 });
             }
             static addFavouriteByShowId(showId) {
@@ -707,7 +710,7 @@ var SeriesfeedImporter;
                     type: 'favourite',
                     selected: '0'
                 };
-                return Services.AjaxService.post("/ajax.php?action=updateFavourite", postData);
+                return Services.AjaxService.post("/ajax/serie/favourite", postData);
             }
         }
         Services.SeriesfeedService = SeriesfeedService;
@@ -719,7 +722,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class NavigationController {
             initialise() {
-                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, "Importeren", SeriesfeedImporter.Enums.ShortUrls.Import);
+                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrls.Import);
             }
         }
         Controllers.NavigationController = NavigationController;
@@ -730,9 +733,9 @@ var SeriesfeedImporter;
     var Services;
     (function (Services) {
         class NavigationService {
-            static add(navigationType, text, url) {
-                $(".nav .dropdown .dropdown-menu:eq(" + navigationType + ")")
-                    .append("<li><a href='" + url + "'>" + text + "</a></li>");
+            static add(navigationType, position, text, url) {
+                const mainMenuItem = $("ul.main-menu .submenu .inner .top-level:eq(" + navigationType + ")");
+                mainMenuItem.find(".main-menu-dropdown li:eq(" + position + ")").before("<li><a href='" + url + "'>" + text + "</a></li>");
             }
         }
         Services.NavigationService = NavigationService;
@@ -762,12 +765,12 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
     (function (Enums) {
-        var NavigationType;
+        let NavigationType;
         (function (NavigationType) {
-            NavigationType[NavigationType["Algemeen"] = 1] = "Algemeen";
-            NavigationType[NavigationType["Series"] = 2] = "Series";
-            NavigationType[NavigationType["Fora"] = 3] = "Fora";
-            NavigationType[NavigationType["Nieuws"] = 4] = "Nieuws";
+            NavigationType[NavigationType["Series"] = 0] = "Series";
+            NavigationType[NavigationType["Fora"] = 1] = "Fora";
+            NavigationType[NavigationType["Nieuws"] = 2] = "Nieuws";
+            NavigationType[NavigationType["Community"] = 3] = "Community";
         })(NavigationType = Enums.NavigationType || (Enums.NavigationType = {}));
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -787,9 +790,9 @@ var SeriesfeedImporter;
     var Enums;
     (function (Enums) {
         Enums.Urls = {
-            Import: "http://www.seriesfeed.com/series/import/",
-            ImportBierdopje: "http://www.seriesfeed.com/series/import/bierdopje/",
-            ImportImdb: "http://www.seriesfeed.com/series/import/imdb/"
+            Import: "https://www.seriesfeed.com/series/import/",
+            ImportBierdopje: "https://www.seriesfeed.com/series/import/bierdopje/",
+            ImportImdb: "https://www.seriesfeed.com/series/import/imdb/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));

@@ -4,12 +4,13 @@ module SeriesfeedImporter.Services {
     export class SeriesfeedService {
         public static getShowIdByTvdbId(tvdbId: string): Promise<any> {
             const postData = {
-                tvdb_id: tvdbId
+                type: 'tvdb_id',
+ 				data: tvdbId
             };
 
-            return Services.AjaxService.post("/ajax.php?action=getShowId", postData)
+            return Services.AjaxService.post("/ajax/serie/find-by", postData)
                 .catch((error) => {
-                    console.log("Could not convert TVDB id " + tvdbId + " on Seriesfeed.com.", error);
+                    console.error("Could not convert TVDB id " + tvdbId + " on Seriesfeed.com.", error);
                 });
         }
 
@@ -20,7 +21,7 @@ module SeriesfeedImporter.Services {
                 selected: '0'
             };
 
-            return Services.AjaxService.post("/ajax.php?action=updateFavourite", postData);
+            return Services.AjaxService.post("/ajax/serie/favourite", postData);
         }
     }
 }

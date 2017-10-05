@@ -30,7 +30,8 @@ module SeriesfeedImporter.Services {
                 'background': colour
             });
             img.css({
-                'max-width': imageSize
+                'max-width': imageSize,
+                'padding': '10px'
             });
 
             // Data binding

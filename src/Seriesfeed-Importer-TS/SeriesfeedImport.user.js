@@ -861,7 +861,8 @@ var SeriesfeedImporter;
                     'background': colour
                 });
                 img.css({
-                    'max-width': imageSize
+                    'max-width': imageSize,
+                    'padding': '10px'
                 });
                 a.attr('href', url);
                 img.attr('src', image).attr('alt', name);

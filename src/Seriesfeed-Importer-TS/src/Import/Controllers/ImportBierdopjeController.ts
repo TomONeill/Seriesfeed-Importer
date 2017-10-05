@@ -3,13 +3,11 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
-            document.title = "Bierdopje series importeren | Seriesfeed";
-            const wrapper = $('<div></div>').addClass('wrapper dashboard bg');
-            const container = $('<div></div>').addClass("container content");
-            $('.contentWrapper > div.container').replaceWith(wrapper);
+            const mainContent = $('.contentWrapper .container').last();
+            
             const head = $('<h1>Series importeren - Bierdopje.com</h1>');
             const p = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
-            container.append(head);
+            mainContent.append(head);
             
             const css = '<style>'
                     + '    .progress {'
@@ -44,7 +42,7 @@ module SeriesfeedImporter.Controllers {
             const detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
             const showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
             
-            container.append(formElement);
+            mainContent.append(formElement);
             formElement.addClass('blog-left cardStyle cardForm formBlock');
             bottomPane.addClass('cardStyle');
             detailsTable.addClass('cardStyle');
@@ -57,8 +55,7 @@ module SeriesfeedImporter.Controllers {
             bottomPane.append(showDetails);
             showDetails.append(detailsTable);
             
-            container.append(p);
-            wrapper.append(container);
+            mainContent.append(p);
 
             Services.BierdopjeService.getUsername()
                 .then((username) => $('#username').attr('value', username));

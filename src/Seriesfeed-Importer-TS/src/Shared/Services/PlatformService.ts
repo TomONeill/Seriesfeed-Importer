@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Services {
     export class PlatformService {
-        public static create(name: string, image: string, imageSize: string, url: string, colour: string): JQuery {
+        public static create(name: string, image: string, imageSize: string, url: Enums.ShortUrl, colour: string): JQuery {
 	        // Element declaration
             var portfolio = $(document.createElement("div"));
             var a         = $(document.createElement("a"));
@@ -35,9 +35,11 @@ module SeriesfeedImporter.Services {
             });
 
             // Data binding
-            a.attr('href', url);
             img.attr('src', image).attr('alt', name);
             h4.append(name);
+
+            // Routing
+            a.click(() => Services.RouterService.navigate(url));
 
             // Element binding
             portfolio.append(a);

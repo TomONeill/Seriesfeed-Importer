@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Controllers {
     export class NavigationController {
         public initialise(): void {
-            Services.NavigationService.add(Enums.NavigationType.Series, 5, "Importeren", Enums.ShortUrls.Import);
+            Services.NavigationService.add(Enums.NavigationType.Series, 5, "Importeren", Enums.ShortUrl.Import);
         }
     }
 }

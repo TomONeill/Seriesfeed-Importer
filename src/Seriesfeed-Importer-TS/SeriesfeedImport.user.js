@@ -27,13 +27,10 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
-                document.title = "Bierdopje series importeren | Seriesfeed";
-                const wrapper = $('<div></div>').addClass('wrapper dashboard bg');
-                const container = $('<div></div>').addClass("container content");
-                $('.contentWrapper > div.container').replaceWith(wrapper);
+                const mainContent = $('.contentWrapper .container').last();
                 const head = $('<h1>Series importeren - Bierdopje.com</h1>');
                 const p = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
-                container.append(head);
+                mainContent.append(head);
                 const css = '<style>'
                     + '    .progress {'
                     + '        margin-top: 10px;'
@@ -65,7 +62,7 @@ var SeriesfeedImporter;
                 const colGroup = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
                 const detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
                 const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-                container.append(formElement);
+                mainContent.append(formElement);
                 formElement.addClass('blog-left cardStyle cardForm formBlock');
                 bottomPane.addClass('cardStyle');
                 detailsTable.addClass('cardStyle');
@@ -76,8 +73,7 @@ var SeriesfeedImporter;
                 detailsTable.append(detailsHeader);
                 bottomPane.append(showDetails);
                 showDetails.append(detailsTable);
-                container.append(p);
-                wrapper.append(container);
+                mainContent.append(p);
                 SeriesfeedImporter.Services.BierdopjeService.getUsername()
                     .then((username) => $('#username').attr('value', username));
                 $("#fav-import").click((event) => {
@@ -223,38 +219,6 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class ImportController {
-            constructor() {
-                document.title = "Series importeren | Seriesfeed";
-                const wrapper = $('<div></div>').addClass('wrapper dashboard bg');
-                const container = $('<div></div>').addClass("container content");
-                const selector = $(document.createElement("div")).addClass("platformSelector");
-                const card = $(document.createElement("div")).addClass("cardStyle cardForm formBlock");
-                const importHead = $(document.createElement("h2")).append('Series importeren');
-                const cardInner = $(document.createElement("div")).addClass("cardFormInner");
-                const platform = $(document.createElement("p")).append('Kies een platform:');
-                $('.contentWrapper > div.container').replaceWith(wrapper);
-                wrapper.append(container);
-                container.append(selector);
-                selector.append(card);
-                card.append(importHead);
-                card.append(cardInner);
-                cardInner.append(platform);
-                const bierdopje = SeriesfeedImporter.Services.PlatformService.create("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", "bierdopje/", "#3399FE");
-                bierdopje.addClass('cardStyle cardForm formBlock');
-                platform.after(bierdopje);
-                const imdb = SeriesfeedImporter.Services.PlatformService.create("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", "imdb/", "#313131");
-                imdb.addClass('cardStyle cardForm formBlock');
-                bierdopje.after(imdb);
-            }
-        }
-        Controllers.ImportController = ImportController;
-    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Controllers;
-    (function (Controllers) {
         class ImportImdbController {
             constructor() {
                 this._selectedLists = [];
@@ -262,13 +226,14 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialise() {
-                this.col = $('.col-md-12').html('');
-                this.head = $('<h1></h1>');
-                this.cardHolder = $('<div></div>').addClass("col-md-6");
-                this.card = $('<div></div>').addClass("blog-left cardStyle cardTable");
-                this.content = $('<div></div>').addClass("blog-content");
-                this.stepTitle = $('<h3></h3>');
-                this.stepcontent = $('<p></p>');
+                const mainContent = $('.contentWrapper .container').last();
+                this.col = mainContent.append('<div></div>').addClass("col-md-12");
+                this.head = this.col.append('<h1></h1>');
+                this.cardHolder = this.col.append('<div></div>').addClass("col-md-6");
+                this.card = this.cardHolder.append('<div></div>').addClass("blog-left cardStyle cardTable");
+                this.content = this.card.append('<div></div>').addClass("blog-content");
+                this.stepTitle = this.content.append('<h3></h3>');
+                this.stepcontent = this.content.append('<p></p>');
                 var css = '<style>'
                     + '    .import-selected {'
                     + '        border-bottom: 3px solid #447C6F;'
@@ -594,6 +559,34 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class PlatformSelectionController {
+            constructor() {
+                const mainContent = $('.contentWrapper .container').last();
+                const selector = $(document.createElement("div")).addClass("platformSelector");
+                const card = $(document.createElement("div")).addClass("cardStyle cardForm formBlock");
+                const importHead = $(document.createElement("h2")).append('Series importeren');
+                const cardInner = $(document.createElement("div")).addClass("cardFormInner");
+                const platform = $(document.createElement("p")).append('Kies een platform:');
+                mainContent.append(selector);
+                selector.append(card);
+                card.append(importHead);
+                card.append(cardInner);
+                cardInner.append(platform);
+                const bierdopje = SeriesfeedImporter.Services.PlatformService.create("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
+                bierdopje.addClass('cardStyle cardForm formBlock');
+                platform.after(bierdopje);
+                const imdb = SeriesfeedImporter.Services.PlatformService.create("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
+                imdb.addClass('cardStyle cardForm formBlock');
+                bierdopje.after(imdb);
+            }
+        }
+        Controllers.PlatformSelectionController = PlatformSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class BierdopjeService {
@@ -722,7 +715,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class NavigationController {
             initialise() {
-                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrls.Import);
+                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrl.Import);
             }
         }
         Controllers.NavigationController = NavigationController;
@@ -747,19 +740,80 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class RoutingController {
             initialise() {
-                if (window.location.href === SeriesfeedImporter.Enums.Urls.Import) {
-                    new Controllers.ImportController();
+                this.firstTimeVisitRouting();
+                this.respondToUrlChanges();
+            }
+            firstTimeVisitRouting() {
+                if (window.location.href === SeriesfeedImporter.Enums.Url.PlatformSelection) {
+                    SeriesfeedImporter.Services.RouterService.platformSelection();
                 }
-                if (window.location.href === SeriesfeedImporter.Enums.Urls.ImportBierdopje) {
-                    new Controllers.ImportBierdopjeController();
+                if (window.location.href === SeriesfeedImporter.Enums.Url.ImportBierdopje) {
+                    SeriesfeedImporter.Services.RouterService.importBierdopje();
                 }
-                if (window.location.href === SeriesfeedImporter.Enums.Urls.ImportImdb) {
-                    new Controllers.ImportImdbController();
+                if (window.location.href === SeriesfeedImporter.Enums.Url.ImportImdb) {
+                    SeriesfeedImporter.Services.RouterService.importImdb();
                 }
+            }
+            respondToUrlChanges() {
+                window.onpopstate = (event) => {
+                    if (event.state == null || event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.Import) {
+                        SeriesfeedImporter.Services.RouterService.platformSelection();
+                        return;
+                    }
+                    if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
+                        SeriesfeedImporter.Services.RouterService.importBierdopje();
+                        return;
+                    }
+                    if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
+                        SeriesfeedImporter.Services.RouterService.importImdb();
+                        return;
+                    }
+                };
             }
         }
         Controllers.RoutingController = RoutingController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class RouterService {
+            static navigate(url) {
+                if (url === SeriesfeedImporter.Enums.ShortUrl.Import) {
+                    this.platformSelection();
+                }
+                if (url === SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
+                    this.importBierdopje();
+                }
+                if (url === SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
+                    this.importImdb();
+                }
+                window.scrollTo(0, 0);
+                window.history.pushState({ "shortUrl": url }, "", url);
+            }
+            static platformSelection() {
+                document.title = "Series importeren | Seriesfeed";
+                this.clearContent();
+                new SeriesfeedImporter.Controllers.PlatformSelectionController();
+            }
+            static importBierdopje() {
+                document.title = "Bierdopje series importeren | Seriesfeed";
+                this.clearContent();
+                new SeriesfeedImporter.Controllers.ImportBierdopjeController();
+            }
+            static importImdb() {
+                document.title = "IMDb series importeren | Seriesfeed";
+                this.clearContent();
+                new SeriesfeedImporter.Controllers.ImportImdbController();
+            }
+            static clearContent() {
+                const mainContent = $('.contentWrapper .container').last();
+                mainContent.empty();
+            }
+        }
+        Services.RouterService = RouterService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -778,7 +832,7 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
     (function (Enums) {
-        Enums.ShortUrls = {
+        Enums.ShortUrl = {
             Import: "/series/import/",
             ImportBierdopje: "/series/import/bierdopje/",
             ImportImdb: "/series/import/imdb/"
@@ -789,8 +843,8 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
     (function (Enums) {
-        Enums.Urls = {
-            Import: "https://www.seriesfeed.com/series/import/",
+        Enums.Url = {
+            PlatformSelection: "https://www.seriesfeed.com/series/import/",
             ImportBierdopje: "https://www.seriesfeed.com/series/import/bierdopje/",
             ImportImdb: "https://www.seriesfeed.com/series/import/imdb/"
         };
@@ -864,9 +918,9 @@ var SeriesfeedImporter;
                     'max-width': imageSize,
                     'padding': '10px'
                 });
-                a.attr('href', url);
                 img.attr('src', image).attr('alt', name);
                 h4.append(name);
+                a.click(() => Services.RouterService.navigate(url));
                 portfolio.append(a);
                 a.append(wrapper);
                 wrapper.append(hover);

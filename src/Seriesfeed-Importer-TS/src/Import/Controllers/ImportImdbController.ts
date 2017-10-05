@@ -23,13 +23,14 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialise(): void {
-            this.col = $('.col-md-12').html('');
-            this.head = $('<h1></h1>');
-            this.cardHolder = $('<div></div>').addClass("col-md-6");
-            this.card = $('<div></div>').addClass("blog-left cardStyle cardTable");
-            this.content = $('<div></div>').addClass("blog-content");
-            this.stepTitle = $('<h3></h3>');
-            this.stepcontent = $('<p></p>');
+            const mainContent = $('.contentWrapper .container').last();
+            this.col = mainContent.append('<div></div>').addClass("col-md-12");
+            this.head = this.col.append('<h1></h1>');
+            this.cardHolder = this.col.append('<div></div>').addClass("col-md-6");
+            this.card = this.cardHolder.append('<div></div>').addClass("blog-left cardStyle cardTable");
+            this.content = this.card.append('<div></div>').addClass("blog-content");
+            this.stepTitle = this.content.append('<h3></h3>');
+            this.stepcontent = this.content.append('<p></p>');
 
             var css = '<style>'
                 + '    .import-selected {'

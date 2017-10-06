@@ -24,13 +24,13 @@ module SeriesfeedImporter.Controllers {
 
         private initialise(): void {
             const mainContent = $('.contentWrapper .container').last();
-            this.col = mainContent.append('<div></div>').addClass("col-md-12");
-            this.head = this.col.append('<h1></h1>');
-            this.cardHolder = this.col.append('<div></div>').addClass("col-md-6");
-            this.card = this.cardHolder.append('<div></div>').addClass("blog-left cardStyle cardTable");
-            this.content = this.card.append('<div></div>').addClass("blog-content");
-            this.stepTitle = this.content.append('<h3></h3>');
-            this.stepcontent = this.content.append('<p></p>');
+            this.col = mainContent.append('<div/>').addClass("col-md-12");
+            this.head = this.col.append('<h1/>');
+            this.cardHolder = this.col.append('<div/>').addClass("col-md-6");
+            this.card = this.cardHolder.append('<div/>').addClass("blog-left cardStyle cardTable");
+            this.content = this.card.append('<div/>').addClass("blog-content");
+            this.stepTitle = this.content.append('<h3/>');
+            this.stepcontent = this.content.append('<p/>');
 
             var css = '<style>'
                 + '    .import-selected {'
@@ -85,18 +85,18 @@ module SeriesfeedImporter.Controllers {
             $('body').append(css);
 
             this.cardHolder.css({
-                'margin': '0 auto',
-                'float': 'none'
+                margin: '0 auto',
+                float: 'none'
             });
 
             this.content.css({
-                'min-height': '425px'
+                minHeight: '425px'
             });
 
             var steps = this.stepFactory(4);
 
-            var importLink = $(document.createElement("a")).attr("href", "/series/import/");
-            var imdbLink = $(document.createElement("a")).attr("href", "http://www.imdb.com/").attr("target", "_blank");
+            var importLink = $('<a/>').attr("href", "/series/import/");
+            var imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
 
             importLink.append("Favorieten importeren");
             imdbLink.append("IMDb.com");

@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Services {
     export class AjaxService {
         public static get(url: string): Promise<any> {
-            return new Promise(function (resolve, reject) {
+            return new Promise((resolve, reject) => {
                 GM_xmlhttpRequest({
                     method: "GET",
                     url: url,
@@ -18,15 +18,15 @@ module SeriesfeedImporter.Services {
         }
 
         public static post(url: string, data: {}): Promise<any> {
-            return new Promise(function (resolve, reject) {
+            return new Promise((resolve, reject) => {
                 $.ajax({
                     type: "POST",
                     url: url,
                     data: data,
                     dataType: "json"
-                }).done(function (data: any) {
+                }).done((data: any) => {
                     resolve(data);
-                }).fail(function (error: any) {
+                }).fail((error: any) => {
                     reject(error);
                 });
             });

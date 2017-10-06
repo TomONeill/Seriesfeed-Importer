@@ -5,8 +5,8 @@ module SeriesfeedImporter.Controllers {
         constructor() {
             const mainContent = $('.contentWrapper .container').last();
             
-            const head = $('<h1>Series importeren - Bierdopje.com</h1>');
-            const p = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
+            const head = $('<h1/>').text('Series importeren - Bierdopje.com');
+            const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
             mainContent.append(head);
             
             const css = '<style>'
@@ -33,13 +33,13 @@ module SeriesfeedImporter.Controllers {
                     + '</style>';
             $('body').append(css);
 
-            const formElement   = $('<div></div>');
-            const usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
-            const submitInput   = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
-            const bottomPane    = $('<div class="blog-left"></div>');
+            const formElement   = $('<div/>');
+            const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
+            const submitInput   = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
+            const bottomPane    = $('<div/>').addClass('blog-left');
             const detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-            const colGroup      = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
-            const detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
+            const colGroup      = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
+            const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
             const showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
             
             mainContent.append(formElement);
@@ -62,20 +62,18 @@ module SeriesfeedImporter.Controllers {
 
             $("#fav-import").click((event) => {
                 const favImportBtn = $(event.currentTarget);
-                const outerProgress = $('<div class="progress"></div>');
-                const progressBar = $('<div class="progress-bar progress-bar-striped active"></div>');
+                const outerProgress = $('<div/>').addClass('progress');
+                const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
 
                 favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
                 outerProgress.append(progressBar);
                 formElement.append(outerProgress);
                 formElement.after(bottomPane);
 
-                const username = $('#username').val();
+                const username = $('#username').val() as string;
                 const favourites = $('#details');
 
-                $("#show-details").click(function () {
-                    detailsTable.toggle();
-                });
+                $("#show-details").click(() => detailsTable.toggle());
 
                 Services.BierdopjeService.getFavouritesByUsername(username)
                     .then((bdFavouriteLinks) => {

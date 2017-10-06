@@ -3,15 +3,15 @@
 module SeriesfeedImporter.Services {
     export class PlatformService {
         public static create(name: string, image: string, imageSize: string, url: Enums.ShortUrl, colour: string): JQuery {
-	        // Element declaration
-            var portfolio = $(document.createElement("div"));
-            var a         = $(document.createElement("a"));
-            var wrapper   = $(document.createElement("div"));
-            var hover     = $(document.createElement("div"));
-            var img       = $(document.createElement("img"));
-            var info      = $(document.createElement("div"));
-            var title     = $(document.createElement("div"));
-            var h4        = $(document.createElement("h4"));
+            // Element declaration
+            var portfolio = $('<div/>');
+            var a = $('<a/>');
+            var wrapper = $('<div/>');
+            var hover = $('<div/>');
+            var img = $('<img/>');
+            var info = $('<div/>');
+            var title = $('<div/>');
+            var h4 = $('<h4/>');
 
             // Adding classes
             portfolio.addClass("portfolio mix_all");
@@ -22,16 +22,22 @@ module SeriesfeedImporter.Services {
 
             // Styling
             portfolio.css({
-                'display': 'inline-block',
-                'width': '100%'
+                display: 'inline-block',
+                width: '100%',
+                transition: 'all .24s ease-in-out'
+            });
+            portfolio.hover(() => {
+                portfolio.addClass('cardStyle cardForm formBlock');
+            }, () => {
+                portfolio.removeClass('cardStyle cardForm formBlock');
             });
             hover.css({
-                'text-align': 'center',
-                'background': colour
+                textAlign: 'center',
+                background: colour
             });
             img.css({
-                'max-width': imageSize,
-                'padding': '10px'
+                maxWidth: imageSize,
+                padding: '10px'
             });
 
             // Data binding

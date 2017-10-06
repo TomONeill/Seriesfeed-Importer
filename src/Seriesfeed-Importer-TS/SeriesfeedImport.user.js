@@ -28,8 +28,8 @@ var SeriesfeedImporter;
         class ImportBierdopjeController {
             constructor() {
                 const mainContent = $('.contentWrapper .container').last();
-                const head = $('<h1>Series importeren - Bierdopje.com</h1>');
-                const p = $('<p>Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"<p>');
+                const head = $('<h1/>').text('Series importeren - Bierdopje.com');
+                const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
                 mainContent.append(head);
                 const css = '<style>'
                     + '    .progress {'
@@ -54,13 +54,13 @@ var SeriesfeedImporter;
                     + '    }'
                     + '</style>';
                 $('body').append(css);
-                const formElement = $('<div></div>');
-                const usernameInput = $('<div><input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" /></div>');
-                const submitInput = $('<div><input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" /></div>');
-                const bottomPane = $('<div class="blog-left"></div>');
+                const formElement = $('<div/>');
+                const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
+                const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
+                const bottomPane = $('<div/>').addClass('blog-left');
                 const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-                const colGroup = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
-                const detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
+                const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
+                const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
                 const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
                 mainContent.append(formElement);
                 formElement.addClass('blog-left cardStyle cardForm formBlock');
@@ -78,17 +78,15 @@ var SeriesfeedImporter;
                     .then((username) => $('#username').attr('value', username));
                 $("#fav-import").click((event) => {
                     const favImportBtn = $(event.currentTarget);
-                    const outerProgress = $('<div class="progress"></div>');
-                    const progressBar = $('<div class="progress-bar progress-bar-striped active"></div>');
+                    const outerProgress = $('<div/>').addClass('progress');
+                    const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
                     favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
                     outerProgress.append(progressBar);
                     formElement.append(outerProgress);
                     formElement.after(bottomPane);
                     const username = $('#username').val();
                     const favourites = $('#details');
-                    $("#show-details").click(function () {
-                        detailsTable.toggle();
-                    });
+                    $("#show-details").click(() => detailsTable.toggle());
                     SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username)
                         .then((bdFavouriteLinks) => {
                         const bdFavouritesLength = bdFavouriteLinks.length;
@@ -227,13 +225,13 @@ var SeriesfeedImporter;
             }
             initialise() {
                 const mainContent = $('.contentWrapper .container').last();
-                this.col = mainContent.append('<div></div>').addClass("col-md-12");
-                this.head = this.col.append('<h1></h1>');
-                this.cardHolder = this.col.append('<div></div>').addClass("col-md-6");
-                this.card = this.cardHolder.append('<div></div>').addClass("blog-left cardStyle cardTable");
-                this.content = this.card.append('<div></div>').addClass("blog-content");
-                this.stepTitle = this.content.append('<h3></h3>');
-                this.stepcontent = this.content.append('<p></p>');
+                this.col = mainContent.append('<div/>').addClass("col-md-12");
+                this.head = this.col.append('<h1/>');
+                this.cardHolder = this.col.append('<div/>').addClass("col-md-6");
+                this.card = this.cardHolder.append('<div/>').addClass("blog-left cardStyle cardTable");
+                this.content = this.card.append('<div/>').addClass("blog-content");
+                this.stepTitle = this.content.append('<h3/>');
+                this.stepcontent = this.content.append('<p/>');
                 var css = '<style>'
                     + '    .import-selected {'
                     + '        border-bottom: 3px solid #447C6F;'
@@ -286,15 +284,15 @@ var SeriesfeedImporter;
                     + '</style>';
                 $('body').append(css);
                 this.cardHolder.css({
-                    'margin': '0 auto',
-                    'float': 'none'
+                    margin: '0 auto',
+                    float: 'none'
                 });
                 this.content.css({
-                    'min-height': '425px'
+                    minHeight: '425px'
                 });
                 var steps = this.stepFactory(4);
-                var importLink = $(document.createElement("a")).attr("href", "/series/import/");
-                var imdbLink = $(document.createElement("a")).attr("href", "http://www.imdb.com/").attr("target", "_blank");
+                var importLink = $('<a/>').attr("href", "/series/import/");
+                var imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
                 importLink.append("Favorieten importeren");
                 imdbLink.append("IMDb.com");
                 this.head.append(importLink);
@@ -564,21 +562,22 @@ var SeriesfeedImporter;
         class PlatformSelectionController {
             constructor() {
                 const mainContent = $('.contentWrapper .container').last();
-                const selector = $(document.createElement("div")).addClass("platformSelector");
-                const card = $(document.createElement("div")).addClass("cardStyle cardForm formBlock");
-                const importHead = $(document.createElement("h2")).append('Series importeren');
-                const cardInner = $(document.createElement("div")).addClass("cardFormInner");
-                const platform = $(document.createElement("p")).append('Kies een platform:');
-                mainContent.append(selector);
+                mainContent.removeClass('container').addClass('wrapper bg');
+                const container = $('<div></div>').addClass('container');
+                mainContent.append(container);
+                const selector = $('<div/>').addClass("platformSelector");
+                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
+                const importHead = $('<h2/>').append('Series importeren');
+                const cardInner = $('<div/>').addClass("cardFormInner");
+                const platform = $('<p/>').append('Kies een platform:');
+                container.append(selector);
                 selector.append(card);
                 card.append(importHead);
                 card.append(cardInner);
                 cardInner.append(platform);
                 const bierdopje = SeriesfeedImporter.Services.PlatformService.create("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
-                bierdopje.addClass('cardStyle cardForm formBlock');
                 platform.after(bierdopje);
                 const imdb = SeriesfeedImporter.Services.PlatformService.create("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
-                imdb.addClass('cardStyle cardForm formBlock');
                 bierdopje.after(imdb);
             }
         }
@@ -597,7 +596,7 @@ var SeriesfeedImporter;
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                     .catch((error) => {
-                    console.error("Could not get username from Bierdopje.com.", error);
+                    throw `Could not get username from Bierdopje.com: ${error}`;
                 });
             }
             static getFavouritesByUsername(username) {
@@ -608,8 +607,8 @@ var SeriesfeedImporter;
                     return data.find(".content").find("ul").find("li").find("a");
                 })
                     .catch((error) => {
-                    console.error("Could not get favourites from Bierdopje.com.", error);
-                    window.alert('Kan geen favorieten vinden voor ' + username + '. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.');
+                    window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
+                    throw `Could not get favourites from Bierdopje.com: ${error}`;
                 });
             }
             static getTvdbIdByShowSlug(showSlug) {
@@ -620,7 +619,7 @@ var SeriesfeedImporter;
                     return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
                 })
                     .catch((error) => {
-                    console.error("Could not get the TVDB of " + showSlug + " from Bierdopje.com.", error);
+                    throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
                 });
             }
         }
@@ -856,7 +855,7 @@ var SeriesfeedImporter;
     (function (Services) {
         class AjaxService {
             static get(url) {
-                return new Promise(function (resolve, reject) {
+                return new Promise((resolve, reject) => {
                     GM_xmlhttpRequest({
                         method: "GET",
                         url: url,
@@ -870,15 +869,15 @@ var SeriesfeedImporter;
                 });
             }
             static post(url, data) {
-                return new Promise(function (resolve, reject) {
+                return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
                         url: url,
                         data: data,
                         dataType: "json"
-                    }).done(function (data) {
+                    }).done((data) => {
                         resolve(data);
-                    }).fail(function (error) {
+                    }).fail((error) => {
                         reject(error);
                     });
                 });
@@ -893,30 +892,36 @@ var SeriesfeedImporter;
     (function (Services) {
         class PlatformService {
             static create(name, image, imageSize, url, colour) {
-                var portfolio = $(document.createElement("div"));
-                var a = $(document.createElement("a"));
-                var wrapper = $(document.createElement("div"));
-                var hover = $(document.createElement("div"));
-                var img = $(document.createElement("img"));
-                var info = $(document.createElement("div"));
-                var title = $(document.createElement("div"));
-                var h4 = $(document.createElement("h4"));
+                var portfolio = $('<div/>');
+                var a = $('<a/>');
+                var wrapper = $('<div/>');
+                var hover = $('<div/>');
+                var img = $('<img/>');
+                var info = $('<div/>');
+                var title = $('<div/>');
+                var h4 = $('<h4/>');
                 portfolio.addClass("portfolio mix_all");
                 wrapper.addClass("portfolio-wrapper cardStyle");
                 hover.addClass("portfolio-hover");
                 info.addClass("portfolio-info");
                 title.addClass("portfolio-title");
                 portfolio.css({
-                    'display': 'inline-block',
-                    'width': '100%'
+                    display: 'inline-block',
+                    width: '100%',
+                    transition: 'all .24s ease-in-out'
+                });
+                portfolio.hover(() => {
+                    portfolio.addClass('cardStyle cardForm formBlock');
+                }, () => {
+                    portfolio.removeClass('cardStyle cardForm formBlock');
                 });
                 hover.css({
-                    'text-align': 'center',
-                    'background': colour
+                    textAlign: 'center',
+                    background: colour
                 });
                 img.css({
-                    'max-width': imageSize,
-                    'padding': '10px'
+                    maxWidth: imageSize,
+                    padding: '10px'
                 });
                 img.attr('src', image).attr('alt', name);
                 h4.append(name);

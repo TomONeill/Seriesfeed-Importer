@@ -41,8 +41,7 @@ module SeriesfeedImporter.Services {
         }
 
         private static clearContent(): void {
-            const mainContent = $('.contentWrapper .container').last();
-            mainContent.empty();
+            $('#mainContent').empty();
         }
     }
 }

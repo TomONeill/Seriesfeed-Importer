@@ -7,13 +7,9 @@ module SeriesfeedImporter.Controllers {
         private _selectedLists: any[];
         private _selectedSeries: any[];
 
-        private col: JQuery;
-        private head: JQuery;
-        private cardHolder: JQuery;
-        private card: JQuery;
         private content: JQuery;
         private stepTitle: JQuery;
-        private stepcontent: JQuery;
+        private stepContent: JQuery;
 
         constructor() {
             this._selectedLists = [];
@@ -23,68 +19,25 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialise(): void {
-            const mainContent = $('.contentWrapper .container').last();
-            this.col = mainContent.append('<div/>').addClass("col-md-12");
-            this.head = this.col.append('<h1/>');
-            this.cardHolder = this.col.append('<div/>').addClass("col-md-6");
-            this.card = this.cardHolder.append('<div/>').addClass("blog-left cardStyle cardTable");
-            this.content = this.card.append('<div/>').addClass("blog-content");
-            this.stepTitle = this.content.append('<h3/>');
-            this.stepcontent = this.content.append('<p/>');
+            const mainContent = $('#mainContent');
 
-            var css = '<style>'
-                + '    .import-selected {'
-                + '        border-bottom: 3px solid #447C6F;'
-                + '    }'
-                + '    input[type="checkbox"] + label span {'
-                + '        position: initial !important'
-                + '    }'
-                + '    '
-                + '    .progress {'
-                + '        width: 90%;'
-                + '        margin: 0 auto;'
-                + '    }'
-                + '    '
-                + '    .progress-bar {'
-                + '        background: #447C6F;'
-                + '    }'
-                + '    '
-                + '    @media only screen and (max-width: 992px)'
-                + '    .favourites i.fa.fa-times:hover:after {'
-                + '        position: fixed;'
-                + '        top: 50px;'
-                + '        left: 10px;'
-                + '        right: 10px;'
-                + '    }'
-                + '    '
-                + '    .favourites i.fa.fa-times:hover:after {'
-                + '        content: "Deze serie staat nog niet op Seriesfeed. Vraag \'m aan via menu-item Series -> Serie voorstellen.";'
-                + '        background: #ffffff;'
-                + '        position: absolute;'
-                + '        min-width: 250px;'
-                + '        padding: 20px;'
-                + '        font-family: "Lato", sans-serif;'
-                + '        border: 1px solid #eaeaea;'
-                + '        border-radius: 3px;'
-                + '        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.15);'
-                + '        line-height: 18px;'
-                + '    }'
-                + '    '
-                + '    tr.row-error {'
-                + '        background-color: rgba(255, 0, 0, 0.15);'
-                + '    }'
-                + '    '
-                + '    tr.row-warning {'
-                + '        background-color: rgba(255, 231, 150, 0.43);'
-                + '    }'
-                + '    '
-                + '    tr.row-info {'
-                + '        background-color: rgba(240, 248, 255, 1.00);'
-                + '    }'
-                + '</style>';
-            $('body').append(css);
+            const col = $('<div/>').addClass("col-md-12");
+            mainContent.append(col);
 
-            this.cardHolder.css({
+            const head = $('<h1/>');
+            col.append(head);
+            const cardHolder = $('<div/>').addClass("col-md-6");
+            col.append(cardHolder);
+            const card = $('<div/>').addClass("blog-left cardStyle cardTable");
+            cardHolder.append(card);
+            this.content = $('<div/>').addClass("blog-content");
+            card.append(this.content);
+            this.stepTitle = $('<h3/>');
+            this.content.append(this.stepTitle);
+            this.stepContent = $('<p/>');
+            this.content.append(this.stepContent);
+
+            cardHolder.css({
                 margin: '0 auto',
                 float: 'none'
             });
@@ -101,18 +54,15 @@ module SeriesfeedImporter.Controllers {
             importLink.append("Favorieten importeren");
             imdbLink.append("IMDb.com");
 
-            this.head.append(importLink);
-            this.head.append(" - ");
-            this.head.append(imdbLink);
+            head.append(importLink);
+            head.append(" - ");
+            head.append(imdbLink);
 
-            //this.col.replaceWith(this.head);
-            this.col.html(<any>this.head);
-            this.head.after(steps);
-            this.col.after(this.cardHolder);
-            //this.cardHolder.replaceWith(this.card);
-            this.cardHolder.html(<any>this.card);
-            //this.card.replaceWith(this.content);
-            this.card.html(<any>this.content);
+            col.html(<any>head);
+            head.after(steps);
+            col.after(cardHolder);
+            cardHolder.html(<any>card);
+            card.html(<any>this.content);
 
             this.stepOne();
         }
@@ -128,11 +78,10 @@ module SeriesfeedImporter.Controllers {
             var userProfile = this.userFactory("Laden...", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg");
 
             this.stepTitle.html(titleCardText);
-            this.stepcontent.html(innerCardText);
-            //this.content.replaceWith(this.stepTitle);
+            this.stepContent.html(innerCardText);
             this.content.html(<any>this.stepTitle);
-            this.stepTitle.after(this.stepcontent);
-            this.stepcontent.after(userProfile);
+            this.stepTitle.after(this.stepContent);
+            this.stepContent.after(userProfile);
 
             Services.ImdbService.getUser()
                 .then((user) => {
@@ -151,7 +100,6 @@ module SeriesfeedImporter.Controllers {
                             }
 
                             const profile = this.userFactory(this._username, avatarUrl);
-                            //userProfile.replaceWith(profile);
                             userProfile.html(<any>profile);
 
                             if (userProfile.find(".user-name").html() !== login) {
@@ -162,11 +110,11 @@ module SeriesfeedImporter.Controllers {
                             }
                         })
                         .catch((error: any) => {
-                            console.log("Could not connect to IMDb to get the avatar of " + this._username + ".");
+                            throw `Could not connect to IMDb to get the avatar of ${this._username}.`;
                         });
                 })
                 .catch((error: any) => {
-                    console.log("Could not connect to IMDb to get current username.");
+                    throw `Could not connect to IMDb to get the current username.`;
                 });
         }
 
@@ -177,8 +125,7 @@ module SeriesfeedImporter.Controllers {
             var innerCardText = 'Vink de lijsten aan met series die je als favoriet wilt toevoegen.';
 
             this.stepTitle.html(titleCardText);
-            this.stepcontent.html(innerCardText);
-            //this.content.replaceWith(this.stepTitle);
+            this.stepContent.html(innerCardText);
             this.content.html(<any>this.stepTitle);
 
             var listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
@@ -187,12 +134,11 @@ module SeriesfeedImporter.Controllers {
             var loadingData = $('<div><h4 style="margin-bottom: 15px;">Lijsten ophalen...</h4></div>');
 
             this.stepTitle.html(titleCardText);
-            this.stepcontent.html(innerCardText);
-            //this.content.replaceWith(this.stepTitle);
+            this.stepContent.html(innerCardText);
             this.content.html(<any>this.stepTitle);
-            this.stepTitle.after(this.stepcontent);
+            this.stepTitle.after(this.stepContent);
 
-            this.stepcontent.after(loadingData);
+            this.stepContent.after(loadingData);
             listsTable.append(tableHeader);
 
             Services.ImdbService.getListsById(this._userId)
@@ -208,7 +154,6 @@ module SeriesfeedImporter.Controllers {
                         tableHeader.after(item);
                     });
 
-                    //loadingData.replaceWith(listsTable);
                     loadingData.html(<any>listsTable);
 
                     const nextStep = this.nextStepFactory("Doorgaan", "step-3");
@@ -254,8 +199,7 @@ module SeriesfeedImporter.Controllers {
             const innerCardText = 'Vink de series aan die je als favoriet wilt toevoegen.';
 
             this.stepTitle.html(titleCardText);
-            this.stepcontent.html(innerCardText);
-            //this.content.replaceWith(this.stepTitle);
+            this.stepContent.html(innerCardText);
             this.content.html(<any>this.stepTitle);
 
             const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
@@ -264,12 +208,11 @@ module SeriesfeedImporter.Controllers {
             const loadingData = $('<div><h4 style="margin-bottom: 15px;">Series ophalen...</h4></div>');
 
             this.stepTitle.html(titleCardText);
-            this.stepcontent.html(innerCardText);
-            //this.content.replaceWith(this.stepTitle);
+            this.stepContent.html(innerCardText);
             this.content.html(<any>this.stepTitle);
-            this.stepTitle.after(this.stepcontent);
+            this.stepTitle.after(this.stepContent);
 
-            this.stepcontent.after(loadingData);
+            this.stepContent.after(loadingData);
             listsTable.append(tableHeader);
 
             const outerProgress = $('<div class="progress"></div>');
@@ -300,7 +243,6 @@ module SeriesfeedImporter.Controllers {
                             progressBar.css('width', Math.round(progress) + "%");
                         });
 
-                        //loadingData.replaceWith(listsTable);
                         loadingData.html(<any>listsTable);
 
                         const nextStep = this.nextStepFactory("Importeren", "step-4");
@@ -343,6 +285,7 @@ module SeriesfeedImporter.Controllers {
         private stepFour(): void {
             this.selectStep(4);
 
+            // TODO
             console.log(this._selectedSeries);
         }
 

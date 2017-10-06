@@ -5,10 +5,19 @@ var SeriesfeedImporter;
             $(() => this.initialise());
         }
         static initialise() {
+            this.fixPageLayout();
+            SeriesfeedImporter.Services.StyleService.loadGlobalStyle();
             new SeriesfeedImporter.Controllers.NavigationController()
                 .initialise();
             new SeriesfeedImporter.Controllers.RoutingController()
                 .initialise();
+        }
+        static fixPageLayout() {
+            const wrapper = $('.contentWrapper .container').last().empty();
+            wrapper.removeClass('container').addClass('wrapper bg');
+            const container = $('<div></div>').addClass('container').attr('id', "mainContent");
+            ;
+            wrapper.append(container);
         }
     }
     App.main();
@@ -27,33 +36,10 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
-                const mainContent = $('.contentWrapper .container').last();
+                const mainContent = $('#mainContent');
                 const head = $('<h1/>').text('Series importeren - Bierdopje.com');
                 const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
                 mainContent.append(head);
-                const css = '<style>'
-                    + '    .progress {'
-                    + '        margin-top: 10px;'
-                    + '        margin-bottom: 0px;'
-                    + '    }'
-                    + '    '
-                    + '    .progress-bar {'
-                    + '        background: #447C6F;'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-error {'
-                    + '        background-color: rgba(255, 0, 0, 0.15);'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-warning {'
-                    + '        background-color: rgba(255, 231, 150, 0.43);'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-info {'
-                    + '        background-color: rgba(240, 248, 255, 1.00);'
-                    + '    }'
-                    + '</style>';
-                $('body').append(css);
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
                 const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
@@ -224,66 +210,22 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialise() {
-                const mainContent = $('.contentWrapper .container').last();
-                this.col = mainContent.append('<div/>').addClass("col-md-12");
-                this.head = this.col.append('<h1/>');
-                this.cardHolder = this.col.append('<div/>').addClass("col-md-6");
-                this.card = this.cardHolder.append('<div/>').addClass("blog-left cardStyle cardTable");
-                this.content = this.card.append('<div/>').addClass("blog-content");
-                this.stepTitle = this.content.append('<h3/>');
-                this.stepcontent = this.content.append('<p/>');
-                var css = '<style>'
-                    + '    .import-selected {'
-                    + '        border-bottom: 3px solid #447C6F;'
-                    + '    }'
-                    + '    input[type="checkbox"] + label span {'
-                    + '        position: initial !important'
-                    + '    }'
-                    + '    '
-                    + '    .progress {'
-                    + '        width: 90%;'
-                    + '        margin: 0 auto;'
-                    + '    }'
-                    + '    '
-                    + '    .progress-bar {'
-                    + '        background: #447C6F;'
-                    + '    }'
-                    + '    '
-                    + '    @media only screen and (max-width: 992px)'
-                    + '    .favourites i.fa.fa-times:hover:after {'
-                    + '        position: fixed;'
-                    + '        top: 50px;'
-                    + '        left: 10px;'
-                    + '        right: 10px;'
-                    + '    }'
-                    + '    '
-                    + '    .favourites i.fa.fa-times:hover:after {'
-                    + '        content: "Deze serie staat nog niet op Seriesfeed. Vraag \'m aan via menu-item Series -> Serie voorstellen.";'
-                    + '        background: #ffffff;'
-                    + '        position: absolute;'
-                    + '        min-width: 250px;'
-                    + '        padding: 20px;'
-                    + '        font-family: "Lato", sans-serif;'
-                    + '        border: 1px solid #eaeaea;'
-                    + '        border-radius: 3px;'
-                    + '        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.15);'
-                    + '        line-height: 18px;'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-error {'
-                    + '        background-color: rgba(255, 0, 0, 0.15);'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-warning {'
-                    + '        background-color: rgba(255, 231, 150, 0.43);'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-info {'
-                    + '        background-color: rgba(240, 248, 255, 1.00);'
-                    + '    }'
-                    + '</style>';
-                $('body').append(css);
-                this.cardHolder.css({
+                const mainContent = $('#mainContent');
+                const col = $('<div/>').addClass("col-md-12");
+                mainContent.append(col);
+                const head = $('<h1/>');
+                col.append(head);
+                const cardHolder = $('<div/>').addClass("col-md-6");
+                col.append(cardHolder);
+                const card = $('<div/>').addClass("blog-left cardStyle cardTable");
+                cardHolder.append(card);
+                this.content = $('<div/>').addClass("blog-content");
+                card.append(this.content);
+                this.stepTitle = $('<h3/>');
+                this.content.append(this.stepTitle);
+                this.stepContent = $('<p/>');
+                this.content.append(this.stepContent);
+                cardHolder.css({
                     margin: '0 auto',
                     float: 'none'
                 });
@@ -295,14 +237,14 @@ var SeriesfeedImporter;
                 var imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
                 importLink.append("Favorieten importeren");
                 imdbLink.append("IMDb.com");
-                this.head.append(importLink);
-                this.head.append(" - ");
-                this.head.append(imdbLink);
-                this.col.html(this.head);
-                this.head.after(steps);
-                this.col.after(this.cardHolder);
-                this.cardHolder.html(this.card);
-                this.card.html(this.content);
+                head.append(importLink);
+                head.append(" - ");
+                head.append(imdbLink);
+                col.html(head);
+                head.after(steps);
+                col.after(cardHolder);
+                cardHolder.html(card);
+                card.html(this.content);
                 this.stepOne();
             }
             stepOne() {
@@ -314,10 +256,10 @@ var SeriesfeedImporter;
                     + 'account is waarvan je wilt importeren.';
                 var userProfile = this.userFactory("Laden...", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg");
                 this.stepTitle.html(titleCardText);
-                this.stepcontent.html(innerCardText);
+                this.stepContent.html(innerCardText);
                 this.content.html(this.stepTitle);
-                this.stepTitle.after(this.stepcontent);
-                this.stepcontent.after(userProfile);
+                this.stepTitle.after(this.stepContent);
+                this.stepContent.after(userProfile);
                 SeriesfeedImporter.Services.ImdbService.getUser()
                     .then((user) => {
                     this._userId = user.id;
@@ -340,11 +282,11 @@ var SeriesfeedImporter;
                         }
                     })
                         .catch((error) => {
-                        console.log("Could not connect to IMDb to get the avatar of " + this._username + ".");
+                        throw `Could not connect to IMDb to get the avatar of ${this._username}.`;
                     });
                 })
                     .catch((error) => {
-                    console.log("Could not connect to IMDb to get current username.");
+                    throw `Could not connect to IMDb to get the current username.`;
                 });
             }
             stepTwo() {
@@ -352,17 +294,17 @@ var SeriesfeedImporter;
                 var titleCardText = 'Lijsten selecteren';
                 var innerCardText = 'Vink de lijsten aan met series die je als favoriet wilt toevoegen.';
                 this.stepTitle.html(titleCardText);
-                this.stepcontent.html(innerCardText);
+                this.stepContent.html(innerCardText);
                 this.content.html(this.stepTitle);
                 var listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
                 var checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
                 var tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
                 var loadingData = $('<div><h4 style="margin-bottom: 15px;">Lijsten ophalen...</h4></div>');
                 this.stepTitle.html(titleCardText);
-                this.stepcontent.html(innerCardText);
+                this.stepContent.html(innerCardText);
                 this.content.html(this.stepTitle);
-                this.stepTitle.after(this.stepcontent);
-                this.stepcontent.after(loadingData);
+                this.stepTitle.after(this.stepContent);
+                this.stepContent.after(loadingData);
                 listsTable.append(tableHeader);
                 SeriesfeedImporter.Services.ImdbService.getListsById(this._userId)
                     .then((lists) => {
@@ -410,17 +352,17 @@ var SeriesfeedImporter;
                 const titleCardText = 'Series selecteren';
                 const innerCardText = 'Vink de series aan die je als favoriet wilt toevoegen.';
                 this.stepTitle.html(titleCardText);
-                this.stepcontent.html(innerCardText);
+                this.stepContent.html(innerCardText);
                 this.content.html(this.stepTitle);
                 const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;" id="lists"><tbody>');
                 const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" id="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
                 const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Serie</th><th>Type</th><th>Lijst</th></tr>');
                 const loadingData = $('<div><h4 style="margin-bottom: 15px;">Series ophalen...</h4></div>');
                 this.stepTitle.html(titleCardText);
-                this.stepcontent.html(innerCardText);
+                this.stepContent.html(innerCardText);
                 this.content.html(this.stepTitle);
-                this.stepTitle.after(this.stepcontent);
-                this.stepcontent.after(loadingData);
+                this.stepTitle.after(this.stepContent);
+                this.stepContent.after(loadingData);
                 listsTable.append(tableHeader);
                 const outerProgress = $('<div class="progress"></div>');
                 const progressBar = $('<div class="progress-bar progress-bar-striped active"></div>');
@@ -561,16 +503,13 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class PlatformSelectionController {
             constructor() {
-                const mainContent = $('.contentWrapper .container').last();
-                mainContent.removeClass('container').addClass('wrapper bg');
-                const container = $('<div></div>').addClass('container');
-                mainContent.append(container);
+                const mainContent = $('#mainContent');
                 const selector = $('<div/>').addClass("platformSelector");
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
                 const importHead = $('<h2/>').append('Series importeren');
                 const cardInner = $('<div/>').addClass("cardFormInner");
                 const platform = $('<p/>').append('Kies een platform:');
-                container.append(selector);
+                mainContent.append(selector);
                 selector.append(card);
                 card.append(importHead);
                 card.append(cardInner);
@@ -807,8 +746,7 @@ var SeriesfeedImporter;
                 new SeriesfeedImporter.Controllers.ImportImdbController();
             }
             static clearContent() {
-                const mainContent = $('.contentWrapper .container').last();
-                mainContent.empty();
+                $('#mainContent').empty();
             }
         }
         Services.RouterService = RouterService;
@@ -937,5 +875,67 @@ var SeriesfeedImporter;
             }
         }
         Services.PlatformService = PlatformService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class StyleService {
+            static loadGlobalStyle() {
+                const css = '<style>'
+                    + '    .import-selected {'
+                    + '        border-bottom: 3px solid #447C6F;'
+                    + '    }'
+                    + '    input[type="checkbox"] + label span {'
+                    + '        position: initial !important'
+                    + '    }'
+                    + '    '
+                    + '    .progress {'
+                    + '        width: 90%;'
+                    + '        margin: 0 auto;'
+                    + '    }'
+                    + '    '
+                    + '    .progress-bar {'
+                    + '        background: #447C6F;'
+                    + '    }'
+                    + '    '
+                    + '    @media only screen and (max-width: 992px)'
+                    + '    .favourites i.fa.fa-times:hover:after {'
+                    + '        position: fixed;'
+                    + '        top: 50px;'
+                    + '        left: 10px;'
+                    + '        right: 10px;'
+                    + '    }'
+                    + '    '
+                    + '    .favourites i.fa.fa-times:hover:after {'
+                    + '        content: "Deze serie staat nog niet op Seriesfeed. Vraag \'m aan via menu-item Series -> Serie voorstellen.";'
+                    + '        background: #ffffff;'
+                    + '        position: absolute;'
+                    + '        min-width: 250px;'
+                    + '        padding: 20px;'
+                    + '        font-family: "Lato", sans-serif;'
+                    + '        border: 1px solid #eaeaea;'
+                    + '        border-radius: 3px;'
+                    + '        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.15);'
+                    + '        line-height: 18px;'
+                    + '    }'
+                    + '    '
+                    + '    tr.row-error {'
+                    + '        background-color: rgba(255, 0, 0, 0.15);'
+                    + '    }'
+                    + '    '
+                    + '    tr.row-warning {'
+                    + '        background-color: rgba(255, 231, 150, 0.43);'
+                    + '    }'
+                    + '    '
+                    + '    tr.row-info {'
+                    + '        background-color: rgba(240, 248, 255, 1.00);'
+                    + '    }'
+                    + '</style>';
+                $('body').append(css);
+            }
+        }
+        Services.StyleService = StyleService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));

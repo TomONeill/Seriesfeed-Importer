@@ -3,10 +3,7 @@
 module SeriesfeedImporter.Controllers {
     export class PlatformSelectionController {
         constructor() {
-            const mainContent = $('.contentWrapper .container').last();
-            mainContent.removeClass('container').addClass('wrapper bg');
-            const container = $('<div></div>').addClass('container');
-            mainContent.append(container);
+            const mainContent = $('#mainContent');
 
             const selector = $('<div/>').addClass("platformSelector");
             const card = $('<div/>').addClass("cardStyle cardForm formBlock");
@@ -14,7 +11,7 @@ module SeriesfeedImporter.Controllers {
             const cardInner = $('<div/>').addClass("cardFormInner");
             const platform = $('<p/>').append('Kies een platform:');
 
-            container.append(selector);
+            mainContent.append(selector);
             selector.append(card);
             card.append(importHead);
             card.append(cardInner);

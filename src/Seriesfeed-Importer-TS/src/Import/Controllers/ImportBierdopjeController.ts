@@ -3,35 +3,11 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
-            const mainContent = $('.contentWrapper .container').last();
+            const mainContent = $('#mainContent');
             
             const head = $('<h1/>').text('Series importeren - Bierdopje.com');
             const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
             mainContent.append(head);
-            
-            const css = '<style>'
-                    + '    .progress {'
-                    + '        margin-top: 10px;'
-                    + '        margin-bottom: 0px;'
-                    + '    }'
-                    + '    '
-                    + '    .progress-bar {'
-                    + '        background: #447C6F;'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-error {'
-                    + '        background-color: rgba(255, 0, 0, 0.15);'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-warning {'
-                    + '        background-color: rgba(255, 231, 150, 0.43);'
-                    + '    }'
-                    + '    '
-                    + '    tr.row-info {'
-                    + '        background-color: rgba(240, 248, 255, 1.00);'
-                    + '    }'
-                    + '</style>';
-            $('body').append(css);
 
             const formElement   = $('<div/>');
             const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');

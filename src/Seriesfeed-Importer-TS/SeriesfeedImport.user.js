@@ -1,3 +1,23 @@
+// ==UserScript==
+// @name         Seriesfeed Importer
+// @namespace    https://www.seriesfeed.com
+// @version      3.0-dev
+// @description  Allows you to import your favourites from Bierdopje.com.
+// @match        https://*.seriesfeed.com/*
+// @grant        unsafeWindow
+// @grant        GM_xmlhttpRequest
+// @connect      www.bierdopje.com
+// @connect      www.imdb.com
+// @domain       www.bierdopje.com
+// @domain       www.imdb.com
+// @require      https://code.jquery.com/jquery-3.2.1.min.js
+// @author       Tom
+// @copyright    2016 - 2017, Tom
+// ==/UserScript==
+/* jshint -W097 */
+/* global $, GM_xmlhttpRequest, Promise, console */
+'use strict';
+
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     class App {
@@ -5,19 +25,11 @@ var SeriesfeedImporter;
             $(() => this.initialise());
         }
         static initialise() {
-            this.fixPageLayout();
             SeriesfeedImporter.Services.StyleService.loadGlobalStyle();
             new SeriesfeedImporter.Controllers.NavigationController()
                 .initialise();
             new SeriesfeedImporter.Controllers.RoutingController()
                 .initialise();
-        }
-        static fixPageLayout() {
-            const wrapper = $('.contentWrapper .container').last().empty();
-            wrapper.removeClass('container').addClass('wrapper bg');
-            const container = $('<div></div>').addClass('container').attr('id', "mainContent");
-            ;
-            wrapper.append(container);
         }
     }
     App.main();
@@ -89,55 +101,58 @@ var SeriesfeedImporter;
                                         let sfSeriesId = sfShowData.id;
                                         let sfSeriesName = sfShowData.name;
                                         const sfSeriesSlug = sfShowData.slug;
-                                        const sfSeriesUrl = 'http://www.seriesfeed.com/series/';
+                                        const sfSeriesUrl = 'https://www.seriesfeed.com/series/';
                                         const MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
                                         let current_retries = 0;
-                                        SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
-                                            .then((result) => {
-                                            const resultStatus = result.status;
-                                            let item = "<tr></tr>";
-                                            let status = "-";
-                                            let showUrl = sfSeriesUrl + sfSeriesSlug;
-                                            if (sfSeriesId === -1) {
-                                                sfSeriesId = "Onbekend";
-                                            }
-                                            if (!sfSeriesName) {
-                                                showUrl = bdShowUrl + bdShowSlug;
-                                                sfSeriesName = bdShowName;
-                                            }
-                                            if (resultStatus === "success") {
-                                                status = "Toegevoegd als favoriet.";
-                                                item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                            }
-                                            else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
-                                                status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-                                                item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                            }
-                                            else {
-                                                status = "Deze serie is al een favoriet.";
-                                                item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                            }
-                                            favourites.append(item);
-                                            const progress = (index / bdFavouritesLength) * 100;
-                                            progressBar.css('width', Math.round(progress) + "%");
-                                            resolve();
-                                        })
-                                            .catch(() => {
-                                            console.log("Retrying to favourite " + sfSeriesName + "(" + sfSeriesId + "). " + current_retries + "/" + MAX_RETRIES);
-                                            current_retries++;
-                                            if (current_retries === MAX_RETRIES) {
-                                                const status = "Kon deze serie niet als favoriet instellen.";
-                                                const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                        function addFavouriteByShowId(sfSeriesId) {
+                                            SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
+                                                .then((result) => {
+                                                const resultStatus = result.status;
+                                                let item = "<tr></tr>";
+                                                let status = "-";
+                                                let showUrl = sfSeriesUrl + sfSeriesSlug;
+                                                if (sfSeriesId === -1) {
+                                                    sfSeriesId = "Onbekend";
+                                                }
+                                                if (!sfSeriesName) {
+                                                    showUrl = bdShowUrl + bdShowSlug;
+                                                    sfSeriesName = bdShowName;
+                                                }
+                                                if (resultStatus === "success") {
+                                                    status = "Toegevoegd als favoriet.";
+                                                    item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                }
+                                                else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
+                                                    status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
+                                                    item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                }
+                                                else {
+                                                    status = "Deze serie is al een favoriet.";
+                                                    item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                }
                                                 favourites.append(item);
                                                 const progress = (index / bdFavouritesLength) * 100;
                                                 progressBar.css('width', Math.round(progress) + "%");
                                                 resolve();
-                                            }
-                                            else {
-                                                this(index);
-                                                resolve();
-                                            }
-                                        });
+                                            })
+                                                .catch(() => {
+                                                console.log(`Retrying to favourite ${sfSeriesName} (${sfSeriesId}). ${current_retries + 1}/${MAX_RETRIES})`);
+                                                current_retries++;
+                                                if (current_retries === MAX_RETRIES) {
+                                                    const status = "Kon deze serie niet als favoriet instellen.";
+                                                    const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                    favourites.append(item);
+                                                    const progress = (index / bdFavouritesLength) * 100;
+                                                    progressBar.css('width', Math.round(progress) + "%");
+                                                    resolve();
+                                                }
+                                                else {
+                                                    addFavouriteByShowId(index);
+                                                    resolve();
+                                                }
+                                            });
+                                        }
+                                        addFavouriteByShowId(sfSeriesId);
                                     }).catch(() => {
                                         const status = 'Het id kan niet van Seriesfeed worden opgehaald.</a>';
                                         const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
@@ -190,7 +205,7 @@ var SeriesfeedImporter;
                             }
                             checkActiveCalls();
                         }).catch((error) => {
-                            console.log("Unknown error: ", error);
+                            throw `Unknown error: ${error}`;
                         });
                     });
                 });
@@ -683,14 +698,24 @@ var SeriesfeedImporter;
             }
             firstTimeVisitRouting() {
                 if (window.location.href === SeriesfeedImporter.Enums.Url.PlatformSelection) {
+                    this.fixPageLayout();
                     SeriesfeedImporter.Services.RouterService.platformSelection();
                 }
                 if (window.location.href === SeriesfeedImporter.Enums.Url.ImportBierdopje) {
+                    this.fixPageLayout();
                     SeriesfeedImporter.Services.RouterService.importBierdopje();
                 }
                 if (window.location.href === SeriesfeedImporter.Enums.Url.ImportImdb) {
+                    this.fixPageLayout();
                     SeriesfeedImporter.Services.RouterService.importImdb();
                 }
+            }
+            fixPageLayout() {
+                const wrapper = $('.contentWrapper .container').last().empty();
+                wrapper.removeClass('container').addClass('wrapper bg');
+                const container = $('<div></div>').addClass('container').attr('id', "mainContent");
+                ;
+                wrapper.append(container);
             }
             respondToUrlChanges() {
                 window.onpopstate = (event) => {

@@ -4,20 +4,20 @@ module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
             const mainContent = $('#mainContent');
-            
+
             const head = $('<h1/>').text('Series importeren - Bierdopje.com');
             const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
             mainContent.append(head);
 
-            const formElement   = $('<div/>');
+            const formElement = $('<div/>');
             const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
-            const submitInput   = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
-            const bottomPane    = $('<div/>').addClass('blog-left');
-            const detailsTable  = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-            const colGroup      = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
+            const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
+            const bottomPane = $('<div/>').addClass('blog-left');
+            const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
+            const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
             const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
-            const showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-            
+            const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
+
             mainContent.append(formElement);
             formElement.addClass('blog-left cardStyle cardForm formBlock');
             bottomPane.addClass('cardStyle');
@@ -30,7 +30,7 @@ module SeriesfeedImporter.Controllers {
             detailsTable.append(detailsHeader);
             bottomPane.append(showDetails);
             showDetails.append(detailsTable);
-            
+
             mainContent.append(p);
 
             Services.BierdopjeService.getUsername()
@@ -70,63 +70,67 @@ module SeriesfeedImporter.Controllers {
                                                 let sfSeriesId = sfShowData.id;
                                                 let sfSeriesName = sfShowData.name;
                                                 const sfSeriesSlug = sfShowData.slug;
-                                                const sfSeriesUrl = 'http://www.seriesfeed.com/series/';
+                                                const sfSeriesUrl = 'https://www.seriesfeed.com/series/';
 
                                                 const MAX_RETRIES = Config.MaxRetries;
                                                 let current_retries = 0;
 
-                                                Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
-                                                    .then((result) => {
-                                                        const resultStatus = result.status;
-                                                        let item = "<tr></tr>";
-                                                        let status = "-";
-                                                        let showUrl = sfSeriesUrl + sfSeriesSlug;
+                                                function addFavouriteByShowId(sfSeriesId: any) {
+                                                    Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
+                                                        .then((result) => {
+                                                            const resultStatus = result.status;
+                                                            let item = "<tr></tr>";
+                                                            let status = "-";
+                                                            let showUrl = sfSeriesUrl + sfSeriesSlug;
 
-                                                        if (sfSeriesId === -1) {
-                                                            sfSeriesId = "Onbekend";
-                                                        }
+                                                            if (sfSeriesId === -1) {
+                                                                sfSeriesId = "Onbekend";
+                                                            }
 
-                                                        if (!sfSeriesName) {
-                                                            showUrl = bdShowUrl + bdShowSlug;
-                                                            sfSeriesName = bdShowName;
-                                                        }
+                                                            if (!sfSeriesName) {
+                                                                showUrl = bdShowUrl + bdShowSlug;
+                                                                sfSeriesName = bdShowName;
+                                                            }
 
-                                                        if (resultStatus === "success") {
-                                                            status = "Toegevoegd als favoriet.";
-                                                            item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                        } else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
-                                                            status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-                                                            item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                        } else {
-                                                            status = "Deze serie is al een favoriet.";
-                                                            item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                        }
+                                                            if (resultStatus === "success") {
+                                                                status = "Toegevoegd als favoriet.";
+                                                                item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                            } else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
+                                                                status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
+                                                                item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                            } else {
+                                                                status = "Deze serie is al een favoriet.";
+                                                                item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                            }
 
-                                                        favourites.append(item);
-
-                                                        const progress = (index / bdFavouritesLength) * 100;
-                                                        progressBar.css('width', Math.round(progress) + "%");
-
-                                                        resolve();
-                                                    })
-                                                    .catch(() => {
-                                                        console.log("Retrying to favourite " + sfSeriesName + "(" + sfSeriesId + "). " + current_retries + "/" + MAX_RETRIES);
-                                                        current_retries++;
-
-                                                        if (current_retries === MAX_RETRIES) {
-                                                            const status = "Kon deze serie niet als favoriet instellen.";
-                                                            const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
                                                             favourites.append(item);
 
                                                             const progress = (index / bdFavouritesLength) * 100;
                                                             progressBar.css('width', Math.round(progress) + "%");
 
                                                             resolve();
-                                                        } else {
-                                                            this(index);
-                                                            resolve();
-                                                        }
-                                                    });
+                                                        })
+                                                        .catch(() => {
+                                                            console.log(`Retrying to favourite ${sfSeriesName} (${sfSeriesId}). ${current_retries + 1}/${MAX_RETRIES})`);
+                                                            current_retries++;
+
+                                                            if (current_retries === MAX_RETRIES) {
+                                                                const status = "Kon deze serie niet als favoriet instellen.";
+                                                                const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                                                favourites.append(item);
+
+                                                                const progress = (index / bdFavouritesLength) * 100;
+                                                                progressBar.css('width', Math.round(progress) + "%");
+
+                                                                resolve();
+                                                            } else {
+                                                                addFavouriteByShowId(index);
+                                                                resolve();
+                                                            }
+                                                        });
+                                                }
+
+                                                addFavouriteByShowId(sfSeriesId);
                                             }).catch(() => {
                                                 const status = 'Het id kan niet van Seriesfeed worden opgehaald.</a>';
                                                 const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
@@ -185,7 +189,7 @@ module SeriesfeedImporter.Controllers {
 
                                 checkActiveCalls();
                             }).catch((error) => {
-                                console.log("Unknown error: ", error);
+                                throw `Unknown error: ${error}`;
                             });
                     });
             });

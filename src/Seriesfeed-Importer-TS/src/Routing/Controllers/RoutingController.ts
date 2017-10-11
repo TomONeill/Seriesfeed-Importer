@@ -15,10 +15,10 @@ module SeriesfeedImporter.Controllers {
                     Services.RouterService.import();
                     break;
 
-                case Config.BaseUrl + Enums.ShortUrl.PlatformSelection:
-                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.PlatformSelection }, "", Enums.ShortUrl.PlatformSelection);
+                case Config.BaseUrl + Enums.ShortUrl.ImportPlatformSelection:
+                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.ImportPlatformSelection }, "", Enums.ShortUrl.ImportPlatformSelection);
                     this.fixPageLayout();
-                    Services.RouterService.platformSelection();
+                    Services.RouterService.importPlatformSelection();
                     break;
 
                 case Config.BaseUrl + Enums.ShortUrl.ImportBierdopje:
@@ -59,8 +59,8 @@ module SeriesfeedImporter.Controllers {
                         Services.RouterService.import();
                         break;
 
-                    case Enums.ShortUrl.PlatformSelection:
-                        Services.RouterService.platformSelection();
+                    case Enums.ShortUrl.ImportPlatformSelection:
+                        Services.RouterService.importPlatformSelection();
                         break;
 
                     case Enums.ShortUrl.ImportBierdopje:

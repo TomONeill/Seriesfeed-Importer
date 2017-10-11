@@ -235,9 +235,9 @@ var SeriesfeedImporter;
                 card.append(cardInner);
                 const platform = $('<p/>').append('Wat wil je importeren?');
                 cardInner.append(platform);
-                const favourites = SeriesfeedImporter.Services.ButtonService.provideCardButton("fa-star", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.PlatformSelection);
+                const favourites = SeriesfeedImporter.Services.ButtonService.provideCardButton("fa-star-o", "600", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection);
                 cardInner.append(favourites);
-                const timeWasted = SeriesfeedImporter.Services.ButtonService.provideCardButton("fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const timeWasted = SeriesfeedImporter.Services.ButtonService.provideCardButton("fa-clock-o", "normal", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                 cardInner.append(timeWasted);
             }
         }
@@ -546,12 +546,12 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class PlatformSelectionController {
+        class ImportPlatformSelectionController {
             constructor() {
                 const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
                 const selector = $('<div/>').addClass("platformSelector");
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-                const importHead = $('<h2/>').append('Series importeren');
+                const importHead = $('<h2/>').append('Favorieten importeren');
                 const cardInner = $('<div/>').addClass("cardFormInner");
                 const platform = $('<p/>').append('Kies een platform:');
                 mainContent.append(selector);
@@ -565,7 +565,7 @@ var SeriesfeedImporter;
                 bierdopje.after(imdb);
             }
         }
-        Controllers.PlatformSelectionController = PlatformSelectionController;
+        Controllers.ImportPlatformSelectionController = ImportPlatformSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -734,10 +734,10 @@ var SeriesfeedImporter;
                         this.fixPageLayout();
                         SeriesfeedImporter.Services.RouterService.import();
                         break;
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.PlatformSelection:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.PlatformSelection }, "", SeriesfeedImporter.Enums.ShortUrl.PlatformSelection);
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection }, "", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection);
                         this.fixPageLayout();
-                        SeriesfeedImporter.Services.RouterService.platformSelection();
+                        SeriesfeedImporter.Services.RouterService.importPlatformSelection();
                         break;
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
                         window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje }, "", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
@@ -771,8 +771,8 @@ var SeriesfeedImporter;
                         case SeriesfeedImporter.Enums.ShortUrl.Import:
                             SeriesfeedImporter.Services.RouterService.import();
                             break;
-                        case SeriesfeedImporter.Enums.ShortUrl.PlatformSelection:
-                            SeriesfeedImporter.Services.RouterService.platformSelection();
+                        case SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection:
+                            SeriesfeedImporter.Services.RouterService.importPlatformSelection();
                             break;
                         case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
                             SeriesfeedImporter.Services.RouterService.importBierdopje();
@@ -800,8 +800,8 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.Import:
                         this.import();
                         break;
-                    case SeriesfeedImporter.Enums.ShortUrl.PlatformSelection:
-                        this.platformSelection();
+                    case SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection:
+                        this.importPlatformSelection();
                         break;
                     case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
                         this.importBierdopje();
@@ -821,10 +821,10 @@ var SeriesfeedImporter;
                 this.clearContent();
                 new SeriesfeedImporter.Controllers.ImportController();
             }
-            static platformSelection() {
+            static importPlatformSelection() {
                 document.title = "Platformkeuze | Series importeren | Seriesfeed";
                 this.clearContent();
-                new SeriesfeedImporter.Controllers.PlatformSelectionController();
+                new SeriesfeedImporter.Controllers.ImportPlatformSelectionController();
             }
             static importBierdopje() {
                 document.title = "Bierdopje series importeren | Seriesfeed";
@@ -867,7 +867,7 @@ var SeriesfeedImporter;
     (function (Enums) {
         Enums.ShortUrl = {
             Import: "/series/import/",
-            PlatformSelection: "/series/import/platform/",
+            ImportPlatformSelection: "/series/import/platform/",
             ImportBierdopje: "/series/import/platform/bierdopje/",
             ImportImdb: "/series/import/platform/imdb/",
             Export: "/series/export/"
@@ -916,7 +916,7 @@ var SeriesfeedImporter;
     var Services;
     (function (Services) {
         class ButtonService {
-            static provideCardButton(iconClass, text, url) {
+            static provideCardButton(iconClass, iconFontWeight, text, url) {
                 const portfolio = $('<div/>');
                 const wrapper = $('<div/>');
                 const info = $('<div/>');
@@ -929,11 +929,12 @@ var SeriesfeedImporter;
                     display: 'inline-block',
                     width: '100%',
                     textAlign: 'center',
-                    fontSize: '20px',
+                    fontSize: '18px',
                     transition: 'all .24s ease-in-out'
                 });
                 icon.css({
-                    paddingRight: '5px'
+                    paddingRight: '5px',
+                    fontWeight: iconFontWeight
                 });
                 portfolio.hover(() => {
                     portfolio.addClass('cardStyle cardForm formBlock');

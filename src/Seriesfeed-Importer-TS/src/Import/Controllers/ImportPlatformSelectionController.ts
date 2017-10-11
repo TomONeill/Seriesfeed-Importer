@@ -1,13 +1,13 @@
 /// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class PlatformSelectionController {
+    export class ImportPlatformSelectionController {
         constructor() {
             const mainContent = $('#' + Config.MainContentId);
 
             const selector = $('<div/>').addClass("platformSelector");
             const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-            const importHead = $('<h2/>').append('Series importeren');
+            const importHead = $('<h2/>').append('Favorieten importeren');
             const cardInner = $('<div/>').addClass("cardFormInner");
             const platform = $('<p/>').append('Kies een platform:');
 

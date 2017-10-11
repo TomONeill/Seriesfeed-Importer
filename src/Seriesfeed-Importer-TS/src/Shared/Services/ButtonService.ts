@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Services {
     export class ButtonService {
-        public static provideCardButton(iconClass: string, text: string, url: Enums.ShortUrl): JQuery {
+        public static provideCardButton(iconClass: string, iconFontWeight: string, text: string, url: Enums.ShortUrl): JQuery {
             // Element declaration
             const portfolio = $('<div/>');
             const wrapper = $('<div/>');
@@ -20,11 +20,12 @@ module SeriesfeedImporter.Services {
                 display: 'inline-block',
                 width: '100%',
                 textAlign: 'center',
-                fontSize: '20px',
+                fontSize: '18px',
                 transition: 'all .24s ease-in-out'
             });
             icon.css({
-                paddingRight: '5px'
+                paddingRight: '5px',
+                fontWeight: iconFontWeight
             });
             portfolio.hover(() => {
                 portfolio.addClass('cardStyle cardForm formBlock');

@@ -61,7 +61,7 @@ module SeriesfeedImporter.Services {
         }
 
         private static clearContent(): void {
-            $('#' + Config.MainContentId).empty();
+            $('#' + Config.Id.MainContent).empty();
         }
     }
 }

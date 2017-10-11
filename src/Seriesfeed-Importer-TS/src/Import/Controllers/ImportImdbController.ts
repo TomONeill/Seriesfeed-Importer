@@ -19,7 +19,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialise(): void {
-            const mainContent = $('#' + Config.MainContentId);
+            const mainContent = $('#' + Config.Id.MainContent);
 
             const col = $('<div/>').addClass("col-md-12");
             mainContent.append(col);

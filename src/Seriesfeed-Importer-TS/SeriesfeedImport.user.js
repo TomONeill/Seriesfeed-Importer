@@ -19,7 +19,10 @@ var SeriesfeedImporter;
     var Config;
     (function (Config) {
         Config.BaseUrl = "https://www.seriesfeed.com";
-        Config.MainContentId = "mainContent";
+        Config.Id = {
+            MainContent: "mainContent",
+            CardContent: "cardContent"
+        };
         Config.MaxRetries = 3;
         Config.MaxAsyncCalls = 3;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
@@ -30,17 +33,10 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ExportController {
             constructor() {
-                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
-                const selector = $('<div/>').addClass("platformSelector");
-                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-                const importHead = $('<h2/>').append('Series exporteren');
-                const cardInner = $('<div/>').addClass("cardFormInner");
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Series exporteren");
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const platform = $('<p/>').append('Dit onderdeel komt binnenkort.');
-                mainContent.append(selector);
-                selector.append(card);
-                card.append(importHead);
-                card.append(cardInner);
-                cardInner.append(platform);
+                cardContent.append(platform);
             }
         }
         Controllers.ExportController = ExportController;
@@ -52,7 +48,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
-                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
+                const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
                 const head = $('<h1/>').text('Series importeren - Bierdopje.com');
                 const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
                 mainContent.append(head);
@@ -224,21 +220,15 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportController {
             constructor() {
-                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
-                const selector = $('<div/>').addClass("platformSelector");
-                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-                const importHead = $('<h2/>').append('Series importeren');
-                const cardInner = $('<div/>').addClass("cardFormInner");
-                mainContent.append(selector);
-                selector.append(card);
-                card.append(importHead);
-                card.append(cardInner);
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Series importeren");
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const platform = $('<p/>').append('Wat wil je importeren?');
-                cardInner.append(platform);
-                const favourites = SeriesfeedImporter.Services.ButtonService.provideCardButton("fa-star-o", "600", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection);
-                cardInner.append(favourites);
-                const timeWasted = SeriesfeedImporter.Services.ButtonService.provideCardButton("fa-clock-o", "normal", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
-                cardInner.append(timeWasted);
+                cardContent.append(platform);
+                const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection, "100%");
+                const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
+                favourites.css({ marginTop: '0px' });
+                cardContent.append(favourites);
+                cardContent.append(timeWasted);
             }
         }
         Controllers.ImportController = ImportController;
@@ -255,7 +245,7 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialise() {
-                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
+                const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
                 const col = $('<div/>').addClass("col-md-12");
                 mainContent.append(col);
                 const head = $('<h1/>');
@@ -548,21 +538,12 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportPlatformSelectionController {
             constructor() {
-                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
-                const selector = $('<div/>').addClass("platformSelector");
-                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-                const importHead = $('<h2/>').append('Favorieten importeren');
-                const cardInner = $('<div/>').addClass("cardFormInner");
-                const platform = $('<p/>').append('Kies een platform:');
-                mainContent.append(selector);
-                selector.append(card);
-                card.append(importHead);
-                card.append(cardInner);
-                cardInner.append(platform);
-                const bierdopje = SeriesfeedImporter.Services.PlatformService.create("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
-                platform.after(bierdopje);
-                const imdb = SeriesfeedImporter.Services.PlatformService.create("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
-                bierdopje.after(imdb);
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren");
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const bierdopje = SeriesfeedImporter.Providers.PlatformProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
+                cardContent.append(bierdopje);
+                const imdb = SeriesfeedImporter.Providers.PlatformProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
+                cardContent.append(imdb);
             }
         }
         Controllers.ImportPlatformSelectionController = ImportPlatformSelectionController;
@@ -759,7 +740,7 @@ var SeriesfeedImporter;
             fixPageLayout() {
                 const wrapper = $('.contentWrapper .container').last().empty();
                 wrapper.removeClass('container').addClass('wrapper bg');
-                const container = $('<div></div>').addClass('container').attr('id', SeriesfeedImporter.Config.MainContentId);
+                const container = $('<div></div>').addClass('container').attr('id', SeriesfeedImporter.Config.Id.MainContent);
                 wrapper.append(container);
             }
             respondToBrowserNavigationChanges() {
@@ -842,11 +823,26 @@ var SeriesfeedImporter;
                 new SeriesfeedImporter.Controllers.ExportController();
             }
             static clearContent() {
-                $('#' + SeriesfeedImporter.Config.MainContentId).empty();
+                $('#' + SeriesfeedImporter.Config.Id.MainContent).empty();
             }
         }
         Services.RouterService = RouterService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Enums;
+    (function (Enums) {
+        Enums.ButtonType = {
+            Default: "btn-default",
+            Primary: "btn-primary",
+            Success: "btn-success",
+            Info: "btn-info",
+            Warning: "btn-warning",
+            Danger: "btn-danger",
+            Link: "btn-link"
+        };
+    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -873,6 +869,68 @@ var SeriesfeedImporter;
             Export: "/series/export/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Providers;
+    (function (Providers) {
+        class ButtonProvider {
+            static provide(buttonType, iconClass, text, url, width) {
+                const button = $('<div/>').addClass(`btn ${buttonType}`).click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
+                const icon = $('<i/>').addClass(`fa ${iconClass}`);
+                button.css({
+                    width: width == null ? 'auto' : width
+                });
+                button.append(icon);
+                button.append(text);
+                return button;
+            }
+        }
+        Providers.ButtonProvider = ButtonProvider;
+    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Providers;
+    (function (Providers) {
+        class PlatformProvider {
+            static provide(name, image, imageSize, url, colour) {
+                var portfolio = $('<div/>').addClass("portfolio mix_all");
+                var a = $('<a/>').click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
+                var wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
+                var hover = $('<div/>').addClass("portfolio-hover");
+                var img = $('<img/>');
+                var info = $('<div/>').addClass("portfolio-info");
+                var title = $('<div/>').addClass("portfolio-title");
+                var h4 = $('<h4/>');
+                portfolio.css({
+                    display: 'inline-block',
+                    width: '100%',
+                    transition: 'all .24s ease-in-out'
+                });
+                portfolio.hover(() => portfolio.addClass('cardStyle cardForm formBlock'), () => portfolio.removeClass('cardStyle cardForm formBlock'));
+                hover.css({
+                    textAlign: 'center',
+                    background: colour
+                });
+                img.css({
+                    maxWidth: imageSize,
+                    padding: '10px'
+                });
+                img.attr('src', image).attr('alt', name);
+                h4.text(name);
+                portfolio.append(a);
+                a.append(wrapper);
+                wrapper.append(hover);
+                hover.append(img);
+                wrapper.append(info);
+                info.append(title);
+                title.append(h4);
+                return portfolio;
+            }
+        }
+        Providers.PlatformProvider = PlatformProvider;
+    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -915,94 +973,20 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
-        class ButtonService {
-            static provideCardButton(iconClass, iconFontWeight, text, url) {
-                const portfolio = $('<div/>');
-                const wrapper = $('<div/>');
-                const info = $('<div/>');
-                const icon = $('<i/>');
-                portfolio.addClass("portfolio mix_all");
-                wrapper.addClass("portfolio-wrapper cardStyle");
-                info.addClass("portfolio-info");
-                icon.addClass(`fa ${iconClass}`);
-                portfolio.css({
-                    display: 'inline-block',
-                    width: '100%',
-                    textAlign: 'center',
-                    fontSize: '18px',
-                    transition: 'all .24s ease-in-out'
-                });
-                icon.css({
-                    paddingRight: '5px',
-                    fontWeight: iconFontWeight
-                });
-                portfolio.hover(() => {
-                    portfolio.addClass('cardStyle cardForm formBlock');
-                }, () => {
-                    portfolio.removeClass('cardStyle cardForm formBlock');
-                });
-                portfolio.click(() => Services.RouterService.navigate(url));
-                portfolio.append(wrapper);
-                wrapper.append(info);
-                info.append(icon);
-                info.append(text);
-                return portfolio;
+        class CardInitialiserService {
+            static initialise(title) {
+                const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
+                const selector = $('<div/>').addClass("platformSelector");
+                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
+                const importHead = $('<h2/>').text(title);
+                const cardInner = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
+                mainContent.append(selector);
+                selector.append(card);
+                card.append(importHead);
+                card.append(cardInner);
             }
         }
-        Services.ButtonService = ButtonService;
-    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Services;
-    (function (Services) {
-        class PlatformService {
-            static create(name, image, imageSize, url, colour) {
-                var portfolio = $('<div/>');
-                var a = $('<a/>');
-                var wrapper = $('<div/>');
-                var hover = $('<div/>');
-                var img = $('<img/>');
-                var info = $('<div/>');
-                var title = $('<div/>');
-                var h4 = $('<h4/>');
-                portfolio.addClass("portfolio mix_all");
-                wrapper.addClass("portfolio-wrapper cardStyle");
-                hover.addClass("portfolio-hover");
-                info.addClass("portfolio-info");
-                title.addClass("portfolio-title");
-                portfolio.css({
-                    display: 'inline-block',
-                    width: '100%',
-                    transition: 'all .24s ease-in-out'
-                });
-                portfolio.hover(() => {
-                    portfolio.addClass('cardStyle cardForm formBlock');
-                }, () => {
-                    portfolio.removeClass('cardStyle cardForm formBlock');
-                });
-                hover.css({
-                    textAlign: 'center',
-                    background: colour
-                });
-                img.css({
-                    maxWidth: imageSize,
-                    padding: '10px'
-                });
-                img.attr('src', image).attr('alt', name);
-                h4.append(name);
-                a.click(() => Services.RouterService.navigate(url));
-                portfolio.append(a);
-                a.append(wrapper);
-                wrapper.append(hover);
-                hover.append(img);
-                wrapper.append(info);
-                info.append(title);
-                title.append(h4);
-                return portfolio;
-            }
-        }
-        Services.PlatformService = PlatformService;
+        Services.CardInitialiserService = CardInitialiserService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

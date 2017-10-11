@@ -44,7 +44,7 @@ module SeriesfeedImporter.Controllers {
         private fixPageLayout(): void {
             const wrapper = $('.contentWrapper .container').last().empty();
             wrapper.removeClass('container').addClass('wrapper bg');
-            const container = $('<div></div>').addClass('container').attr('id', Config.MainContentId);
+            const container = $('<div></div>').addClass('container').attr('id', Config.Id.MainContent);
             wrapper.append(container);
         }
 

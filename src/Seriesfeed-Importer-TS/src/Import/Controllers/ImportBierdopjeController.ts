@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
-            const mainContent = $('#' + Config.MainContentId);
+            const mainContent = $('#' + Config.Id.MainContent);
 
             const head = $('<h1/>').text('Series importeren - Bierdopje.com');
             const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');

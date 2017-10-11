@@ -3,26 +3,18 @@
 module SeriesfeedImporter.Controllers {
     export class ImportController {
         constructor() {
-            const mainContent = $('#' + Config.MainContentId);
-
-            const selector = $('<div/>').addClass("platformSelector");
-            const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-            const importHead = $('<h2/>').append('Series importeren');
-            const cardInner = $('<div/>').addClass("cardFormInner");
-
-            mainContent.append(selector);
-            selector.append(card);
-            card.append(importHead);
-            card.append(cardInner);
+            Services.CardInitialiserService.initialise("Series importeren");
+            const cardContent = $('#' + Config.Id.CardContent);
             
             const platform = $('<p/>').append('Wat wil je importeren?');
-            cardInner.append(platform);
+            cardContent.append(platform);
             
-            const favourites = Services.ButtonService.provideCardButton("fa-star-o", "600", "Favorieten", Enums.ShortUrl.ImportPlatformSelection);
-            cardInner.append(favourites);
+            const favourites = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-star-o", "Favorieten", Enums.ShortUrl.ImportPlatformSelection, "100%");
+            const timeWasted = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", Enums.ShortUrl.ImportBierdopje, "100%");
 
-            const timeWasted = Services.ButtonService.provideCardButton("fa-clock-o", "normal", "Time Wasted", Enums.ShortUrl.ImportBierdopje);
-            cardInner.append(timeWasted);
+            favourites.css({ marginTop: '0px' });
+            cardContent.append(favourites);
+            cardContent.append(timeWasted);
         }
     }
 }

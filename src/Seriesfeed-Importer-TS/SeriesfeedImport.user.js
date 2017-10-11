@@ -18,9 +18,32 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Config;
     (function (Config) {
+        Config.BaseUrl = "https://www.seriesfeed.com";
         Config.MaxRetries = 3;
         Config.MaxAsyncCalls = 3;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ExportController {
+            constructor() {
+                const mainContent = $('#mainContent');
+                const selector = $('<div/>').addClass("platformSelector");
+                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
+                const importHead = $('<h2/>').append('Series exporteren');
+                const cardInner = $('<div/>').addClass("cardFormInner");
+                const platform = $('<p/>').append('Dit onderdeel komt binnenkort.');
+                mainContent.append(selector);
+                selector.append(card);
+                card.append(importHead);
+                card.append(cardInner);
+                cardInner.append(platform);
+            }
+        }
+        Controllers.ExportController = ExportController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -648,7 +671,8 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class NavigationController {
             initialise() {
-                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrl.Import);
+                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrl.PlatformSelection);
+                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 6, "Exporteren", SeriesfeedImporter.Enums.ShortUrl.Export);
             }
         }
         Controllers.NavigationController = NavigationController;
@@ -674,20 +698,24 @@ var SeriesfeedImporter;
         class RoutingController {
             initialise() {
                 this.firstTimeVisitRouting();
-                this.respondToUrlChanges();
+                this.respondToBrowserNavigationChanges();
             }
             firstTimeVisitRouting() {
-                if (window.location.href === SeriesfeedImporter.Enums.Url.PlatformSelection) {
+                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.PlatformSelection) {
                     this.fixPageLayout();
                     SeriesfeedImporter.Services.RouterService.platformSelection();
                 }
-                if (window.location.href === SeriesfeedImporter.Enums.Url.ImportBierdopje) {
+                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
                     this.fixPageLayout();
                     SeriesfeedImporter.Services.RouterService.importBierdopje();
                 }
-                if (window.location.href === SeriesfeedImporter.Enums.Url.ImportImdb) {
+                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
                     this.fixPageLayout();
                     SeriesfeedImporter.Services.RouterService.importImdb();
+                }
+                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Export) {
+                    this.fixPageLayout();
+                    SeriesfeedImporter.Services.RouterService.export();
                 }
             }
             fixPageLayout() {
@@ -697,9 +725,9 @@ var SeriesfeedImporter;
                 ;
                 wrapper.append(container);
             }
-            respondToUrlChanges() {
+            respondToBrowserNavigationChanges() {
                 window.onpopstate = (event) => {
-                    if (event.state == null || event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.Import) {
+                    if (event.state == null || event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.PlatformSelection) {
                         SeriesfeedImporter.Services.RouterService.platformSelection();
                         return;
                     }
@@ -709,6 +737,10 @@ var SeriesfeedImporter;
                     }
                     if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
                         SeriesfeedImporter.Services.RouterService.importImdb();
+                        return;
+                    }
+                    if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.Export) {
+                        SeriesfeedImporter.Services.RouterService.export();
                         return;
                     }
                 };
@@ -723,7 +755,7 @@ var SeriesfeedImporter;
     (function (Services) {
         class RouterService {
             static navigate(url) {
-                if (url === SeriesfeedImporter.Enums.ShortUrl.Import) {
+                if (url === SeriesfeedImporter.Enums.ShortUrl.PlatformSelection) {
                     this.platformSelection();
                 }
                 if (url === SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
@@ -731,6 +763,9 @@ var SeriesfeedImporter;
                 }
                 if (url === SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
                     this.importImdb();
+                }
+                if (url === SeriesfeedImporter.Enums.ShortUrl.Export) {
+                    this.export();
                 }
                 window.scrollTo(0, 0);
                 window.history.pushState({ "shortUrl": url }, "", url);
@@ -749,6 +784,11 @@ var SeriesfeedImporter;
                 document.title = "IMDb series importeren | Seriesfeed";
                 this.clearContent();
                 new SeriesfeedImporter.Controllers.ImportImdbController();
+            }
+            static export() {
+                document.title = "Series exporteren | Seriesfeed";
+                this.clearContent();
+                new SeriesfeedImporter.Controllers.ExportController();
             }
             static clearContent() {
                 $('#mainContent').empty();
@@ -775,20 +815,10 @@ var SeriesfeedImporter;
     var Enums;
     (function (Enums) {
         Enums.ShortUrl = {
-            Import: "/series/import/",
+            PlatformSelection: "/series/import/",
             ImportBierdopje: "/series/import/bierdopje/",
-            ImportImdb: "/series/import/imdb/"
-        };
-    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Enums;
-    (function (Enums) {
-        Enums.Url = {
-            PlatformSelection: "https://www.seriesfeed.com/series/import/",
-            ImportBierdopje: "https://www.seriesfeed.com/series/import/bierdopje/",
-            ImportImdb: "https://www.seriesfeed.com/series/import/imdb/"
+            ImportImdb: "/series/import/imdb/",
+            Export: "/series/export/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));

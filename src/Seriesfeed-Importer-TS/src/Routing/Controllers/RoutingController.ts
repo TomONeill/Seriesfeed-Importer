@@ -4,23 +4,28 @@ module SeriesfeedImporter.Controllers {
     export class RoutingController {
         public initialise(): void {
             this.firstTimeVisitRouting();
-            this.respondToUrlChanges();
+            this.respondToBrowserNavigationChanges();
         }
 
         private firstTimeVisitRouting(): void {
-            if (window.location.href === Enums.Url.PlatformSelection) {
+            if (window.location.href === Config.BaseUrl + Enums.ShortUrl.PlatformSelection) {
                 this.fixPageLayout();
                 Services.RouterService.platformSelection();
             }
 
-            if (window.location.href === Enums.Url.ImportBierdopje) {
+            if (window.location.href === Config.BaseUrl + Enums.ShortUrl.ImportBierdopje) {
                 this.fixPageLayout();
                 Services.RouterService.importBierdopje();
             }
 
-            if (window.location.href === Enums.Url.ImportImdb) {
+            if (window.location.href === Config.BaseUrl + Enums.ShortUrl.ImportImdb) {
                 this.fixPageLayout();
                 Services.RouterService.importImdb();
+            }
+
+            if (window.location.href === Config.BaseUrl + Enums.ShortUrl.Export) {
+                this.fixPageLayout();
+                Services.RouterService.export();
             }
         }
 
@@ -31,9 +36,9 @@ module SeriesfeedImporter.Controllers {
             wrapper.append(container);
         }
 
-        private respondToUrlChanges(): void {
+        private respondToBrowserNavigationChanges(): void {
             window.onpopstate = (event) => {
-                if (event.state == null || event.state.shortUrl === Enums.ShortUrl.Import) {
+                if (event.state == null || event.state.shortUrl === Enums.ShortUrl.PlatformSelection) {
                     Services.RouterService.platformSelection();
                     return;
                 }
@@ -45,6 +50,11 @@ module SeriesfeedImporter.Controllers {
 
                 if (event.state.shortUrl === Enums.ShortUrl.ImportImdb) {
                     Services.RouterService.importImdb();
+                    return;
+                }
+
+                if (event.state.shortUrl === Enums.ShortUrl.Export) {
+                    Services.RouterService.export();
                     return;
                 }
             }

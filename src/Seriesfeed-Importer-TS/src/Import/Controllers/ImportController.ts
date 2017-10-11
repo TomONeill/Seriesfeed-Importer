@@ -5,10 +5,10 @@ module SeriesfeedImporter.Controllers {
         constructor() {
             Services.CardInitialiserService.initialise("Series importeren");
             const cardContent = $('#' + Config.Id.CardContent);
-            
+
             const platform = $('<p/>').append('Wat wil je importeren?');
             cardContent.append(platform);
-            
+
             const favourites = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-star-o", "Favorieten", Enums.ShortUrl.ImportPlatformSelection, "100%");
             const timeWasted = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", Enums.ShortUrl.ImportBierdopje, "100%");
 

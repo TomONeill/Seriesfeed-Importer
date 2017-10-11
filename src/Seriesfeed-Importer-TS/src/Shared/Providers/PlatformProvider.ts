@@ -3,38 +3,41 @@
 module SeriesfeedImporter.Providers {
     export class PlatformProvider {
         public static provide(name: string, image: string, imageSize: string, url: Enums.ShortUrl, colour: string): JQuery {
-            var portfolio = $('<div/>').addClass("portfolio mix_all");
-            var a = $('<a/>').click(() => Services.RouterService.navigate(url));
-            var wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
-            var hover = $('<div/>').addClass("portfolio-hover");
-            var img = $('<img/>');
-            var info = $('<div/>').addClass("portfolio-info");
-            var title = $('<div/>').addClass("portfolio-title");
-            var h4 = $('<h4/>');
+            const portfolio = $('<div/>').addClass("portfolio mix_all");
+            const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
+            const hover = $('<div/>').addClass("portfolio-hover");
+            const img = $('<img/>');
+            const info = $('<div/>').addClass("portfolio-info");
+            const title = $('<div/>').addClass("portfolio-title");
+            const h4 = $('<h4/>').text(name);
 
-            portfolio.css({
-                display: 'inline-block',
-                width: '100%',
-                transition: 'all .24s ease-in-out'
-            });
-            portfolio.hover(
+            portfolio
+                .css({
+                    display: 'inline-block',
+                    width: '100%',
+                    transition: 'all .24s ease-in-out'
+                })
+                .hover(
                 () => portfolio.addClass('cardStyle cardForm formBlock'),
                 () => portfolio.removeClass('cardStyle cardForm formBlock')
-            );
-            hover.css({
-                textAlign: 'center',
-                background: colour
-            });
-            img.css({
-                maxWidth: imageSize,
-                padding: '10px'
-            });
+                )
+                .click(() => Services.RouterService.navigate(url));
 
-            img.attr('src', image).attr('alt', name);
-            h4.text(name);
+            hover
+                .css({
+                    textAlign: 'center',
+                    background: colour
+                });
+                
+            img
+                .css({
+                    maxWidth: imageSize,
+                    padding: '10px'
+                })
+                .attr('src', image)
+                .attr('alt', name);
 
-            portfolio.append(a);
-            a.append(wrapper);
+            portfolio.append(wrapper);
             wrapper.append(hover);
             hover.append(img);
             wrapper.append(info);

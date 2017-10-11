@@ -538,7 +538,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportPlatformSelectionController {
             constructor() {
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren");
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import);
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const bierdopje = SeriesfeedImporter.Providers.PlatformProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
                 cardContent.append(bierdopje);
@@ -895,32 +895,34 @@ var SeriesfeedImporter;
     (function (Providers) {
         class PlatformProvider {
             static provide(name, image, imageSize, url, colour) {
-                var portfolio = $('<div/>').addClass("portfolio mix_all");
-                var a = $('<a/>').click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
-                var wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
-                var hover = $('<div/>').addClass("portfolio-hover");
-                var img = $('<img/>');
-                var info = $('<div/>').addClass("portfolio-info");
-                var title = $('<div/>').addClass("portfolio-title");
-                var h4 = $('<h4/>');
-                portfolio.css({
+                const portfolio = $('<div/>').addClass("portfolio mix_all");
+                const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
+                const hover = $('<div/>').addClass("portfolio-hover");
+                const img = $('<img/>');
+                const info = $('<div/>').addClass("portfolio-info");
+                const title = $('<div/>').addClass("portfolio-title");
+                const h4 = $('<h4/>').text(name);
+                portfolio
+                    .css({
                     display: 'inline-block',
                     width: '100%',
                     transition: 'all .24s ease-in-out'
-                });
-                portfolio.hover(() => portfolio.addClass('cardStyle cardForm formBlock'), () => portfolio.removeClass('cardStyle cardForm formBlock'));
-                hover.css({
+                })
+                    .hover(() => portfolio.addClass('cardStyle cardForm formBlock'), () => portfolio.removeClass('cardStyle cardForm formBlock'))
+                    .click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
+                hover
+                    .css({
                     textAlign: 'center',
                     background: colour
                 });
-                img.css({
+                img
+                    .css({
                     maxWidth: imageSize,
                     padding: '10px'
-                });
-                img.attr('src', image).attr('alt', name);
-                h4.text(name);
-                portfolio.append(a);
-                a.append(wrapper);
+                })
+                    .attr('src', image)
+                    .attr('alt', name);
+                portfolio.append(wrapper);
                 wrapper.append(hover);
                 hover.append(img);
                 wrapper.append(info);
@@ -974,15 +976,27 @@ var SeriesfeedImporter;
     var Services;
     (function (Services) {
         class CardInitialiserService {
-            static initialise(title) {
+            static initialise(title, backButtonUrl) {
                 const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
                 const selector = $('<div/>').addClass("platformSelector");
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-                const importHead = $('<h2/>').text(title);
+                const headerTitle = $('<h2/>').text(title);
                 const cardInner = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
+                if (backButtonUrl != null) {
+                    const backButton = $('<i/>')
+                        .css({
+                        float: 'left',
+                        padding: '5px',
+                        margin: '-5px',
+                        cursor: 'pointer'
+                    })
+                        .addClass("fa fa-arrow-left")
+                        .click(() => Services.RouterService.navigate(backButtonUrl));
+                    headerTitle.append(backButton);
+                }
                 mainContent.append(selector);
                 selector.append(card);
-                card.append(importHead);
+                card.append(headerTitle);
                 card.append(cardInner);
             }
         }

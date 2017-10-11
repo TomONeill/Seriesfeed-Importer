@@ -21,6 +21,7 @@ var SeriesfeedImporter;
         Config.BaseUrl = "https://www.seriesfeed.com";
         Config.MaxRetries = 3;
         Config.MaxAsyncCalls = 3;
+        Config.MainContentId = "mainContent";
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -29,7 +30,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ExportController {
             constructor() {
-                const mainContent = $('#mainContent');
+                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
                 const selector = $('<div/>').addClass("platformSelector");
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
                 const importHead = $('<h2/>').append('Series exporteren');
@@ -51,10 +52,11 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
-                const mainContent = $('#mainContent');
+                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
                 const head = $('<h1/>').text('Series importeren - Bierdopje.com');
                 const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
                 mainContent.append(head);
+                mainContent.append(p);
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
                 const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
@@ -74,7 +76,6 @@ var SeriesfeedImporter;
                 detailsTable.append(detailsHeader);
                 bottomPane.append(showDetails);
                 showDetails.append(detailsTable);
-                mainContent.append(p);
                 SeriesfeedImporter.Services.BierdopjeService.getUsername()
                     .then((username) => $('#username').attr('value', username));
                 $("#fav-import").click((event) => {
@@ -221,6 +222,28 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
+        class ImportController {
+            constructor() {
+                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
+                const selector = $('<div/>').addClass("platformSelector");
+                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
+                const importHead = $('<h2/>').append('Series importeren');
+                const cardInner = $('<div/>').addClass("cardFormInner");
+                const platform = $('<p/>').append('Wat wil je doen?');
+                mainContent.append(selector);
+                selector.append(card);
+                card.append(importHead);
+                card.append(cardInner);
+                cardInner.append(platform);
+            }
+        }
+        Controllers.ImportController = ImportController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
         class ImportImdbController {
             constructor() {
                 this._selectedLists = [];
@@ -228,7 +251,7 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialise() {
-                const mainContent = $('#mainContent');
+                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
                 const col = $('<div/>').addClass("col-md-12");
                 mainContent.append(col);
                 const head = $('<h1/>');
@@ -521,7 +544,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class PlatformSelectionController {
             constructor() {
-                const mainContent = $('#mainContent');
+                const mainContent = $('#' + SeriesfeedImporter.Config.MainContentId);
                 const selector = $('<div/>').addClass("platformSelector");
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
                 const importHead = $('<h2/>').append('Series importeren');
@@ -672,7 +695,6 @@ var SeriesfeedImporter;
         class NavigationController {
             initialise() {
                 SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrl.PlatformSelection);
-                SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 6, "Exporteren", SeriesfeedImporter.Enums.ShortUrl.Export);
             }
         }
         Controllers.NavigationController = NavigationController;
@@ -697,51 +719,65 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class RoutingController {
             initialise() {
-                this.firstTimeVisitRouting();
+                this.initialVisitRouting();
                 this.respondToBrowserNavigationChanges();
             }
-            firstTimeVisitRouting() {
-                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.PlatformSelection) {
-                    this.fixPageLayout();
-                    SeriesfeedImporter.Services.RouterService.platformSelection();
-                }
-                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
-                    this.fixPageLayout();
-                    SeriesfeedImporter.Services.RouterService.importBierdopje();
-                }
-                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
-                    this.fixPageLayout();
-                    SeriesfeedImporter.Services.RouterService.importImdb();
-                }
-                if (window.location.href === SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Export) {
-                    this.fixPageLayout();
-                    SeriesfeedImporter.Services.RouterService.export();
+            initialVisitRouting() {
+                switch (window.location.href) {
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Import:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.Import }, "", SeriesfeedImporter.Enums.ShortUrl.Import);
+                        this.fixPageLayout();
+                        SeriesfeedImporter.Services.RouterService.import();
+                        break;
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.PlatformSelection:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.PlatformSelection }, "", SeriesfeedImporter.Enums.ShortUrl.PlatformSelection);
+                        this.fixPageLayout();
+                        SeriesfeedImporter.Services.RouterService.platformSelection();
+                        break;
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje }, "", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                        this.fixPageLayout();
+                        SeriesfeedImporter.Services.RouterService.importBierdopje();
+                        break;
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportImdb }, "", SeriesfeedImporter.Enums.ShortUrl.ImportImdb);
+                        this.fixPageLayout();
+                        SeriesfeedImporter.Services.RouterService.importImdb();
+                        break;
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Export:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.Export }, "", SeriesfeedImporter.Enums.ShortUrl.Export);
+                        this.fixPageLayout();
+                        SeriesfeedImporter.Services.RouterService.export();
+                        break;
                 }
             }
             fixPageLayout() {
                 const wrapper = $('.contentWrapper .container').last().empty();
                 wrapper.removeClass('container').addClass('wrapper bg');
-                const container = $('<div></div>').addClass('container').attr('id', "mainContent");
-                ;
+                const container = $('<div></div>').addClass('container').attr('id', SeriesfeedImporter.Config.MainContentId);
                 wrapper.append(container);
             }
             respondToBrowserNavigationChanges() {
                 window.onpopstate = (event) => {
-                    if (event.state == null || event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.PlatformSelection) {
-                        SeriesfeedImporter.Services.RouterService.platformSelection();
+                    if (event.state == null) {
                         return;
                     }
-                    if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
-                        SeriesfeedImporter.Services.RouterService.importBierdopje();
-                        return;
-                    }
-                    if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
-                        SeriesfeedImporter.Services.RouterService.importImdb();
-                        return;
-                    }
-                    if (event.state.shortUrl === SeriesfeedImporter.Enums.ShortUrl.Export) {
-                        SeriesfeedImporter.Services.RouterService.export();
-                        return;
+                    switch (event.state.shortUrl) {
+                        case SeriesfeedImporter.Enums.ShortUrl.Import:
+                            SeriesfeedImporter.Services.RouterService.import();
+                            break;
+                        case SeriesfeedImporter.Enums.ShortUrl.PlatformSelection:
+                            SeriesfeedImporter.Services.RouterService.platformSelection();
+                            break;
+                        case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
+                            SeriesfeedImporter.Services.RouterService.importBierdopje();
+                            break;
+                        case SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
+                            SeriesfeedImporter.Services.RouterService.importImdb();
+                            break;
+                        case SeriesfeedImporter.Enums.ShortUrl.Export:
+                            SeriesfeedImporter.Services.RouterService.export();
+                            break;
                     }
                 };
             }
@@ -755,23 +791,33 @@ var SeriesfeedImporter;
     (function (Services) {
         class RouterService {
             static navigate(url) {
-                if (url === SeriesfeedImporter.Enums.ShortUrl.PlatformSelection) {
-                    this.platformSelection();
-                }
-                if (url === SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje) {
-                    this.importBierdopje();
-                }
-                if (url === SeriesfeedImporter.Enums.ShortUrl.ImportImdb) {
-                    this.importImdb();
-                }
-                if (url === SeriesfeedImporter.Enums.ShortUrl.Export) {
-                    this.export();
+                switch (url) {
+                    case SeriesfeedImporter.Enums.ShortUrl.Import:
+                        this.import();
+                        break;
+                    case SeriesfeedImporter.Enums.ShortUrl.PlatformSelection:
+                        this.platformSelection();
+                        break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
+                        this.importBierdopje();
+                        break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
+                        this.importImdb();
+                        break;
+                    case SeriesfeedImporter.Enums.ShortUrl.Export:
+                        this.export();
+                        break;
                 }
                 window.scrollTo(0, 0);
                 window.history.pushState({ "shortUrl": url }, "", url);
             }
-            static platformSelection() {
+            static import() {
                 document.title = "Series importeren | Seriesfeed";
+                this.clearContent();
+                new SeriesfeedImporter.Controllers.ImportController();
+            }
+            static platformSelection() {
+                document.title = "Platformkeuze | Series importeren | Seriesfeed";
                 this.clearContent();
                 new SeriesfeedImporter.Controllers.PlatformSelectionController();
             }
@@ -791,7 +837,7 @@ var SeriesfeedImporter;
                 new SeriesfeedImporter.Controllers.ExportController();
             }
             static clearContent() {
-                $('#mainContent').empty();
+                $('#' + SeriesfeedImporter.Config.MainContentId).empty();
             }
         }
         Services.RouterService = RouterService;
@@ -815,9 +861,10 @@ var SeriesfeedImporter;
     var Enums;
     (function (Enums) {
         Enums.ShortUrl = {
-            PlatformSelection: "/series/import/",
-            ImportBierdopje: "/series/import/bierdopje/",
-            ImportImdb: "/series/import/imdb/",
+            Import: "/series/import/",
+            PlatformSelection: "/series/import/platform/",
+            ImportBierdopje: "/series/import/platform/bierdopje/",
+            ImportImdb: "/series/import/platform/imdb/",
             Export: "/series/export/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));

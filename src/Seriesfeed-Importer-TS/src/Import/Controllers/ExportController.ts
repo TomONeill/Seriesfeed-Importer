@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Controllers {
     export class ExportController {
         constructor() {
-            const mainContent = $('#mainContent');
+            const mainContent = $('#' + Config.MainContentId);
 
             const selector = $('<div/>').addClass("platformSelector");
             const card = $('<div/>').addClass("cardStyle cardForm formBlock");

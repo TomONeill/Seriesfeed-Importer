@@ -3,28 +3,37 @@
 module SeriesfeedImporter.Services {
     export class RouterService {
         public static navigate(url: Enums.ShortUrl): void {
-            if (url === Enums.ShortUrl.PlatformSelection) {
-                this.platformSelection();
+            switch (url) {
+                case Enums.ShortUrl.Import:
+                    this.import();
+                    break;
+                case Enums.ShortUrl.PlatformSelection:
+                    this.platformSelection();
+                    break;
+                case Enums.ShortUrl.ImportBierdopje:
+                    this.importBierdopje();
+                    break;
+                case Enums.ShortUrl.ImportImdb:
+                    this.importImdb();
+                    break;
+                case Enums.ShortUrl.Export:
+                    this.export();
+                    break;
             }
-
-            if (url === Enums.ShortUrl.ImportBierdopje) {
-                this.importBierdopje();
-            }
-
-            if (url === Enums.ShortUrl.ImportImdb) {
-                this.importImdb();
-            }
-
-            if (url === Enums.ShortUrl.Export) {
-                this.export();
-            }
-
+            
             window.scrollTo(0, 0);
             window.history.pushState({ "shortUrl": url }, "", url);
         }
 
-        public static platformSelection(): void {
+        public static import(): void {
             document.title = "Series importeren | Seriesfeed";
+            this.clearContent();
+
+            new Controllers.ImportController();
+        }
+
+        public static platformSelection(): void {
+            document.title = "Platformkeuze | Series importeren | Seriesfeed";
             this.clearContent();
 
             new Controllers.PlatformSelectionController();
@@ -52,7 +61,7 @@ module SeriesfeedImporter.Services {
         }
 
         private static clearContent(): void {
-            $('#mainContent').empty();
+            $('#' + Config.MainContentId).empty();
         }
     }
 }

@@ -3,9 +3,10 @@
 module SeriesfeedImporter.Enums {
     export type ShortUrl = string;
     export const ShortUrl = {
-        PlatformSelection: "/series/import/" as ShortUrl,
-        ImportBierdopje: "/series/import/bierdopje/" as ShortUrl,
-        ImportImdb: "/series/import/imdb/" as ShortUrl,
+        Import: "/series/import/" as ShortUrl,
+        PlatformSelection: "/series/import/platform/" as ShortUrl,
+        ImportBierdopje: "/series/import/platform/bierdopje/" as ShortUrl,
+        ImportImdb: "/series/import/platform/imdb/" as ShortUrl,
         Export: "/series/export/" as ShortUrl
     };
 }

@@ -3,11 +3,12 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
-            const mainContent = $('#mainContent');
+            const mainContent = $('#' + Config.MainContentId);
 
             const head = $('<h1/>').text('Series importeren - Bierdopje.com');
             const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
             mainContent.append(head);
+            mainContent.append(p);
 
             const formElement = $('<div/>');
             const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
@@ -30,8 +31,6 @@ module SeriesfeedImporter.Controllers {
             detailsTable.append(detailsHeader);
             bottomPane.append(showDetails);
             showDetails.append(detailsTable);
-
-            mainContent.append(p);
 
             Services.BierdopjeService.getUsername()
                 .then((username) => $('#username').attr('value', username));

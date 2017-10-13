@@ -12,10 +12,10 @@ module SeriesfeedImporter.Controllers {
             Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
             const cardContent = $('#' + Config.Id.CardContent);
 
-            const platform = $('<p/>').append('Wat wil je importeren?');
-            cardContent.append(platform);
+            const text = $('<p/>').append('Wat wil je importeren?');
+            cardContent.append(text);
 
-            const favourites = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-star-o", "Favorieten", Enums.ShortUrl.ImportPlatformSelection, "100%");
+            const favourites = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-star-o", "Favorieten", Enums.ShortUrl.ImportSourceSelection, "100%");
             const timeWasted = Providers.ButtonProvider.provide(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", Enums.ShortUrl.ImportBierdopje, "100%");
 
             favourites.css({ marginTop: '0px' });

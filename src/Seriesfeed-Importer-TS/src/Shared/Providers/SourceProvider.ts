@@ -1,7 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Providers {
-    export class PlatformProvider {
+    export class SourceProvider {
         public static provide(name: string, image: string, imageSize: string, url: Enums.ShortUrl, colour: string): JQuery {
             const portfolio = $('<div/>').addClass("portfolio mix_all");
             const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");

@@ -9,15 +9,15 @@ module SeriesfeedImporter.Controllers {
                     text: "Soort import"
                 },
                 {
-                    shortUrl: Enums.ShortUrl.ImportPlatformSelection,
-                    text: "Platformkeuze"
+                    shortUrl: Enums.ShortUrl.ImportSourceSelection,
+                    text: "Bronkeuze"
                 },
                 {
                     shortUrl: Enums.ShortUrl.ImportBierdopje,
                     text: "Bierdopje"
                 }
             ];
-            Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", Enums.ShortUrl.ImportPlatformSelection, breadCrumbs);
+            Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", Enums.ShortUrl.ImportSourceSelection, breadCrumbs);
             const cardContent = $('#' + Config.Id.CardContent);
 
             const formElement = $('<div/>');

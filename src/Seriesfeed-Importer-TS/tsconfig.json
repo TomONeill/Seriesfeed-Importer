@@ -4,6 +4,6 @@
     "noImplicitAny": true,
     "target": "es6",
     "outFile": "./SeriesfeedImport.user.js",
-    "removeComments": true
+    "removeComments": false
   }
 }

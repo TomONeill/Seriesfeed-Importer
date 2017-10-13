@@ -7,8 +7,8 @@ module SeriesfeedImporter.Services {
                 case Enums.ShortUrl.Import:
                     this.import();
                     break;
-                case Enums.ShortUrl.ImportPlatformSelection:
-                    this.importPlatformSelection();
+                case Enums.ShortUrl.ImportSourceSelection:
+                    this.importSourceSelection();
                     break;
                 case Enums.ShortUrl.ImportBierdopje:
                     this.importBierdopje();
@@ -32,11 +32,11 @@ module SeriesfeedImporter.Services {
             new Controllers.ImportController();
         }
 
-        public static importPlatformSelection(): void {
-            document.title = "Platformkeuze | Series importeren | Seriesfeed";
+        public static importSourceSelection(): void {
+            document.title = "Bronkeuze | Series importeren | Seriesfeed";
             this.clearContent();
 
-            new Controllers.ImportPlatformSelectionController();
+            new Controllers.ImportSourceSelectionController();
         }
 
         public static importBierdopje(): void {

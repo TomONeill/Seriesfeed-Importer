@@ -1,3 +1,23 @@
+// ==UserScript==
+// @name         Seriesfeed Importer
+// @namespace    https://www.seriesfeed.com
+// @version      3.0-dev
+// @description  Allows you to import your favourites from Bierdopje.com.
+// @match        https://*.seriesfeed.com/*
+// @grant        unsafeWindow
+// @grant        GM_xmlhttpRequest
+// @connect      www.bierdopje.com
+// @connect      www.imdb.com
+// @domain       www.bierdopje.com
+// @domain       www.imdb.com
+// @require      https://code.jquery.com/jquery-3.2.1.min.js
+// @author       Tom
+// @copyright    2016 - 2017, Tom
+// ==/UserScript==
+/* jshint -W097 */
+/* global $, GM_xmlhttpRequest, Promise, console */
+'use strict';
+/// <reference path="./typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     class App {
@@ -14,6 +34,7 @@ var SeriesfeedImporter;
     }
     App.main();
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Config;
@@ -27,6 +48,7 @@ var SeriesfeedImporter;
         Config.MaxAsyncCalls = 3;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -35,14 +57,15 @@ var SeriesfeedImporter;
             constructor() {
                 SeriesfeedImporter.Services.CardInitialiserService.initialise("Series exporteren");
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const platform = $('<p/>').append('Dit onderdeel komt binnenkort.');
-                platform.css({ marginBottom: '0' });
-                cardContent.append(platform);
+                const text = $('<p/>').append('Dit onderdeel komt binnenkort.');
+                text.css({ marginBottom: '0' });
+                cardContent.append(text);
             }
         }
         Controllers.ExportController = ExportController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -55,15 +78,15 @@ var SeriesfeedImporter;
                         text: "Soort import"
                     },
                     {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection,
-                        text: "Platformkeuze"
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection,
+                        text: "Bronkeuze"
                     },
                     {
                         shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje,
                         text: "Bierdopje"
                     }
                 ];
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection, breadCrumbs);
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, breadCrumbs);
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
@@ -226,6 +249,7 @@ var SeriesfeedImporter;
         Controllers.ImportBierdopjeController = ImportBierdopjeController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -240,9 +264,9 @@ var SeriesfeedImporter;
                 ];
                 SeriesfeedImporter.Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const platform = $('<p/>').append('Wat wil je importeren?');
-                cardContent.append(platform);
-                const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection, "100%");
+                const text = $('<p/>').append('Wat wil je importeren?');
+                cardContent.append(text);
+                const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
                 const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
                 favourites.css({ marginTop: '0px' });
                 cardContent.append(favourites);
@@ -252,6 +276,7 @@ var SeriesfeedImporter;
         Controllers.ImportController = ImportController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -475,6 +500,7 @@ var SeriesfeedImporter;
             }
             stepFour() {
                 this.selectStep(4);
+                // TODO
                 console.log(this._selectedSeries);
             }
             stepFactory(steps) {
@@ -550,11 +576,12 @@ var SeriesfeedImporter;
         Controllers.ImportImdbController = ImportImdbController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class ImportPlatformSelectionController {
+        class ImportSourceSelectionController {
             constructor() {
                 const breadCrumbs = [
                     {
@@ -562,21 +589,22 @@ var SeriesfeedImporter;
                         text: "Soort import"
                     },
                     {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection,
-                        text: "Platformkeuze"
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection,
+                        text: "Bronkeuze"
                     }
                 ];
                 SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import, breadCrumbs);
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const bierdopje = SeriesfeedImporter.Providers.PlatformProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
+                const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
                 cardContent.append(bierdopje);
-                const imdb = SeriesfeedImporter.Providers.PlatformProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
+                const imdb = SeriesfeedImporter.Providers.SourceProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
                 cardContent.append(imdb);
             }
         }
-        Controllers.ImportPlatformSelectionController = ImportPlatformSelectionController;
+        Controllers.ImportSourceSelectionController = ImportSourceSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -619,6 +647,7 @@ var SeriesfeedImporter;
         Services.BierdopjeService = BierdopjeService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -674,6 +703,7 @@ var SeriesfeedImporter;
         Services.ImdbService = ImdbService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -701,6 +731,7 @@ var SeriesfeedImporter;
         Services.SeriesfeedService = SeriesfeedService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -714,6 +745,7 @@ var SeriesfeedImporter;
         Controllers.NavigationController = NavigationController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -727,6 +759,7 @@ var SeriesfeedImporter;
         Services.NavigationService = NavigationService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -743,10 +776,10 @@ var SeriesfeedImporter;
                         this.fixPageLayout();
                         SeriesfeedImporter.Services.RouterService.import();
                         break;
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection }, "", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection);
+                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection:
+                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection }, "", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
                         this.fixPageLayout();
-                        SeriesfeedImporter.Services.RouterService.importPlatformSelection();
+                        SeriesfeedImporter.Services.RouterService.importSourceSelection();
                         break;
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
                         window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje }, "", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
@@ -780,8 +813,8 @@ var SeriesfeedImporter;
                         case SeriesfeedImporter.Enums.ShortUrl.Import:
                             SeriesfeedImporter.Services.RouterService.import();
                             break;
-                        case SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection:
-                            SeriesfeedImporter.Services.RouterService.importPlatformSelection();
+                        case SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection:
+                            SeriesfeedImporter.Services.RouterService.importSourceSelection();
                             break;
                         case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
                             SeriesfeedImporter.Services.RouterService.importBierdopje();
@@ -799,6 +832,7 @@ var SeriesfeedImporter;
         Controllers.RoutingController = RoutingController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -809,8 +843,8 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.Import:
                         this.import();
                         break;
-                    case SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection:
-                        this.importPlatformSelection();
+                    case SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection:
+                        this.importSourceSelection();
                         break;
                     case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
                         this.importBierdopje();
@@ -830,10 +864,10 @@ var SeriesfeedImporter;
                 this.clearContent();
                 new SeriesfeedImporter.Controllers.ImportController();
             }
-            static importPlatformSelection() {
-                document.title = "Platformkeuze | Series importeren | Seriesfeed";
+            static importSourceSelection() {
+                document.title = "Bronkeuze | Series importeren | Seriesfeed";
                 this.clearContent();
-                new SeriesfeedImporter.Controllers.ImportPlatformSelectionController();
+                new SeriesfeedImporter.Controllers.ImportSourceSelectionController();
             }
             static importBierdopje() {
                 document.title = "Bierdopje series importeren | Seriesfeed";
@@ -857,6 +891,7 @@ var SeriesfeedImporter;
         Services.RouterService = RouterService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -872,6 +907,7 @@ var SeriesfeedImporter;
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -885,19 +921,21 @@ var SeriesfeedImporter;
         })(NavigationType = Enums.NavigationType || (Enums.NavigationType = {}));
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
     (function (Enums) {
         Enums.ShortUrl = {
             Import: "/series/import/",
-            ImportPlatformSelection: "/series/import/platform/",
-            ImportBierdopje: "/series/import/platform/bierdopje/",
-            ImportImdb: "/series/import/platform/imdb/",
+            ImportSourceSelection: "/series/import/source/",
+            ImportBierdopje: "/series/import/source/bierdopje/",
+            ImportImdb: "/series/import/source/imdb/",
             Export: "/series/export/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
@@ -917,11 +955,12 @@ var SeriesfeedImporter;
         Providers.ButtonProvider = ButtonProvider;
     })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
     (function (Providers) {
-        class PlatformProvider {
+        class SourceProvider {
             static provide(name, image, imageSize, url, colour) {
                 const portfolio = $('<div/>').addClass("portfolio mix_all");
                 const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
@@ -959,9 +998,10 @@ var SeriesfeedImporter;
                 return portfolio;
             }
         }
-        Providers.PlatformProvider = PlatformProvider;
+        Providers.SourceProvider = SourceProvider;
     })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -999,6 +1039,7 @@ var SeriesfeedImporter;
         Services.AjaxService = AjaxService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -1069,6 +1110,7 @@ var SeriesfeedImporter;
         Services.CardInitialiserService = CardInitialiserService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
+/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;

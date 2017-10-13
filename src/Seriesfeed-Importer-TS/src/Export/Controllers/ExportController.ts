@@ -3,12 +3,12 @@
 module SeriesfeedImporter.Controllers {
     export class ExportController {
         constructor() {
-            Services.CardInitialiserService.initialise("Series exporteren");
-            const cardContent = $('#' + Config.Id.CardContent);
+            const card = Services.CardService.getCard();
+            card.setTitle("Series exporteren");
 
             const text = $('<p/>').append('Dit onderdeel komt binnenkort.');
             text.css({ marginBottom: '0' });
-            cardContent.append(text);
+            card.setContent(text);
         }
     }
 }

@@ -10,42 +10,45 @@ module SeriesfeedImporter.Controllers {
         private initialVisitRouting(): void {
             switch (window.location.href) {
                 case Config.BaseUrl + Enums.ShortUrl.Import:
-                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.Import }, "", Enums.ShortUrl.Import);
-                    this.fixPageLayout();
+                    this.initialiseInitialVisit(Enums.ShortUrl.Import);
                     Services.RouterService.import();
                     break;
 
                 case Config.BaseUrl + Enums.ShortUrl.ImportSourceSelection:
-                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.ImportSourceSelection }, "", Enums.ShortUrl.ImportSourceSelection);
-                    this.fixPageLayout();
+                    this.initialiseInitialVisit(Enums.ShortUrl.ImportSourceSelection);
                     Services.RouterService.importSourceSelection();
                     break;
 
                 case Config.BaseUrl + Enums.ShortUrl.ImportBierdopje:
-                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.ImportBierdopje }, "", Enums.ShortUrl.ImportBierdopje);
-                    this.fixPageLayout();
+                    this.initialiseInitialVisit(Enums.ShortUrl.ImportBierdopje);
                     Services.RouterService.importBierdopje();
                     break;
 
                 case Config.BaseUrl + Enums.ShortUrl.ImportImdb:
-                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.ImportImdb }, "", Enums.ShortUrl.ImportImdb);
-                    this.fixPageLayout();
+                    this.initialiseInitialVisit(Enums.ShortUrl.ImportImdb);
                     Services.RouterService.importImdb();
                     break;
 
                 case Config.BaseUrl + Enums.ShortUrl.Export:
-                    window.history.replaceState({ "shortUrl": Enums.ShortUrl.Export }, "", Enums.ShortUrl.Export);
-                    this.fixPageLayout();
+                    this.initialiseInitialVisit(Enums.ShortUrl.Export);
                     Services.RouterService.export();
                     break;
             }
         }
 
-        private fixPageLayout(): void {
+        private initialiseInitialVisit(url: Enums.ShortUrl): void {
+            window.history.replaceState({ "shortUrl": url }, "", url);
+            const mainContent = this.fixPageLayoutAndGetMainContent();
+            const card = Services.CardService.initialise();
+            mainContent.append(card.instance);
+        }
+
+        private fixPageLayoutAndGetMainContent(): JQuery<HTMLElement> {
             const wrapper = $('.contentWrapper .container').last().empty();
             wrapper.removeClass('container').addClass('wrapper bg');
             const container = $('<div></div>').addClass('container').attr('id', Config.Id.MainContent);
             wrapper.append(container);
+            return container;
         }
 
         private respondToBrowserNavigationChanges(): void {

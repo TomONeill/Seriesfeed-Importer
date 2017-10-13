@@ -5,7 +5,7 @@ module SeriesfeedImporter.Providers {
         public static provide(name: string, image: string, imageSize: string, url: Enums.ShortUrl, colour: string): JQuery {
             const portfolio = $('<div/>').addClass("portfolio mix_all");
             const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
-            const hover = $('<div/>').addClass("portfolio-hover");
+            const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
             const img = $('<img/>');
             const info = $('<div/>').addClass("portfolio-info");
             const title = $('<div/>').addClass("portfolio-title");
@@ -18,17 +18,26 @@ module SeriesfeedImporter.Providers {
                     transition: 'all .24s ease-in-out'
                 })
                 .hover(
-                () => portfolio.addClass('cardStyle cardForm formBlock'),
-                () => portfolio.removeClass('cardStyle cardForm formBlock')
+                () => portfolio.css({
+                    webkitBoxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.15)'
+                }),
+                () => portfolio.css({
+                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
+                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
+                })
                 )
                 .click(() => Services.RouterService.navigate(url));
 
             hover
                 .css({
-                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100px',
                     background: colour
                 });
-                
+
             img
                 .css({
                     maxWidth: imageSize,

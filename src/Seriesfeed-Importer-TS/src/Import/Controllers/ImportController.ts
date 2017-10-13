@@ -14,13 +14,15 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialise(): void {
+            const card = Services.CardService.getCard();
+            card.setTitle("Series importeren");
             const breadCrumbs = [
                 {
                     shortUrl: Enums.ShortUrl.Import,
                     text: "Soort import"
                 }
             ];
-            Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
+            card.setBreadcrumbs(breadCrumbs);
         }
 
         private addFavourites(cardContent: JQuery<HTMLElement>): void {

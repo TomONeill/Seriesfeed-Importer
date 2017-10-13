@@ -27,41 +27,37 @@ module SeriesfeedImporter.Services {
 
         public static import(): void {
             document.title = "Series importeren | Seriesfeed";
-            this.clearContent();
+            CardService.getCard().clear();
 
             new Controllers.ImportController();
         }
 
         public static importSourceSelection(): void {
-            document.title = "Bronkeuze | Series importeren | Seriesfeed";
-            this.clearContent();
+            document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
+            CardService.getCard().clear();
 
             new Controllers.ImportSourceSelectionController();
         }
 
         public static importBierdopje(): void {
-            document.title = "Bierdopje series importeren | Seriesfeed";
-            this.clearContent();
+            document.title = "Bierdopje favorieten importeren | Seriesfeed";
+            CardService.getCard().clear();
 
             new Controllers.ImportBierdopjeController();
         }
 
         public static importImdb(): void {
             document.title = "IMDb series importeren | Seriesfeed";
-            this.clearContent();
+            CardService.getCard().clear();
 
             new Controllers.ImportImdbController();
         }
 
         public static export(): void {
             document.title = "Series exporteren | Seriesfeed";
-            this.clearContent();
+            CardService.getCard().clear();
 
             new Controllers.ExportController();
-        }
-
-        private static clearContent(): void {
-            $('#' + Config.Id.MainContent).empty();
         }
     }
 }

@@ -33,11 +33,11 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ExportController {
             constructor() {
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Series exporteren");
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Series exporteren");
                 const text = $('<p/>').append('Dit onderdeel komt binnenkort.');
                 text.css({ marginBottom: '0' });
-                cardContent.append(text);
+                card.setContent(text);
             }
         }
         Controllers.ExportController = ExportController;
@@ -49,6 +49,9 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
                 const breadCrumbs = [
                     {
                         shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
@@ -63,8 +66,8 @@ var SeriesfeedImporter;
                         text: "Bierdopje"
                     }
                 ];
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, breadCrumbs, '500px');
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                card.setBreadcrumbs(breadCrumbs);
+                card.setWidth('500px');
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
                 const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
@@ -73,7 +76,7 @@ var SeriesfeedImporter;
                 const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
                 const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
                 const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-                cardContent.append(formElement);
+                card.setContent(formElement);
                 formElement.addClass('blog-left cardStyle cardForm formBlock');
                 bottomPane.addClass('cardStyle');
                 detailsTable.addClass('cardStyle');
@@ -240,13 +243,15 @@ var SeriesfeedImporter;
                 this.addTimeWasted(cardContent);
             }
             initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Series importeren");
                 const breadCrumbs = [
                     {
                         shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
                         text: "Soort import"
                     }
                 ];
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
+                card.setBreadcrumbs(breadCrumbs);
             }
             addFavourites(cardContent) {
                 const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
@@ -571,6 +576,9 @@ var SeriesfeedImporter;
                 this.addImdb(cardContent);
             }
             initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
                 const breadCrumbs = [
                     {
                         shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
@@ -581,7 +589,7 @@ var SeriesfeedImporter;
                         text: "Bronkeuze"
                     }
                 ];
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import, breadCrumbs);
+                card.setBreadcrumbs(breadCrumbs);
             }
             addBierdopje(cardContent) {
                 const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
@@ -757,37 +765,39 @@ var SeriesfeedImporter;
             initialVisitRouting() {
                 switch (window.location.href) {
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Import:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.Import }, "", SeriesfeedImporter.Enums.ShortUrl.Import);
-                        this.fixPageLayout();
+                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.Import);
                         SeriesfeedImporter.Services.RouterService.import();
                         break;
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection }, "", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
-                        this.fixPageLayout();
+                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
                         SeriesfeedImporter.Services.RouterService.importSourceSelection();
                         break;
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje }, "", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
-                        this.fixPageLayout();
+                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                         SeriesfeedImporter.Services.RouterService.importBierdopje();
                         break;
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.ImportImdb }, "", SeriesfeedImporter.Enums.ShortUrl.ImportImdb);
-                        this.fixPageLayout();
+                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.ImportImdb);
                         SeriesfeedImporter.Services.RouterService.importImdb();
                         break;
                     case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Export:
-                        window.history.replaceState({ "shortUrl": SeriesfeedImporter.Enums.ShortUrl.Export }, "", SeriesfeedImporter.Enums.ShortUrl.Export);
-                        this.fixPageLayout();
+                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.Export);
                         SeriesfeedImporter.Services.RouterService.export();
                         break;
                 }
             }
-            fixPageLayout() {
+            initialiseInitialVisit(url) {
+                window.history.replaceState({ "shortUrl": url }, "", url);
+                const mainContent = this.fixPageLayoutAndGetMainContent();
+                const card = SeriesfeedImporter.Services.CardService.initialise();
+                mainContent.append(card.instance);
+            }
+            fixPageLayoutAndGetMainContent() {
                 const wrapper = $('.contentWrapper .container').last().empty();
                 wrapper.removeClass('container').addClass('wrapper bg');
                 const container = $('<div></div>').addClass('container').attr('id', SeriesfeedImporter.Config.Id.MainContent);
                 wrapper.append(container);
+                return container;
             }
             respondToBrowserNavigationChanges() {
                 window.onpopstate = (event) => {
@@ -845,31 +855,28 @@ var SeriesfeedImporter;
             }
             static import() {
                 document.title = "Series importeren | Seriesfeed";
-                this.clearContent();
+                Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportController();
             }
             static importSourceSelection() {
-                document.title = "Bronkeuze | Series importeren | Seriesfeed";
-                this.clearContent();
+                document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportSourceSelectionController();
             }
             static importBierdopje() {
-                document.title = "Bierdopje series importeren | Seriesfeed";
-                this.clearContent();
+                document.title = "Bierdopje favorieten importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportBierdopjeController();
             }
             static importImdb() {
                 document.title = "IMDb series importeren | Seriesfeed";
-                this.clearContent();
+                Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportImdbController();
             }
             static export() {
                 document.title = "Series exporteren | Seriesfeed";
-                this.clearContent();
+                Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ExportController();
-            }
-            static clearContent() {
-                $('#' + SeriesfeedImporter.Config.Id.MainContent).empty();
             }
         }
         Services.RouterService = RouterService;
@@ -918,6 +925,112 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class Card {
+            constructor() {
+                this.instance = $('<div/>').addClass("cardStyle cardForm formBlock").css({ transition: 'max-width .3s ease-in-out' });
+                this.backButton = this.createBackButton();
+                const titleContainer = $('<h2/>').css({ height: '60px' });
+                this.title = $('<span/>');
+                this.breadcrumbs = this.createBreadcrumbs();
+                this.content = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
+                this.instance.append(titleContainer);
+                titleContainer.append(this.title);
+                titleContainer.append(this.backButton);
+                this.instance.append(this.breadcrumbs);
+                this.instance.append(this.content);
+            }
+            createBackButton() {
+                return $('<i/>').css({
+                    display: 'none',
+                    float: 'left',
+                    padding: '5px',
+                    margin: '-5px',
+                    cursor: 'pointer'
+                }).addClass("fa fa-arrow-left");
+            }
+            createBreadcrumbs() {
+                const breadcrumbs = $('<h2/>').css({
+                    display: 'none',
+                    fontSize: '12px',
+                    padding: '10px 15px',
+                    background: '#5f7192',
+                    borderRadius: '0 0 0 0',
+                    mozBorderRadius: '0 0 0 0',
+                    webkitBorderRadius: '0 0 0 0'
+                });
+                return breadcrumbs;
+            }
+            setBackButtonUrl(url) {
+                if (url == null) {
+                    this.backButton.hide();
+                    this.backButton.click(() => { });
+                    return;
+                }
+                this.backButton.show();
+                this.backButton.click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
+            }
+            setTitle(title) {
+                if (title == null) {
+                    title = '';
+                }
+                this.title.text(title);
+            }
+            setBreadcrumbs(breadcrumbs) {
+                if (breadcrumbs == null || breadcrumbs.length === 0) {
+                    this.breadcrumbs.hide();
+                    this.breadcrumbs.empty();
+                    return;
+                }
+                for (let i = 0; i < breadcrumbs.length; i++) {
+                    const breadCrumb = breadcrumbs[i];
+                    const link = $('<span/>')
+                        .css({ cursor: 'pointer', color: '#bfc6d2' })
+                        .text(breadCrumb.text)
+                        .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadCrumb.shortUrl));
+                    this.breadcrumbs.append(link);
+                    if (i < breadcrumbs.length - 1) {
+                        const chevronRight = $('<i/>')
+                            .addClass('fa fa-chevron-right')
+                            .css({
+                            fontSize: '9px',
+                            padding: '0 5px',
+                            cursor: 'default'
+                        });
+                        this.breadcrumbs.append(chevronRight);
+                    }
+                    else {
+                        link.css({ color: '#ffffff' });
+                    }
+                }
+                this.breadcrumbs.show();
+            }
+            setContent(content) {
+                if (content == null) {
+                    this.content.empty();
+                    return;
+                }
+                this.content.append(content);
+            }
+            clear() {
+                this.setTitle(null);
+                this.setBackButtonUrl(null);
+                this.setBreadcrumbs(null);
+                this.setContent(null);
+                this.setWidth();
+            }
+            setWidth(width) {
+                this.instance.css({
+                    maxWidth: width != null ? width : '400px'
+                });
+            }
+        }
+        Models.Card = Card;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
     var Providers;
     (function (Providers) {
         class ButtonProvider {
@@ -943,7 +1056,7 @@ var SeriesfeedImporter;
             static provide(name, image, imageSize, url, colour) {
                 const portfolio = $('<div/>').addClass("portfolio mix_all");
                 const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
-                const hover = $('<div/>').addClass("portfolio-hover");
+                const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
                 const img = $('<img/>');
                 const info = $('<div/>').addClass("portfolio-info");
                 const title = $('<div/>').addClass("portfolio-title");
@@ -954,11 +1067,20 @@ var SeriesfeedImporter;
                     width: '100%',
                     transition: 'all .24s ease-in-out'
                 })
-                    .hover(() => portfolio.addClass('cardStyle cardForm formBlock'), () => portfolio.removeClass('cardStyle cardForm formBlock'))
+                    .hover(() => portfolio.css({
+                    webkitBoxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.15)'
+                }), () => portfolio.css({
+                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
+                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
+                }))
                     .click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
                 hover
                     .css({
-                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100px',
                     background: colour
                 });
                 img
@@ -1021,75 +1143,16 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
-        class CardInitialiserService {
-            static initialise(title, backButtonUrl, breadCrumbs, width) {
-                const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
-                const card = $('<div/>').addClass("cardStyle cardForm formBlock");
-                const headerTitle = $('<h2/>').text(title);
-                const cardInner = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
-                if (backButtonUrl != null) {
-                    const backButton = this.getBackButton(backButtonUrl);
-                    headerTitle.append(backButton);
-                }
-                mainContent.append(card);
-                card.append(headerTitle);
-                if (breadCrumbs != null) {
-                    const breadCrumbsSection = this.getBreadCrumbs(breadCrumbs);
-                    card.append(breadCrumbsSection);
-                }
-                if (width != null) {
-                    card.animate({
-                        maxWidth: width
-                    }, 300);
-                }
-                card.append(cardInner);
+        class CardService {
+            static initialise() {
+                this.card = new SeriesfeedImporter.Models.Card();
+                return this.card;
             }
-            static getBackButton(backButtonUrl) {
-                return $('<i/>')
-                    .css({
-                    float: 'left',
-                    padding: '5px',
-                    margin: '-5px',
-                    cursor: 'pointer'
-                })
-                    .addClass("fa fa-arrow-left")
-                    .click(() => Services.RouterService.navigate(backButtonUrl));
-            }
-            static getBreadCrumbs(breadCrumbs) {
-                const headerBreadCrumbs = $('<h2/>');
-                headerBreadCrumbs.css({
-                    fontSize: '12px',
-                    padding: '10px 15px',
-                    background: '#5f7192',
-                    borderRadius: '0 0 0 0',
-                    mozBorderRadius: '0 0 0 0',
-                    webkitBorderRadius: '0 0 0 0'
-                });
-                for (let i = 0; i < breadCrumbs.length; i++) {
-                    const breadCrumb = breadCrumbs[i];
-                    const link = $('<span/>')
-                        .css({ cursor: 'pointer', color: '#bfc6d2' })
-                        .text(breadCrumb.text)
-                        .click(() => Services.RouterService.navigate(breadCrumb.shortUrl));
-                    headerBreadCrumbs.append(link);
-                    if (i < breadCrumbs.length - 1) {
-                        const chevronRight = $('<i/>')
-                            .addClass('fa fa-chevron-right')
-                            .css({
-                            fontSize: '9px',
-                            padding: '0 5px',
-                            cursor: 'default'
-                        });
-                        headerBreadCrumbs.append(chevronRight);
-                    }
-                    else {
-                        link.css({ color: '#ffffff' });
-                    }
-                }
-                return headerBreadCrumbs;
+            static getCard() {
+                return this.card;
             }
         }
-        Services.CardInitialiserService = CardInitialiserService;
+        Services.CardService = CardService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

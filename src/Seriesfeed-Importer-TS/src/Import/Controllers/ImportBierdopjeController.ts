@@ -3,6 +3,9 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
+            const card = Services.CardService.getCard();
+            card.setTitle("Bierdopje favorieten importeren");
+            card.setBackButtonUrl(Enums.ShortUrl.ImportSourceSelection);
             const breadCrumbs = [
                 {
                     shortUrl: Enums.ShortUrl.Import,
@@ -17,8 +20,8 @@ module SeriesfeedImporter.Controllers {
                     text: "Bierdopje"
                 }
             ];
-            Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", Enums.ShortUrl.ImportSourceSelection, breadCrumbs, '500px');
-            const cardContent = $('#' + Config.Id.CardContent);
+            card.setBreadcrumbs(breadCrumbs);
+            card.setWidth('500px');
 
             const formElement = $('<div/>');
             const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
@@ -29,7 +32,7 @@ module SeriesfeedImporter.Controllers {
             const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
             const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
 
-            cardContent.append(formElement);
+            card.setContent(formElement);
             formElement.addClass('blog-left cardStyle cardForm formBlock');
             bottomPane.addClass('cardStyle');
             detailsTable.addClass('cardStyle');

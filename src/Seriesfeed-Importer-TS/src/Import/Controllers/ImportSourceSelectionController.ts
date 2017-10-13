@@ -11,6 +11,9 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialise(): void {
+            const card = Services.CardService.getCard();
+            card.setTitle("Favorieten importeren");
+            card.setBackButtonUrl(Enums.ShortUrl.Import);
             const breadCrumbs = [
                 {
                     shortUrl: Enums.ShortUrl.Import,
@@ -21,7 +24,7 @@ module SeriesfeedImporter.Controllers {
                     text: "Bronkeuze"
                 }
             ];
-            Services.CardInitialiserService.initialise("Favorieten importeren", Enums.ShortUrl.Import, breadCrumbs);
+            card.setBreadcrumbs(breadCrumbs);
         }
 
         private addBierdopje(cardContent: JQuery<HTMLElement>): void {

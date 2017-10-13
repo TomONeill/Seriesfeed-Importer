@@ -7,6 +7,7 @@ module SeriesfeedImporter.Controllers {
             const cardContent = $('#' + Config.Id.CardContent);
 
             const platform = $('<p/>').append('Dit onderdeel komt binnenkort.');
+            platform.css({ marginBottom: '0' });
             cardContent.append(platform);
         }
     }

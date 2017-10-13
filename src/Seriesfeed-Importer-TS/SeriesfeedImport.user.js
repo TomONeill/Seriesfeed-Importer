@@ -36,6 +36,7 @@ var SeriesfeedImporter;
                 SeriesfeedImporter.Services.CardInitialiserService.initialise("Series exporteren");
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const platform = $('<p/>').append('Dit onderdeel komt binnenkort.');
+                platform.css({ marginBottom: '0' });
                 cardContent.append(platform);
             }
         }
@@ -48,11 +49,22 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
-                const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
-                const head = $('<h1/>').text('Series importeren - Bierdopje.com');
-                const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
-                mainContent.append(head);
-                mainContent.append(p);
+                const breadCrumbs = [
+                    {
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
+                        text: "Soort import"
+                    },
+                    {
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection,
+                        text: "Platformkeuze"
+                    },
+                    {
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje,
+                        text: "Bierdopje"
+                    }
+                ];
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection, breadCrumbs);
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
                 const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
@@ -61,7 +73,7 @@ var SeriesfeedImporter;
                 const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
                 const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
                 const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-                mainContent.append(formElement);
+                cardContent.append(formElement);
                 formElement.addClass('blog-left cardStyle cardForm formBlock');
                 bottomPane.addClass('cardStyle');
                 detailsTable.addClass('cardStyle');
@@ -220,7 +232,13 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportController {
             constructor() {
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Series importeren");
+                const breadCrumbs = [
+                    {
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
+                        text: "Soort import"
+                    }
+                ];
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const platform = $('<p/>').append('Wat wil je importeren?');
                 cardContent.append(platform);
@@ -538,7 +556,17 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportPlatformSelectionController {
             constructor() {
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import);
+                const breadCrumbs = [
+                    {
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
+                        text: "Soort import"
+                    },
+                    {
+                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportPlatformSelection,
+                        text: "Platformkeuze"
+                    }
+                ];
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import, breadCrumbs);
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const bierdopje = SeriesfeedImporter.Providers.PlatformProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
                 cardContent.append(bierdopje);
@@ -976,28 +1004,66 @@ var SeriesfeedImporter;
     var Services;
     (function (Services) {
         class CardInitialiserService {
-            static initialise(title, backButtonUrl) {
+            static initialise(title, backButtonUrl, breadCrumbs) {
                 const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
-                const selector = $('<div/>').addClass("platformSelector");
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
                 const headerTitle = $('<h2/>').text(title);
                 const cardInner = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
                 if (backButtonUrl != null) {
-                    const backButton = $('<i/>')
-                        .css({
-                        float: 'left',
-                        padding: '5px',
-                        margin: '-5px',
-                        cursor: 'pointer'
-                    })
-                        .addClass("fa fa-arrow-left")
-                        .click(() => Services.RouterService.navigate(backButtonUrl));
+                    const backButton = this.getBackButton(backButtonUrl);
                     headerTitle.append(backButton);
                 }
-                mainContent.append(selector);
-                selector.append(card);
+                mainContent.append(card);
                 card.append(headerTitle);
+                if (breadCrumbs != null) {
+                    const breadCrumbsSection = this.getBreadCrumbs(breadCrumbs);
+                    card.append(breadCrumbsSection);
+                }
                 card.append(cardInner);
+            }
+            static getBackButton(backButtonUrl) {
+                return $('<i/>')
+                    .css({
+                    float: 'left',
+                    padding: '5px',
+                    margin: '-5px',
+                    cursor: 'pointer'
+                })
+                    .addClass("fa fa-arrow-left")
+                    .click(() => Services.RouterService.navigate(backButtonUrl));
+            }
+            static getBreadCrumbs(breadCrumbs) {
+                const headerBreadCrumbs = $('<h2/>');
+                headerBreadCrumbs.css({
+                    fontSize: '12px',
+                    padding: '10px 15px',
+                    background: '#5f7192',
+                    borderRadius: '0 0 0 0',
+                    mozBorderRadius: '0 0 0 0',
+                    webkitBorderRadius: '0 0 0 0'
+                });
+                for (let i = 0; i < breadCrumbs.length; i++) {
+                    const breadCrumb = breadCrumbs[i];
+                    const link = $('<span/>')
+                        .css({ cursor: 'pointer', color: '#bfc6d2' })
+                        .text(breadCrumb.text)
+                        .click(() => Services.RouterService.navigate(breadCrumb.shortUrl));
+                    headerBreadCrumbs.append(link);
+                    if (i < breadCrumbs.length - 1) {
+                        const chevronRight = $('<i/>')
+                            .addClass('fa fa-chevron-right')
+                            .css({
+                            fontSize: '9px',
+                            padding: '0 5px',
+                            cursor: 'default'
+                        });
+                        headerBreadCrumbs.append(chevronRight);
+                    }
+                    else {
+                        link.css({ color: '#ffffff' });
+                    }
+                }
+                return headerBreadCrumbs;
             }
         }
         Services.CardInitialiserService = CardInitialiserService;

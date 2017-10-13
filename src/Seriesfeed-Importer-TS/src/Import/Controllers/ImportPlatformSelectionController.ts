@@ -3,7 +3,17 @@
 module SeriesfeedImporter.Controllers {
     export class ImportPlatformSelectionController {
         constructor() {
-            Services.CardInitialiserService.initialise("Favorieten importeren", Enums.ShortUrl.Import);
+            const breadCrumbs = [
+                {
+                    shortUrl: Enums.ShortUrl.Import,
+                    text: "Soort import"
+                },
+                {
+                    shortUrl: Enums.ShortUrl.ImportPlatformSelection,
+                    text: "Platformkeuze"
+                }
+            ];
+            Services.CardInitialiserService.initialise("Favorieten importeren", Enums.ShortUrl.Import, breadCrumbs);
             const cardContent = $('#' + Config.Id.CardContent);
 
             const bierdopje = Providers.PlatformProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", Enums.ShortUrl.ImportBierdopje, "#3399FE");

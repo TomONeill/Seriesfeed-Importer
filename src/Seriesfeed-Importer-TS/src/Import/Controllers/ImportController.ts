@@ -3,7 +3,13 @@
 module SeriesfeedImporter.Controllers {
     export class ImportController {
         constructor() {
-            Services.CardInitialiserService.initialise("Series importeren");
+            const breadCrumbs = [
+                {
+                    shortUrl: Enums.ShortUrl.Import,
+                    text: "Soort import"
+                }
+            ];
+            Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
             const cardContent = $('#' + Config.Id.CardContent);
 
             const platform = $('<p/>').append('Wat wil je importeren?');

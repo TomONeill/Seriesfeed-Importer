@@ -3,12 +3,22 @@
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
         constructor() {
-            const mainContent = $('#' + Config.Id.MainContent);
-
-            const head = $('<h1/>').text('Series importeren - Bierdopje.com');
-            const p = $('<p/>').text('Voer je gebruikersnaam in en klik op de knop "Favorieten Importeren"');
-            mainContent.append(head);
-            mainContent.append(p);
+            const breadCrumbs = [
+                {
+                    shortUrl: Enums.ShortUrl.Import,
+                    text: "Soort import"
+                },
+                {
+                    shortUrl: Enums.ShortUrl.ImportPlatformSelection,
+                    text: "Platformkeuze"
+                },
+                {
+                    shortUrl: Enums.ShortUrl.ImportBierdopje,
+                    text: "Bierdopje"
+                }
+            ];
+            Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", Enums.ShortUrl.ImportPlatformSelection, breadCrumbs);
+            const cardContent = $('#' + Config.Id.CardContent);
 
             const formElement = $('<div/>');
             const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
@@ -19,7 +29,7 @@ module SeriesfeedImporter.Controllers {
             const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
             const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
 
-            mainContent.append(formElement);
+            cardContent.append(formElement);
             formElement.addClass('blog-left cardStyle cardForm formBlock');
             bottomPane.addClass('cardStyle');
             detailsTable.addClass('cardStyle');

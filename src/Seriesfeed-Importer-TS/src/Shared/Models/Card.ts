@@ -66,7 +66,7 @@ module SeriesfeedImporter.Models {
             this.title.text(title);
         }
 
-        public setBreadcrumbs(breadcrumbs: { shortUrl: Enums.ShortUrl, text: string }[]): void {
+        public setBreadcrumbs(breadcrumbs: Breadcrumb[]): void {
             if (breadcrumbs == null || breadcrumbs.length === 0) {
                 this.breadcrumbs.hide();
                 this.breadcrumbs.empty();
@@ -74,11 +74,11 @@ module SeriesfeedImporter.Models {
             }
 
             for (let i = 0; i < breadcrumbs.length; i++) {
-                const breadCrumb = breadcrumbs[i];
+                const breadcrumb = breadcrumbs[i];
                 const link = $('<span/>')
                     .css({ cursor: 'pointer', color: '#bfc6d2' })
-                    .text(breadCrumb.text)
-                    .click(() => Services.RouterService.navigate(breadCrumb.shortUrl));
+                    .text(breadcrumb.text)
+                    .click(() => Services.RouterService.navigate(breadcrumb.shortUrl));
                 this.breadcrumbs.append(link);
 
                 if (i < breadcrumbs.length - 1) {

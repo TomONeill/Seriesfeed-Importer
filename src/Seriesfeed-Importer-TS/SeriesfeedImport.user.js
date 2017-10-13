@@ -52,21 +52,12 @@ var SeriesfeedImporter;
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Bierdopje favorieten importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
-                const breadCrumbs = [
-                    {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
-                        text: "Soort import"
-                    },
-                    {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection,
-                        text: "Bronkeuze"
-                    },
-                    {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje,
-                        text: "Bierdopje"
-                    }
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
                 ];
-                card.setBreadcrumbs(breadCrumbs);
+                card.setBreadcrumbs(breadcrumbs);
                 card.setWidth('500px');
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
@@ -245,13 +236,10 @@ var SeriesfeedImporter;
             initialise() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Series importeren");
-                const breadCrumbs = [
-                    {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
-                        text: "Soort import"
-                    }
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import)
                 ];
-                card.setBreadcrumbs(breadCrumbs);
+                card.setBreadcrumbs(breadcrumbs);
             }
             addFavourites(cardContent) {
                 const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
@@ -579,17 +567,11 @@ var SeriesfeedImporter;
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Favorieten importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
-                const breadCrumbs = [
-                    {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
-                        text: "Soort import"
-                    },
-                    {
-                        shortUrl: SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection,
-                        text: "Bronkeuze"
-                    }
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection)
                 ];
-                card.setBreadcrumbs(breadCrumbs);
+                card.setBreadcrumbs(breadcrumbs);
             }
             addBierdopje(cardContent) {
                 const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
@@ -927,6 +909,19 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Models;
     (function (Models) {
+        class Breadcrumb {
+            constructor(text, shortUrl) {
+                this.text = text;
+                this.shortUrl = shortUrl;
+            }
+        }
+        Models.Breadcrumb = Breadcrumb;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
         class Card {
             constructor() {
                 this.instance = $('<div/>').addClass("cardStyle cardForm formBlock").css({ transition: 'max-width .3s ease-in-out' });
@@ -984,11 +979,11 @@ var SeriesfeedImporter;
                     return;
                 }
                 for (let i = 0; i < breadcrumbs.length; i++) {
-                    const breadCrumb = breadcrumbs[i];
+                    const breadcrumb = breadcrumbs[i];
                     const link = $('<span/>')
                         .css({ cursor: 'pointer', color: '#bfc6d2' })
-                        .text(breadCrumb.text)
-                        .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadCrumb.shortUrl));
+                        .text(breadcrumb.text)
+                        .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadcrumb.shortUrl));
                     this.breadcrumbs.append(link);
                     if (i < breadcrumbs.length - 1) {
                         const chevronRight = $('<i/>')

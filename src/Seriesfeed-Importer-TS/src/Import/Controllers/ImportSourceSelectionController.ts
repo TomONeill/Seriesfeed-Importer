@@ -14,17 +14,11 @@ module SeriesfeedImporter.Controllers {
             const card = Services.CardService.getCard();
             card.setTitle("Favorieten importeren");
             card.setBackButtonUrl(Enums.ShortUrl.Import);
-            const breadCrumbs = [
-                {
-                    shortUrl: Enums.ShortUrl.Import,
-                    text: "Soort import"
-                },
-                {
-                    shortUrl: Enums.ShortUrl.ImportSourceSelection,
-                    text: "Bronkeuze"
-                }
+            const breadcrumbs = [
+                new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
+                new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection)
             ];
-            card.setBreadcrumbs(breadCrumbs);
+            card.setBreadcrumbs(breadcrumbs);
         }
 
         private addBierdopje(cardContent: JQuery<HTMLElement>): void {

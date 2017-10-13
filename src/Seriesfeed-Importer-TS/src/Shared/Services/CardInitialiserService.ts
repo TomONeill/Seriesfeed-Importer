@@ -23,9 +23,9 @@ module SeriesfeedImporter.Services {
             }
             
             if (width != null) {
-                card.css({
+                card.animate({
                     maxWidth: width
-                });
+                }, 300);
             }
 
             card.append(cardInner);

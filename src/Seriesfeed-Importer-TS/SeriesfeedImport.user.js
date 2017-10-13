@@ -1038,9 +1038,9 @@ var SeriesfeedImporter;
                     card.append(breadCrumbsSection);
                 }
                 if (width != null) {
-                    card.css({
+                    card.animate({
                         maxWidth: width
-                    });
+                    }, 300);
                 }
                 card.append(cardInner);
             }

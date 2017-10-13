@@ -17,7 +17,7 @@ module SeriesfeedImporter.Controllers {
                     text: "Bierdopje"
                 }
             ];
-            Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", Enums.ShortUrl.ImportSourceSelection, breadCrumbs);
+            Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", Enums.ShortUrl.ImportSourceSelection, breadCrumbs, '500px');
             const cardContent = $('#' + Config.Id.CardContent);
 
             const formElement = $('<div/>');

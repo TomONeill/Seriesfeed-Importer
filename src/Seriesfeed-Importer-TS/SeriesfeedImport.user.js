@@ -1,23 +1,3 @@
-// ==UserScript==
-// @name         Seriesfeed Importer
-// @namespace    https://www.seriesfeed.com
-// @version      3.0-dev
-// @description  Allows you to import your favourites from Bierdopje.com.
-// @match        https://*.seriesfeed.com/*
-// @grant        unsafeWindow
-// @grant        GM_xmlhttpRequest
-// @connect      www.bierdopje.com
-// @connect      www.imdb.com
-// @domain       www.bierdopje.com
-// @domain       www.imdb.com
-// @require      https://code.jquery.com/jquery-3.2.1.min.js
-// @author       Tom
-// @copyright    2016 - 2017, Tom
-// ==/UserScript==
-/* jshint -W097 */
-/* global $, GM_xmlhttpRequest, Promise, console */
-'use strict';
-/// <reference path="./typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     class App {
@@ -34,7 +14,6 @@ var SeriesfeedImporter;
     }
     App.main();
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Config;
@@ -48,7 +27,6 @@ var SeriesfeedImporter;
         Config.MaxAsyncCalls = 3;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -65,7 +43,6 @@ var SeriesfeedImporter;
         Controllers.ExportController = ExportController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -86,7 +63,7 @@ var SeriesfeedImporter;
                         text: "Bierdopje"
                     }
                 ];
-                SeriesfeedImporter.Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, breadCrumbs);
+                SeriesfeedImporter.Services.CardInitialiserService.initialise("Bierdopje favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, breadCrumbs, '500px');
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
@@ -249,7 +226,6 @@ var SeriesfeedImporter;
         Controllers.ImportBierdopjeController = ImportBierdopjeController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -285,7 +261,6 @@ var SeriesfeedImporter;
         Controllers.ImportController = ImportController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -509,7 +484,6 @@ var SeriesfeedImporter;
             }
             stepFour() {
                 this.selectStep(4);
-                // TODO
                 console.log(this._selectedSeries);
             }
             stepFactory(steps) {
@@ -585,7 +559,6 @@ var SeriesfeedImporter;
         Controllers.ImportImdbController = ImportImdbController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -622,7 +595,6 @@ var SeriesfeedImporter;
         Controllers.ImportSourceSelectionController = ImportSourceSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -665,7 +637,6 @@ var SeriesfeedImporter;
         Services.BierdopjeService = BierdopjeService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -721,7 +692,6 @@ var SeriesfeedImporter;
         Services.ImdbService = ImdbService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -749,7 +719,6 @@ var SeriesfeedImporter;
         Services.SeriesfeedService = SeriesfeedService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -763,7 +732,6 @@ var SeriesfeedImporter;
         Controllers.NavigationController = NavigationController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -777,7 +745,6 @@ var SeriesfeedImporter;
         Services.NavigationService = NavigationService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
@@ -850,7 +817,6 @@ var SeriesfeedImporter;
         Controllers.RoutingController = RoutingController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -909,7 +875,6 @@ var SeriesfeedImporter;
         Services.RouterService = RouterService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -925,7 +890,6 @@ var SeriesfeedImporter;
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -939,7 +903,6 @@ var SeriesfeedImporter;
         })(NavigationType = Enums.NavigationType || (Enums.NavigationType = {}));
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Enums;
@@ -953,7 +916,6 @@ var SeriesfeedImporter;
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
@@ -973,7 +935,6 @@ var SeriesfeedImporter;
         Providers.ButtonProvider = ButtonProvider;
     })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
@@ -1019,7 +980,6 @@ var SeriesfeedImporter;
         Providers.SourceProvider = SourceProvider;
     })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
@@ -1057,13 +1017,12 @@ var SeriesfeedImporter;
         Services.AjaxService = AjaxService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class CardInitialiserService {
-            static initialise(title, backButtonUrl, breadCrumbs) {
+            static initialise(title, backButtonUrl, breadCrumbs, width) {
                 const mainContent = $('#' + SeriesfeedImporter.Config.Id.MainContent);
                 const card = $('<div/>').addClass("cardStyle cardForm formBlock");
                 const headerTitle = $('<h2/>').text(title);
@@ -1077,6 +1036,11 @@ var SeriesfeedImporter;
                 if (breadCrumbs != null) {
                     const breadCrumbsSection = this.getBreadCrumbs(breadCrumbs);
                     card.append(breadCrumbsSection);
+                }
+                if (width != null) {
+                    card.css({
+                        maxWidth: width
+                    });
                 }
                 card.append(cardInner);
             }
@@ -1128,7 +1092,6 @@ var SeriesfeedImporter;
         Services.CardInitialiserService = CardInitialiserService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
-/// <reference path="../../typings/index.d.ts" />
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;

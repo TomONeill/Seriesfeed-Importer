@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Services {
     export class CardInitialiserService {
-        public static initialise(title: string, backButtonUrl?: Enums.ShortUrl, breadCrumbs?: { shortUrl: Enums.ShortUrl, text: string }[]): void {
+        public static initialise(title: string, backButtonUrl?: Enums.ShortUrl, breadCrumbs?: { shortUrl: Enums.ShortUrl, text: string }[], width?: string): void {
             const mainContent = $('#' + Config.Id.MainContent);
 
             const card = $('<div/>').addClass("cardStyle cardForm formBlock");
@@ -20,6 +20,12 @@ module SeriesfeedImporter.Services {
             if (breadCrumbs != null) {
                 const breadCrumbsSection = this.getBreadCrumbs(breadCrumbs);
                 card.append(breadCrumbsSection);
+            }
+            
+            if (width != null) {
+                card.css({
+                    maxWidth: width
+                });
             }
 
             card.append(cardInner);

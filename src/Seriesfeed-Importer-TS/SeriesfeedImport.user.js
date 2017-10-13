@@ -256,6 +256,14 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportController {
             constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const text = $('<p/>').append('Wat wil je importeren?');
+                cardContent.append(text);
+                this.addFavourites(cardContent);
+                this.addTimeWasted(cardContent);
+            }
+            initialise() {
                 const breadCrumbs = [
                     {
                         shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
@@ -263,13 +271,14 @@ var SeriesfeedImporter;
                     }
                 ];
                 SeriesfeedImporter.Services.CardInitialiserService.initialise("Series importeren", null, breadCrumbs);
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const text = $('<p/>').append('Wat wil je importeren?');
-                cardContent.append(text);
+            }
+            addFavourites(cardContent) {
                 const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
-                const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
                 favourites.css({ marginTop: '0px' });
                 cardContent.append(favourites);
+            }
+            addTimeWasted(cardContent) {
+                const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
                 cardContent.append(timeWasted);
             }
         }
@@ -583,6 +592,12 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ImportSourceSelectionController {
             constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this.addBierdopje(cardContent);
+                this.addImdb(cardContent);
+            }
+            initialise() {
                 const breadCrumbs = [
                     {
                         shortUrl: SeriesfeedImporter.Enums.ShortUrl.Import,
@@ -594,9 +609,12 @@ var SeriesfeedImporter;
                     }
                 ];
                 SeriesfeedImporter.Services.CardInitialiserService.initialise("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import, breadCrumbs);
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+            }
+            addBierdopje(cardContent) {
                 const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
                 cardContent.append(bierdopje);
+            }
+            addImdb(cardContent) {
                 const imdb = SeriesfeedImporter.Providers.SourceProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
                 cardContent.append(imdb);
             }

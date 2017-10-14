@@ -19,8 +19,8 @@ module SeriesfeedImporter.Providers {
                 })
                 .hover(
                 () => portfolio.css({
-                    webkitBoxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.15)',
-                    boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.15)'
+                    webkitBoxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)'
                 }),
                 () => portfolio.css({
                     webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',

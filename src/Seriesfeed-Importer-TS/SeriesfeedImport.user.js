@@ -141,7 +141,7 @@ var SeriesfeedImporter;
                 const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
                 const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
                 const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
-                cardContent.after(loadingData);
+                cardContent.append(loadingData);
                 listsTable.append(tableHeader);
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username).then((favourites) => {
                     favourites.each((index, favourite) => {

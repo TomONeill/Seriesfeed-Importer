@@ -30,7 +30,7 @@ module SeriesfeedImporter.Controllers {
             const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
             const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
 
-            cardContent.after(loadingData);
+            cardContent.append(loadingData);
             listsTable.append(tableHeader);
 
             Services.BierdopjeService.getFavouritesByUsername(username).then((favourites) => {

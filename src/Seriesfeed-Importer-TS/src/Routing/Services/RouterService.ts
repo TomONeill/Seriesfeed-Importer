@@ -36,7 +36,7 @@ module SeriesfeedImporter.Services {
             document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImportSourceSelectionController();
+            new Controllers.FavouritesController();
         }
 
         public static importBierdopje(): void {

@@ -1,4 +1,4 @@
-/// <reference path="../../typings/index.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeController {
@@ -12,7 +12,7 @@ module SeriesfeedImporter.Controllers {
                 new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportBierdopje)
             ];
             card.setBreadcrumbs(breadcrumbs);
-            card.setWidth('500px');
+            card.setWidth('800px');
 
             const formElement = $('<div/>');
             const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');

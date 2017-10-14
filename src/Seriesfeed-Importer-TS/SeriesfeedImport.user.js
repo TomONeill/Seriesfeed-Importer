@@ -47,6 +47,73 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
+        class ImportController {
+            constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const text = $('<p/>').append('Wat wil je importeren?');
+                cardContent.append(text);
+                this.addFavourites(cardContent);
+                this.addTimeWasted(cardContent);
+            }
+            initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Series importeren");
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+            }
+            addFavourites(cardContent) {
+                const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
+                favourites.css({ marginTop: '0px' });
+                cardContent.append(favourites);
+            }
+            addTimeWasted(cardContent) {
+                const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
+                cardContent.append(timeWasted);
+            }
+        }
+        Controllers.ImportController = ImportController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class FavouritesController {
+            constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this.addBierdopje(cardContent);
+                this.addImdb(cardContent);
+            }
+            initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+            }
+            addBierdopje(cardContent) {
+                const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
+                cardContent.append(bierdopje);
+            }
+            addImdb(cardContent) {
+                const imdb = SeriesfeedImporter.Providers.SourceProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
+                cardContent.append(imdb);
+            }
+        }
+        Controllers.FavouritesController = FavouritesController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
         class ImportBierdopjeController {
             constructor() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -58,7 +125,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
-                card.setWidth('500px');
+                card.setWidth('800px');
                 const formElement = $('<div/>');
                 const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
                 const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
@@ -222,37 +289,45 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
-    var Controllers;
-    (function (Controllers) {
-        class ImportController {
-            constructor() {
-                this.initialise();
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const text = $('<p/>').append('Wat wil je importeren?');
-                cardContent.append(text);
-                this.addFavourites(cardContent);
-                this.addTimeWasted(cardContent);
+    var Services;
+    (function (Services) {
+        class BierdopjeService {
+            static getUsername() {
+                return Services.AjaxService.get("http://www.bierdopje.com/stats")
+                    .then((statsPageData) => {
+                    const statsData = $(statsPageData.responseText);
+                    return statsData.find("#userbox_loggedin").find("h4").html();
+                })
+                    .catch((error) => {
+                    throw `Could not get username from Bierdopje.com: ${error}`;
+                });
             }
-            initialise() {
-                const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Series importeren");
-                const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import)
-                ];
-                card.setBreadcrumbs(breadcrumbs);
+            static getFavouritesByUsername(username) {
+                const url = "http://www.bierdopje.com/users/" + username + "/shows";
+                return Services.AjaxService.get(url)
+                    .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    return data.find(".content").find("ul").find("li").find("a");
+                })
+                    .catch((error) => {
+                    window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
+                    throw `Could not get favourites from Bierdopje.com: ${error}`;
+                });
             }
-            addFavourites(cardContent) {
-                const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
-                favourites.css({ marginTop: '0px' });
-                cardContent.append(favourites);
-            }
-            addTimeWasted(cardContent) {
-                const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
-                cardContent.append(timeWasted);
+            static getTvdbIdByShowSlug(showSlug) {
+                const url = "http://www.bierdopje.com" + showSlug;
+                return Services.AjaxService.get(url)
+                    .then((pageData) => {
+                    const favouriteData = $(pageData.responseText);
+                    return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
+                })
+                    .catch((error) => {
+                    throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
+                });
             }
         }
-        Controllers.ImportController = ImportController;
-    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+        Services.BierdopjeService = BierdopjeService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -554,81 +629,6 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
-    var Controllers;
-    (function (Controllers) {
-        class ImportSourceSelectionController {
-            constructor() {
-                this.initialise();
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this.addBierdopje(cardContent);
-                this.addImdb(cardContent);
-            }
-            initialise() {
-                const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Favorieten importeren");
-                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
-                const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection)
-                ];
-                card.setBreadcrumbs(breadcrumbs);
-            }
-            addBierdopje(cardContent) {
-                const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
-                cardContent.append(bierdopje);
-            }
-            addImdb(cardContent) {
-                const imdb = SeriesfeedImporter.Providers.SourceProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
-                cardContent.append(imdb);
-            }
-        }
-        Controllers.ImportSourceSelectionController = ImportSourceSelectionController;
-    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Services;
-    (function (Services) {
-        class BierdopjeService {
-            static getUsername() {
-                return Services.AjaxService.get("http://www.bierdopje.com/stats")
-                    .then((statsPageData) => {
-                    const statsData = $(statsPageData.responseText);
-                    return statsData.find("#userbox_loggedin").find("h4").html();
-                })
-                    .catch((error) => {
-                    throw `Could not get username from Bierdopje.com: ${error}`;
-                });
-            }
-            static getFavouritesByUsername(username) {
-                const url = "http://www.bierdopje.com/users/" + username + "/shows";
-                return Services.AjaxService.get(url)
-                    .then((pageData) => {
-                    const data = $(pageData.responseText);
-                    return data.find(".content").find("ul").find("li").find("a");
-                })
-                    .catch((error) => {
-                    window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
-                    throw `Could not get favourites from Bierdopje.com: ${error}`;
-                });
-            }
-            static getTvdbIdByShowSlug(showSlug) {
-                const url = "http://www.bierdopje.com" + showSlug;
-                return Services.AjaxService.get(url)
-                    .then((pageData) => {
-                    const favouriteData = $(pageData.responseText);
-                    return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
-                })
-                    .catch((error) => {
-                    throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
-                });
-            }
-        }
-        Services.BierdopjeService = BierdopjeService;
-    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class ImdbService {
@@ -694,7 +694,7 @@ var SeriesfeedImporter;
                 };
                 return Services.AjaxService.post("/ajax/serie/find-by", postData)
                     .catch((error) => {
-                    console.error("Could not convert TVDB id " + tvdbId + " on Seriesfeed.com.", error);
+                    throw `Could not convert TVDB id ${tvdbId} on Seriesfeed.com: ${error}`;
                 });
             }
             static addFavouriteByShowId(showId) {
@@ -843,7 +843,7 @@ var SeriesfeedImporter;
             static importSourceSelection() {
                 document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImportSourceSelectionController();
+                new SeriesfeedImporter.Controllers.FavouritesController();
             }
             static importBierdopje() {
                 document.title = "Bierdopje favorieten importeren | Seriesfeed";

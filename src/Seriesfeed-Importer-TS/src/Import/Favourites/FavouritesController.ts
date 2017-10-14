@@ -1,7 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class ImportSourceSelectionController {
+    export class FavouritesController {
         constructor() {
             this.initialise();
             const cardContent = $('#' + Config.Id.CardContent);

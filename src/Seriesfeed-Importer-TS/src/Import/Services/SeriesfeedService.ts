@@ -10,7 +10,7 @@ module SeriesfeedImporter.Services {
 
             return Services.AjaxService.post("/ajax/serie/find-by", postData)
                 .catch((error) => {
-                    console.error("Could not convert TVDB id " + tvdbId + " on Seriesfeed.com.", error);
+                    throw `Could not convert TVDB id ${tvdbId} on Seriesfeed.com: ${error}`;
                 });
         }
 

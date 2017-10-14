@@ -19,6 +19,8 @@ var SeriesfeedImporter;
     var Config;
     (function (Config) {
         Config.BaseUrl = "https://www.seriesfeed.com";
+        Config.BierdopjeBaseUrl = "http://www.bierdopje.com";
+        Config.ImdbBaseUrl = "http://www.imdb.com";
         Config.Id = {
             MainContent: "mainContent",
             CardContent: "cardContent"
@@ -65,13 +67,13 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(breadcrumbs);
             }
             addFavourites(cardContent) {
-                const favourites = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection, "100%");
-                favourites.css({ marginTop: '0px' });
-                cardContent.append(favourites);
+                const favourites = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection), "100%");
+                favourites.instance.css({ marginTop: '0px' });
+                cardContent.append(favourites.instance);
             }
             addTimeWasted(cardContent) {
-                const timeWasted = SeriesfeedImporter.Providers.ButtonProvider.provide(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "100%");
-                cardContent.append(timeWasted);
+                const timeWasted = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje), "100%");
+                cardContent.append(timeWasted.instance);
             }
         }
         Controllers.ImportController = ImportController;
@@ -114,40 +116,44 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class ImportBierdopjeController {
-            constructor() {
+        class BierdopjeFavouriteSelectionController {
+            constructor(username) {
+                this.initialiseCard();
+                this.initialise(username);
+            }
+            initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Bierdopje favorieten importeren");
-                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
-                card.setWidth('800px');
-                const formElement = $('<div/>');
-                const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
-                const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
+                card.setWidth();
+                card.setContent();
+            }
+            initialise(username) {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const formElement = $('<div/>').html("Favorieten van " + username);
+                const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');
                 const bottomPane = $('<div/>').addClass('blog-left');
                 const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
                 const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
                 const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
                 const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-                card.setContent(formElement);
+                cardContent.append(formElement);
                 formElement.addClass('blog-left cardStyle cardForm formBlock');
                 bottomPane.addClass('cardStyle');
                 detailsTable.addClass('cardStyle');
                 formElement.css('padding', '10px');
-                formElement.append(usernameInput);
                 formElement.append(submitInput);
                 detailsTable.append(colGroup);
                 detailsTable.append(detailsHeader);
                 bottomPane.append(showDetails);
                 showDetails.append(detailsTable);
-                SeriesfeedImporter.Services.BierdopjeService.getUsername()
-                    .then((username) => $('#username').attr('value', username));
-                $("#fav-import").click((event) => {
+                submitInput.click((event) => {
                     const favImportBtn = $(event.currentTarget);
                     const outerProgress = $('<div/>').addClass('progress');
                     const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
@@ -155,7 +161,6 @@ var SeriesfeedImporter;
                     outerProgress.append(progressBar);
                     formElement.append(outerProgress);
                     formElement.after(bottomPane);
-                    const username = $('#username').val();
                     const favourites = $('#details');
                     $("#show-details").click(() => detailsTable.toggle());
                     SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username)
@@ -284,7 +289,149 @@ var SeriesfeedImporter;
                 });
             }
         }
-        Controllers.ImportBierdopjeController = ImportBierdopjeController;
+        Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportBierdopjeFavouritesController {
+            constructor() {
+            }
+        }
+        Controllers.ImportBierdopjeFavouritesController = ImportBierdopjeFavouritesController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportBierdopjeFavouritesUserSelectionController {
+            constructor() {
+                this.initialiseCard();
+                this.initialiseCurrentUser();
+                this.initialiseCustomUser();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth('700px');
+            }
+            initialiseCurrentUser() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this.user = new SeriesfeedImporter.Models.User();
+                this.user.setTopText("Huidige gebruiker");
+                this.user.setWidth('49%');
+                this.user.setUsername("Laden...");
+                this.user.instance.css({ marginRight: '1%' });
+                cardContent.append(this.user.instance);
+                const refreshButtonAction = (event) => {
+                    event.stopPropagation();
+                    this.loadUser();
+                };
+                const refreshButton = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+                refreshButton.instance.css({
+                    position: 'absolute',
+                    left: '0',
+                    bottom: '0'
+                });
+                this.user.instance.append(refreshButton.instance);
+                this.loadUser();
+            }
+            loadUser() {
+                SeriesfeedImporter.Services.BierdopjeService.getUsername()
+                    .then((username) => {
+                    if (username == null) {
+                        this.user.setClick();
+                        this.user.setAvatarUrl();
+                        this.user.setUsername("Niet ingelogd");
+                    }
+                    else {
+                        this.user.setClick(() => this.continue(username));
+                        this.user.setUsername(username);
+                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
+                            .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
+                    }
+                });
+            }
+            continue(username) {
+                new Controllers.BierdopjeFavouriteSelectionController(username);
+            }
+            initialiseCustomUser() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this.customUser = new SeriesfeedImporter.Models.User();
+                this.customUser.setTopText("Andere gebruiker");
+                this.customUser.setWidth('49%');
+                this.customUser.instance.css({ marginLeft: '1%' });
+                cardContent.append(this.customUser.instance);
+                const userInputWrapper = $('<div/>').css({ textAlign: 'center' });
+                userInputWrapper.click((event) => event.stopPropagation());
+                const userInput = SeriesfeedImporter.Providers.InputProvider.provide('85%', "Gebruikersnaam");
+                userInput.css({ margin: '0 auto', display: 'inline-block' });
+                userInput.on('keyup', (event) => {
+                    const key = event.keyCode || event.which;
+                    if (key === 12 || key === 13) {
+                        searchButton.instance.click();
+                    }
+                });
+                const searchButtonAction = (event) => {
+                    notFoundMessage.hide();
+                    this.searchUser(userInput.val().toString().trim())
+                        .then((hasResult) => {
+                        if (!hasResult) {
+                            notFoundMessage.show();
+                        }
+                    });
+                };
+                const searchButton = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-search", null, searchButtonAction, "15%");
+                searchButton.instance.css({
+                    marginTop: '0',
+                    borderRadius: '0px 5px 5px 0px',
+                    padding: '10px 14px',
+                    fontSize: '14px'
+                });
+                const notFoundMessage = $('<div/>').css({
+                    display: 'none',
+                    textAlign: 'left',
+                    color: '#9f9f9f'
+                }).html("Gebruiker niet gevonden.");
+                userInputWrapper.append(userInput);
+                userInputWrapper.append(searchButton.instance);
+                userInputWrapper.append(notFoundMessage);
+                this.customUser.replaceUsername(userInputWrapper);
+            }
+            searchUser(username) {
+                return SeriesfeedImporter.Services.BierdopjeService.isExistingUser(username)
+                    .then((isExistingUser) => {
+                    if (!isExistingUser) {
+                        this.customUser.setClick();
+                        this.customUser.setAvatarUrl();
+                    }
+                    else {
+                        this.customUser.setClick(() => this.continue(username));
+                        this.customUser.setUsername(username);
+                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
+                            .then((avatarUrl) => {
+                            if (avatarUrl == null || avatarUrl == "") {
+                                this.customUser.setAvatarUrl("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAD0lEQVQYV2NkgALGocMAAAgWABX8twh4AAAAAElFTkSuQmCC");
+                                return;
+                            }
+                            this.customUser.setAvatarUrl(avatarUrl);
+                        });
+                    }
+                    return isExistingUser;
+                });
+            }
+        }
+        Controllers.ImportBierdopjeFavouritesUserSelectionController = ImportBierdopjeFavouritesUserSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -293,13 +440,33 @@ var SeriesfeedImporter;
     (function (Services) {
         class BierdopjeService {
             static getUsername() {
-                return Services.AjaxService.get("http://www.bierdopje.com/stats")
+                return Services.AjaxService.get(SeriesfeedImporter.Config.BierdopjeBaseUrl + "/stats")
                     .then((statsPageData) => {
                     const statsData = $(statsPageData.responseText);
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                     .catch((error) => {
                     throw `Could not get username from Bierdopje.com: ${error}`;
+                });
+            }
+            static isExistingUser(username) {
+                return Services.AjaxService.get(SeriesfeedImporter.Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
+                    .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    return data.find("#page .maincontent .content-links .content h3").html() !== "Fout - Pagina niet gevonden";
+                })
+                    .catch((error) => {
+                    throw `Could not check for existing user on Bierdopje.com: ${error}`;
+                });
+            }
+            static getAvatarUrlByUsername(username) {
+                return Services.AjaxService.get(SeriesfeedImporter.Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
+                    .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    return data.find('img.avatar').attr('src');
+                })
+                    .catch((error) => {
+                    throw `Could not get avatar url from Bierdopje.com: ${error}`;
                 });
             }
             static getFavouritesByUsername(username) {
@@ -362,9 +529,9 @@ var SeriesfeedImporter;
                 this.content.css({
                     minHeight: '425px'
                 });
-                var steps = this.stepFactory(4);
-                var importLink = $('<a/>').attr("href", "/series/import/");
-                var imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
+                const steps = this.stepFactory(4);
+                const importLink = $('<a/>').attr("href", "/series/import/");
+                const imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
                 importLink.append("Favorieten importeren");
                 imdbLink.append("IMDb.com");
                 head.append(importLink);
@@ -379,17 +546,18 @@ var SeriesfeedImporter;
             }
             stepOne() {
                 this.selectStep(1);
-                var titleCardText = 'Account verifiëren';
-                var innerCardText = 'Om je favorieten succesvol te importeren dien je te verifiëren '
+                const titleCardText = 'Account verifiëren';
+                const innerCardText = 'Om je favorieten succesvol te importeren dien je te verifiëren '
                     + 'of het onderstaande account waarop je nu bent ingelogd op '
                     + '<a href="http://www.imdb.com/">www.imdb.com</a> het '
                     + 'account is waarvan je wilt importeren.';
-                var userProfile = this.userFactory("Laden...", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg");
+                const userProfile = new SeriesfeedImporter.Models.User();
+                userProfile.setUsername("Laden...");
                 this.stepTitle.html(titleCardText);
                 this.stepContent.html(innerCardText);
                 this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepContent);
-                this.stepContent.after(userProfile);
+                this.stepContent.after(userProfile.instance);
                 SeriesfeedImporter.Services.ImdbService.getUser()
                     .then((user) => {
                     this._userId = user.id;
@@ -403,11 +571,11 @@ var SeriesfeedImporter;
                         if (!this._username) {
                             this._username = login;
                         }
-                        const profile = this.userFactory(this._username, avatarUrl);
-                        userProfile.html(profile);
-                        if (userProfile.find(".user-name").html() !== login) {
+                        userProfile.setUsername(this._username);
+                        userProfile.setAvatarUrl(avatarUrl);
+                        if (userProfile.instance.find(".user-name").html() !== login) {
                             const nextStep = this.nextStepFactory("Doorgaan", "step-2");
-                            userProfile.after(nextStep);
+                            userProfile.instance.after(nextStep);
                             $("#step-2").on('click', () => this.stepTwo());
                         }
                     })
@@ -604,19 +772,6 @@ var SeriesfeedImporter;
                 });
                 a.append(text);
                 return a;
-            }
-            userFactory(user, avatarUrl) {
-                const div = $('<div></div>');
-                const img = $('<img></img>');
-                const h3 = $('<h3></h3>');
-                div.addClass("col-md-12 user-img-container");
-                img.addClass("user-img");
-                h3.addClass("user-name");
-                img.attr('src', avatarUrl);
-                h3.append(user);
-                div.append(img);
-                div.append(h3);
-                return div;
             }
             toggleAllCheckboxes() {
                 $('.check').each((i, checkbox) => {
@@ -848,7 +1003,7 @@ var SeriesfeedImporter;
             static importBierdopje() {
                 document.title = "Bierdopje favorieten importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImportBierdopjeController();
+                new SeriesfeedImporter.Controllers.ImportBierdopjeFavouritesUserSelectionController();
             }
             static importImdb() {
                 document.title = "IMDb series importeren | Seriesfeed";
@@ -922,6 +1077,58 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Models;
     (function (Models) {
+        class Button {
+            constructor(buttonType, iconClass, text, action, width) {
+                this.instance = $('<div/>').addClass('btn');
+                this.icon = $('<i/>').addClass('fa');
+                this.text = $('<span/>');
+                this.setButtonType(buttonType);
+                this.setClick(action);
+                this.setIcon(iconClass);
+                this.setText(text);
+                this.setWidth(width);
+                this.instance.append(this.icon);
+                this.instance.append(this.text);
+            }
+            setButtonType(buttonType) {
+                if (this.currentButtonType != null || this.currentButtonType !== "") {
+                    this.instance.removeClass(this.currentButtonType);
+                    this.currentButtonType = null;
+                }
+                this.instance.addClass(buttonType);
+                this.currentButtonType = buttonType;
+            }
+            setClick(action) {
+                this.instance.unbind('click');
+                if (action == null) {
+                    return;
+                }
+                this.instance.click(action);
+            }
+            setIcon(iconClass) {
+                if (this.currentIconClass != null || this.currentIconClass !== "") {
+                    this.icon.removeClass(this.currentIconClass);
+                    this.currentIconClass = null;
+                }
+                this.icon.addClass(iconClass);
+                this.currentIconClass = iconClass;
+            }
+            setText(text) {
+                this.text.text(text);
+            }
+            setWidth(width) {
+                this.instance.css({
+                    width: width == null ? 'auto' : width
+                });
+            }
+        }
+        Models.Button = Button;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
         class Card {
             constructor() {
                 this.instance = $('<div/>').addClass("cardStyle cardForm formBlock").css({ transition: 'max-width .3s ease-in-out' });
@@ -958,9 +1165,9 @@ var SeriesfeedImporter;
                 return breadcrumbs;
             }
             setBackButtonUrl(url) {
+                this.backButton.hide();
+                this.backButton.click(() => { });
                 if (url == null) {
-                    this.backButton.hide();
-                    this.backButton.click(() => { });
                     return;
                 }
                 this.backButton.show();
@@ -973,9 +1180,9 @@ var SeriesfeedImporter;
                 this.title.text(title);
             }
             setBreadcrumbs(breadcrumbs) {
+                this.breadcrumbs.hide();
+                this.breadcrumbs.empty();
                 if (breadcrumbs == null || breadcrumbs.length === 0) {
-                    this.breadcrumbs.hide();
-                    this.breadcrumbs.empty();
                     return;
                 }
                 for (let i = 0; i < breadcrumbs.length; i++) {
@@ -1002,8 +1209,8 @@ var SeriesfeedImporter;
                 this.breadcrumbs.show();
             }
             setContent(content) {
+                this.content.empty();
                 if (content == null) {
-                    this.content.empty();
                     return;
                 }
                 this.content.append(content);
@@ -1026,21 +1233,94 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
-    var Providers;
-    (function (Providers) {
-        class ButtonProvider {
-            static provide(buttonType, iconClass, text, url, width) {
-                const button = $('<div/>').addClass(`btn ${buttonType}`).click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
-                const icon = $('<i/>').addClass(`fa ${iconClass}`);
-                button.css({
-                    width: width == null ? 'auto' : width
+    var Models;
+    (function (Models) {
+        class User {
+            constructor() {
+                this.unknownUserAvatarUrl = "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg";
+                this.instance = $('<div/>').addClass("portfolio mix_all");
+                const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle").css({ cursor: 'inherit' });
+                this.topText = $('<h4/>').css({ padding: '15px 0 0 15px' });
+                const hover = $('<div/>').addClass("portfolio-hover").css({ padding: '15px 15px 5px 15px', height: '170px' });
+                this.avatar = $('<img/>').addClass("user-img").css({ maxHeight: '150px' }).attr('src', this.unknownUserAvatarUrl);
+                this.username = $('<h3/>').addClass("user-name");
+                const info = $('<div/>').addClass("portfolio-info").css({ height: '90px' });
+                const title = $('<div/>').addClass("portfolio-title");
+                this.instance
+                    .css({
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '100%',
+                    transition: 'all .24s ease-in-out'
                 });
-                button.append(icon);
-                button.append(text);
-                return button;
+                hover
+                    .css({
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                });
+                this.instance.append(wrapper);
+                wrapper.append(this.topText);
+                wrapper.append(hover);
+                hover.append(this.avatar);
+                wrapper.append(info);
+                info.append(title);
+                title.append(this.username);
+            }
+            setTopText(text) {
+                this.topText.text(text);
+            }
+            setUsername(username) {
+                this.username.text(username);
+            }
+            replaceUsername(element) {
+                this.username.replaceWith(element);
+            }
+            setAvatarUrl(avatarUrl) {
+                if (avatarUrl == null || avatarUrl === "") {
+                    this.avatar.attr('src', this.unknownUserAvatarUrl);
+                }
+                this.avatar.attr('src', avatarUrl);
+            }
+            setWidth(width) {
+                this.instance.css({
+                    width: width != null ? width : 'auto'
+                });
+            }
+            setClick(action) {
+                this.instance.css({ cursor: 'default' }).unbind('mouseenter mouseleave click');
+                if (action == null) {
+                    return;
+                }
+                this.instance
+                    .css({ cursor: 'pointer' })
+                    .hover(() => this.instance.css({
+                    webkitBoxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)'
+                }), () => this.instance.css({
+                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
+                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
+                }))
+                    .click(action);
             }
         }
-        Providers.ButtonProvider = ButtonProvider;
+        Models.User = User;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Providers;
+    (function (Providers) {
+        class InputProvider {
+            static provide(width, placeholder, value) {
+                return $('<input type="text"/>')
+                    .addClass('form-control')
+                    .attr('placeholder', placeholder)
+                    .attr('value', value)
+                    .css({ maxWidth: width });
+            }
+        }
+        Providers.InputProvider = InputProvider;
     })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

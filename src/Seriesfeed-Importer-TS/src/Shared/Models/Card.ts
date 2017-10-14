@@ -48,9 +48,10 @@ module SeriesfeedImporter.Models {
         }
 
         public setBackButtonUrl(url: Enums.ShortUrl): void {
+            this.backButton.hide();
+            this.backButton.click(() => { });
+            
             if (url == null) {
-                this.backButton.hide();
-                this.backButton.click(() => { });
                 return;
             }
 
@@ -67,9 +68,10 @@ module SeriesfeedImporter.Models {
         }
 
         public setBreadcrumbs(breadcrumbs: Breadcrumb[]): void {
+            this.breadcrumbs.hide();
+            this.breadcrumbs.empty();
+
             if (breadcrumbs == null || breadcrumbs.length === 0) {
-                this.breadcrumbs.hide();
-                this.breadcrumbs.empty();
                 return;
             }
 
@@ -98,9 +100,10 @@ module SeriesfeedImporter.Models {
             this.breadcrumbs.show();
         }
 
-        public setContent(content: JQuery<HTMLElement>): void {
+        public setContent(content?: JQuery<HTMLElement>): void {
+            this.content.empty();
+
             if (content == null) {
-                this.content.empty();
                 return;
             }
 

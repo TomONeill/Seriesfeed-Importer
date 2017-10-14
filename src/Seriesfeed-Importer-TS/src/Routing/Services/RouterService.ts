@@ -43,7 +43,7 @@ module SeriesfeedImporter.Services {
             document.title = "Bierdopje favorieten importeren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImportBierdopjeController();
+            new Controllers.ImportBierdopjeFavouritesUserSelectionController();
         }
 
         public static importImdb(): void {

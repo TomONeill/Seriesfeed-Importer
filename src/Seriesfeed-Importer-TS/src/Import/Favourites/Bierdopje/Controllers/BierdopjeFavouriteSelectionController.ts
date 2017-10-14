@@ -1,45 +1,49 @@
-/// <reference path="../../../typings/index.d.ts" />
+/// <reference path="../../../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class ImportBierdopjeController {
-        constructor() {
+    export class BierdopjeFavouriteSelectionController {
+        constructor(username: string) {
+            this.initialiseCard();
+            this.initialise(username);
+        }
+
+        private initialiseCard(): void {
             const card = Services.CardService.getCard();
-            card.setTitle("Bierdopje favorieten importeren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportSourceSelection);
+            card.setTitle("Bierdopje favorieten selecteren");
+            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
                 new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportBierdopje)
             ];
             card.setBreadcrumbs(breadcrumbs);
-            card.setWidth('800px');
+            card.setWidth();
+            card.setContent();
+        }
 
-            const formElement = $('<div/>');
-            const usernameInput = $('<div/>').append('<input type="text" id="username" class="form-control" placeholder="Gebruikersnaam" />');
-            const submitInput = $('<div/>').append('<input type="button" id="fav-import" class="btn btn-success btn-block" value="Favorieten Importeren" />');
+        private initialise(username: string): void {
+            const cardContent = $('#' + Config.Id.CardContent);
+            const formElement = $('<div/>').html("Favorieten van " + username);
+            const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');
             const bottomPane = $('<div/>').addClass('blog-left');
             const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
             const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
             const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
             const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
 
-            card.setContent(formElement);
+            cardContent.append(formElement);
             formElement.addClass('blog-left cardStyle cardForm formBlock');
             bottomPane.addClass('cardStyle');
             detailsTable.addClass('cardStyle');
             formElement.css('padding', '10px');
 
-            formElement.append(usernameInput);
             formElement.append(submitInput);
             detailsTable.append(colGroup);
             detailsTable.append(detailsHeader);
             bottomPane.append(showDetails);
             showDetails.append(detailsTable);
 
-            Services.BierdopjeService.getUsername()
-                .then((username) => $('#username').attr('value', username));
-
-            $("#fav-import").click((event) => {
+            submitInput.click((event) => {
                 const favImportBtn = $(event.currentTarget);
                 const outerProgress = $('<div/>').addClass('progress');
                 const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
@@ -49,7 +53,6 @@ module SeriesfeedImporter.Controllers {
                 formElement.append(outerProgress);
                 formElement.after(bottomPane);
 
-                const username = $('#username').val() as string;
                 const favourites = $('#details');
 
                 $("#show-details").click(() => detailsTable.toggle());

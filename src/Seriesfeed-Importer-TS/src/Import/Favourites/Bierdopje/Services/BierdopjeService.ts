@@ -3,13 +3,35 @@
 module SeriesfeedImporter.Services {
     export class BierdopjeService {
         public static getUsername(): Promise<string> {
-            return Services.AjaxService.get("http://www.bierdopje.com/stats")
+            return Services.AjaxService.get(Config.BierdopjeBaseUrl + "/stats")
                 .then((statsPageData) => {
                     const statsData = $(statsPageData.responseText);
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                 .catch((error) => {
                     throw `Could not get username from Bierdopje.com: ${error}`;
+                });
+        }
+
+        public static isExistingUser(username: string): Promise<boolean> {
+            return Services.AjaxService.get(Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
+                .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    return data.find("#page .maincontent .content-links .content h3").html() !== "Fout - Pagina niet gevonden";
+                })
+                .catch((error) => {
+                    throw `Could not check for existing user on Bierdopje.com: ${error}`;
+                });
+        }
+        
+        public static getAvatarUrlByUsername(username: string): Promise<string> {
+            return Services.AjaxService.get(Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
+                .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    return data.find('img.avatar').attr('src');
+                })
+                .catch((error) => {
+                    throw `Could not get avatar url from Bierdopje.com: ${error}`;
                 });
         }
 

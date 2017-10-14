@@ -46,10 +46,10 @@ module SeriesfeedImporter.Controllers {
                 minHeight: '425px'
             });
 
-            var steps = this.stepFactory(4);
+            const steps = this.stepFactory(4);
 
-            var importLink = $('<a/>').attr("href", "/series/import/");
-            var imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
+            const importLink = $('<a/>').attr("href", "/series/import/");
+            const imdbLink = $('<a/>').attr("href", "http://www.imdb.com/").attr("target", "_blank");
 
             importLink.append("Favorieten importeren");
             imdbLink.append("IMDb.com");
@@ -70,18 +70,19 @@ module SeriesfeedImporter.Controllers {
         private stepOne(): void {
             this.selectStep(1);
 
-            var titleCardText = 'Account verifiëren';
-            var innerCardText = 'Om je favorieten succesvol te importeren dien je te verifiëren '
+            const titleCardText = 'Account verifiëren';
+            const innerCardText = 'Om je favorieten succesvol te importeren dien je te verifiëren '
                 + 'of het onderstaande account waarop je nu bent ingelogd op '
                 + '<a href="http://www.imdb.com/">www.imdb.com</a> het '
                 + 'account is waarvan je wilt importeren.';
-            var userProfile = this.userFactory("Laden...", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg");
+            const userProfile = new Models.User();
+            userProfile.setUsername("Laden...");
 
             this.stepTitle.html(titleCardText);
             this.stepContent.html(innerCardText);
             this.content.html(<any>this.stepTitle);
             this.stepTitle.after(this.stepContent);
-            this.stepContent.after(userProfile);
+            this.stepContent.after(userProfile.instance);
 
             Services.ImdbService.getUser()
                 .then((user) => {
@@ -99,12 +100,12 @@ module SeriesfeedImporter.Controllers {
                                 this._username = login;
                             }
 
-                            const profile = this.userFactory(this._username, avatarUrl);
-                            userProfile.html(<any>profile);
+                            userProfile.setUsername(this._username);
+                            userProfile.setAvatarUrl(avatarUrl);
 
-                            if (userProfile.find(".user-name").html() !== login) {
+                            if (userProfile.instance.find(".user-name").html() !== login) {
                                 const nextStep = this.nextStepFactory("Doorgaan", "step-2");
-                                userProfile.after(nextStep);
+                                userProfile.instance.after(nextStep);
 
                                 $("#step-2").on('click', () => this.stepTwo());
                             }
@@ -353,24 +354,6 @@ module SeriesfeedImporter.Controllers {
             a.append(text);
 
             return a;
-        }
-
-        private userFactory(user: string, avatarUrl: string): JQuery {
-            const div = $('<div></div>');
-            const img = $('<img></img>');
-            const h3 = $('<h3></h3>');
-
-            div.addClass("col-md-12 user-img-container");
-            img.addClass("user-img");
-            h3.addClass("user-name");
-
-            img.attr('src', avatarUrl);
-            h3.append(user);
-
-            div.append(img);
-            div.append(h3);
-
-            return div;
         }
 
         private toggleAllCheckboxes(): void {

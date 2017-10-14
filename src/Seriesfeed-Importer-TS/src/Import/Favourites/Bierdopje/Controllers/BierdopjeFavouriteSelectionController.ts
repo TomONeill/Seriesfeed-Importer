@@ -23,181 +23,56 @@ module SeriesfeedImporter.Controllers {
 
         private initialise(username: string): void {
             const cardContent = $('#' + Config.Id.CardContent);
-            const formElement = $('<div/>').html("Favorieten van " + username);
-            const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');
-            const bottomPane = $('<div/>').addClass('blog-left');
-            const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-            const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
-            const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
-            const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
 
-            cardContent.append(formElement);
-            formElement.addClass('blog-left cardStyle cardForm formBlock');
-            bottomPane.addClass('cardStyle');
-            detailsTable.addClass('cardStyle');
-            formElement.css('padding', '10px');
+            const formElement = $('<div/>').html(`Favorieten van ${username}:`);
+            const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;"><tbody>');
+            const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
+            const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
+            const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
 
-            formElement.append(submitInput);
-            detailsTable.append(colGroup);
-            detailsTable.append(detailsHeader);
-            bottomPane.append(showDetails);
-            showDetails.append(detailsTable);
+            cardContent.after(loadingData);
+            listsTable.append(tableHeader);
 
-            submitInput.click((event) => {
-                const favImportBtn = $(event.currentTarget);
-                const outerProgress = $('<div/>').addClass('progress');
-                const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
+            Services.BierdopjeService.getFavouritesByUsername(username).then((favourites) => {
+                favourites.each((index, favourite) => {
+                    const bdShowName = $(favourite).text();
+                    const bdShowSlug = $(favourite).attr('href');
+                    const bdShowUrl = Config.BierdopjeBaseUrl + bdShowSlug;
 
-                favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
-                outerProgress.append(progressBar);
-                formElement.append(outerProgress);
-                formElement.after(bottomPane);
+                    const checkbox = '<fieldset><input type="checkbox" name="show_' + index + '" id="show_' + index + '" class="hideCheckbox"><label for="show_' + index + '" class="checkbox-label"><span class="check" data-list-id="' + index + '" data-list-name="' + bdShowName + '" data-list-url="' + bdShowUrl + '"></span></label></fieldset>';
+                    const item = '<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>';
 
-                const favourites = $('#details');
+                    tableHeader.after(item);
+                });
+                loadingData.html(<any>listsTable)
 
-                $("#show-details").click(() => detailsTable.toggle());
+                //checkboxAll.click(() => this.toggleAllCheckboxes());
 
-                Services.BierdopjeService.getFavouritesByUsername(username)
-                    .then((bdFavouriteLinks) => {
-                        const bdFavouritesLength = bdFavouriteLinks.length;
+                // $('.checkbox-label').on('click', (event) => {
+                //     const checkbox = $(event.currentTarget).find(".check");
 
-                        var MAX_RETRIES = Config.MaxRetries;
+                //     if (!checkbox.hasClass("checked")) {
+                //         const listItem = {
+                //             id: checkbox.data("list-id"),
+                //             name: checkbox.data("list-name"),
+                //             url: checkbox.data("list-url")
+                //         };
 
-                        function getBierdopjeFavourite(index: number) {
-                            return new Promise((resolve) => {
-                                const bdShowName = $(bdFavouriteLinks[index]).text();
-                                const bdShowSlug = $(bdFavouriteLinks[index]).attr('href');
-                                const bdShowUrl = 'http://www.bierdopje.com';
+                //         this._selectedLists.push(listItem);
 
-                                Services.BierdopjeService.getTvdbIdByShowSlug(bdShowSlug)
-                                    .then((tvdbId) => {
-                                        Services.SeriesfeedService.getShowIdByTvdbId(tvdbId)
-                                            .then((sfShowData) => {
-                                                let sfSeriesId = sfShowData.id;
-                                                let sfSeriesName = sfShowData.name;
-                                                const sfSeriesSlug = sfShowData.slug;
-                                                const sfSeriesUrl = 'https://www.seriesfeed.com/series/';
+                //         checkbox.addClass("checked");
+                //     } else {
+                //         const pos = this._selectedLists.map((list: any) => list.id).indexOf(checkbox.data("list-id"));
+                //         this._selectedLists.splice(pos, 1);
+                //         checkbox.removeClass("checked");
+                //     }
 
-                                                const MAX_RETRIES = Config.MaxRetries;
-                                                let current_retries = 0;
-
-                                                function addFavouriteByShowId(sfSeriesId: any) {
-                                                    Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
-                                                        .then((result) => {
-                                                            const resultStatus = result.status;
-                                                            let item = "<tr></tr>";
-                                                            let status = "-";
-                                                            let showUrl = sfSeriesUrl + sfSeriesSlug;
-
-                                                            if (sfSeriesId === -1) {
-                                                                sfSeriesId = "Onbekend";
-                                                            }
-
-                                                            if (!sfSeriesName) {
-                                                                showUrl = bdShowUrl + bdShowSlug;
-                                                                sfSeriesName = bdShowName;
-                                                            }
-
-                                                            if (resultStatus === "success") {
-                                                                status = "Toegevoegd als favoriet.";
-                                                                item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                            } else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
-                                                                status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-                                                                item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                            } else {
-                                                                status = "Deze serie is al een favoriet.";
-                                                                item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                            }
-
-                                                            favourites.append(item);
-
-                                                            const progress = (index / bdFavouritesLength) * 100;
-                                                            progressBar.css('width', Math.round(progress) + "%");
-
-                                                            resolve();
-                                                        })
-                                                        .catch(() => {
-                                                            console.log(`Retrying to favourite ${sfSeriesName} (${sfSeriesId}). ${current_retries + 1}/${MAX_RETRIES})`);
-                                                            current_retries++;
-
-                                                            if (current_retries === MAX_RETRIES) {
-                                                                const status = "Kon deze serie niet als favoriet instellen.";
-                                                                const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                                favourites.append(item);
-
-                                                                const progress = (index / bdFavouritesLength) * 100;
-                                                                progressBar.css('width', Math.round(progress) + "%");
-
-                                                                resolve();
-                                                            } else {
-                                                                addFavouriteByShowId(index);
-                                                                resolve();
-                                                            }
-                                                        });
-                                                }
-
-                                                addFavouriteByShowId(sfSeriesId);
-                                            }).catch(() => {
-                                                const status = 'Het id kan niet van Seriesfeed worden opgehaald.</a>';
-                                                const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-                                                favourites.append(item);
-
-                                                const progress = (index / bdFavouritesLength) * 100;
-                                                progressBar.css('width', Math.round(progress) + "%");
-
-                                                resolve();
-                                            });
-                                    }).catch((error) => {
-                                        const status = 'Deze serie kan niet gevonden worden op Bierdopje.';
-                                        const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-                                        favourites.append(item);
-
-                                        const progress = (index / bdFavouritesLength) * 100;
-                                        progressBar.css('width', Math.round(progress) + "%");
-
-                                        resolve();
-                                    });
-                            });
-                        }
-
-                        var MAX_ASYNC_CALLS = Config.MaxAsyncCalls;
-                        let current_async_calls = 0;
-
-                        Promise.resolve(1)
-                            .then(function loop(i): any {
-                                if (current_async_calls < MAX_ASYNC_CALLS) {
-                                    if (i < bdFavouritesLength) {
-                                        current_async_calls += 1;
-                                        getBierdopjeFavourite(i)
-                                            .then(() => current_async_calls -= 1);
-
-                                        return loop(i + 1);
-                                    }
-                                } else {
-                                    return new Promise((resolve) => {
-                                        setTimeout(() => {
-                                            resolve(loop(i));
-                                        }, 80);
-                                    });
-                                }
-                            })
-                            .then(() => {
-                                function checkActiveCalls() {
-                                    if (current_async_calls === 0) {
-                                        favImportBtn.prop('disabled', false);
-                                        favImportBtn.attr('value', "Favorieten Importeren");
-                                        outerProgress.removeClass('progress');
-                                        progressBar.replaceWith("Importeren voltooid.");
-                                    } else {
-                                        setTimeout(checkActiveCalls, 80);
-                                    }
-                                }
-
-                                checkActiveCalls();
-                            }).catch((error) => {
-                                throw `Unknown error: ${error}`;
-                            });
-                    });
+                //     if (this._selectedLists.length > 0) {
+                //         nextStep.show();
+                //     } else {
+                //         nextStep.hide();
+                //     }
+                // });
             });
         }
     }

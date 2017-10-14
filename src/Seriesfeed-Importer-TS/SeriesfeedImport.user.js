@@ -136,6 +136,38 @@ var SeriesfeedImporter;
             }
             initialise(username) {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const formElement = $('<div/>').html(`Favorieten van ${username}:`);
+                const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;"><tbody>');
+                const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
+                const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
+                const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
+                cardContent.after(loadingData);
+                listsTable.append(tableHeader);
+                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username).then((favourites) => {
+                    favourites.each((index, favourite) => {
+                        const bdShowName = $(favourite).text();
+                        const bdShowSlug = $(favourite).attr('href');
+                        const bdShowUrl = SeriesfeedImporter.Config.BierdopjeBaseUrl + bdShowSlug;
+                        const checkbox = '<fieldset><input type="checkbox" name="show_' + index + '" id="show_' + index + '" class="hideCheckbox"><label for="show_' + index + '" class="checkbox-label"><span class="check" data-list-id="' + index + '" data-list-name="' + bdShowName + '" data-list-url="' + bdShowUrl + '"></span></label></fieldset>';
+                        const item = '<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>';
+                        tableHeader.after(item);
+                    });
+                    loadingData.html(listsTable);
+                });
+            }
+        }
+        Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportBierdopjeFavouritesController {
+            constructor() {
+            }
+            initialise(username) {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const formElement = $('<div/>').html("Favorieten van " + username);
                 const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');
                 const bottomPane = $('<div/>').addClass('blog-left');
@@ -287,17 +319,6 @@ var SeriesfeedImporter;
                         });
                     });
                 });
-            }
-        }
-        Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;
-    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Controllers;
-    (function (Controllers) {
-        class ImportBierdopjeFavouritesController {
-            constructor() {
             }
         }
         Controllers.ImportBierdopjeFavouritesController = ImportBierdopjeFavouritesController;

@@ -178,7 +178,7 @@ $(function() {
 							}).error(function(error) {
 								if (error.status === 400) {
 									console.log("Could not convert " + tvdbId + " on Seriesfeed.");
-									const status = '<a href="https://www.seriesfeed.com/voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
+									const status = '<a href="https://www.seriesfeed.com/series/suggest/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
 									const item = '<tr class="row-warning"><td>-</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
 									favourites.append(item);
 

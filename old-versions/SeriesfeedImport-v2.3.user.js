@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Seriesfeed Importer
 // @namespace    https://www.seriesfeed.com
-// @version      2.3.1
+// @version      2.3
 // @description  Allows you to import your favourites from Bierdopje.com.
 // @updateURL 	 https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js
 // @match        https://*.seriesfeed.com/*
@@ -84,9 +84,7 @@ $(function() {
 		var colGroup      = $('<colgroup><col width="15%"><col width="35%"><col width="50%"></colgroup>');
 		var detailsHeader = $('<tr><th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th></tr>');
 		var showDetails   = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-
-		wrapper.append(container);
-		container.append(p);
+		
 		container.append(formElement);
 		formElement.addClass('blog-left cardStyle cardForm formBlock');
 		bottomPane.addClass('cardStyle');
@@ -100,6 +98,8 @@ $(function() {
 		bottomPane.append(showDetails);
 		showDetails.append(detailsTable);
 		
+		container.append(p);
+		wrapper.append(container);
 
 		
 		getCurrentBierdopjeUsername().then(function(username) {
@@ -139,13 +139,34 @@ $(function() {
 								var sfSeriesId   = sfShowData.id;
 								var sfSeriesName = sfShowData.name;
 								var sfSeriesSlug = sfShowData.slug;
-								var sfSeriesUrl  = 'https://www.seriesfeed.com/series/';
+								var sfSeriesUrl  = 'http://www.seriesfeed.com/series/';
 
 								addSeriesfeedFavouriteByShowId(sfSeriesId).success(function(result) {
+									var resultStatus = result.status;
+									var item = "<tr></tr>";
+									var status = "-";
 									var showUrl = sfSeriesUrl + sfSeriesSlug;
-									var status = "Toegevoegd als favoriet.";
-									var item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+									
+									if (sfSeriesId === -1) {
+										sfSeriesId = "Onbekend";
+									}
+									
+									if (!sfSeriesName) {
+										showUrl = bdShowUrl + bdShowSlug;
+										sfSeriesName = bdShowName;
+									}
 
+									if (resultStatus === "success") {
+										status = "Toegevoegd als favoriet.";
+										item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+									} else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
+										status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
+										item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+									} else {
+										status = "Deze serie is mogelijk al een favoriet en is dus ongewijzigd.";
+										item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+									}
+									
 									favourites.append(item);
 
 									var progress = (index/bdFavouritesLength) * 100;
@@ -153,47 +174,23 @@ $(function() {
 
 									resolve();
 								}).error(function(error) {
-									if (error.status === 400) {
-										console.log("Series " + sfSeriesName + " with id " + sfSeriesId + " is already a favourite.");
-										const status = "Deze serie is mogelijk al een favoriet en is dus ongewijzigd.";
-										const item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-										favourites.append(item);
-
-										const progress = (index/bdFavouritesLength) * 100;
-										progressBar.css('width', Math.round(progress) + "%");
-
-										return resolve();
-									}
-
 									console.log("Could not connect to Seriesfeed to favourite series " + sfSeriesName + " with id " + sfSeriesId + ".");
-									const status = "Kon deze serie niet als favoriet instellen.";
-									const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+									var status = "Kon deze serie niet als favoriet instellen.";
+									var item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
 									favourites.append(item);
 
-									const progress = (index/bdFavouritesLength) * 100;
+									var progress = (index/bdFavouritesLength) * 100;
 									progressBar.css('width', Math.round(progress) + "%");
 									
 									resolve();
 								});
 							}).error(function(error) {
-								if (error.status === 400) {
-									console.log("Could not convert " + tvdbId + " on Seriesfeed.");
-									const status = '<a href="https://www.seriesfeed.com/voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-									const item = '<tr class="row-warning"><td>-</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-									favourites.append(item);
-
-									const progress = (index/bdFavouritesLength) * 100;
-									progressBar.css('width', Math.round(progress) + "%");
-
-									return resolve();
-								}
-
 								console.log("Could not connect to Seriesfeed to convert TVDB id " + tvdbId + ".");
-								const status = 'Kon geen verbinding met Seriesfeed maken om het id op te halen.</a>';
-								const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
+								var status = 'Kon geen verbinding met Seriesfeed maken om het id op te halen.</a>';
+								var item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
 								favourites.append(item);
 
-								const progress = (index/bdFavouritesLength) * 100;
+								var progress = (index/bdFavouritesLength) * 100;
 								progressBar.css('width', Math.round(progress) + "%");
 
 								resolve();

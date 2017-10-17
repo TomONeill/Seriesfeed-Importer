@@ -26,10 +26,14 @@ Check out other userscripts for Seriesfeed by me:<BR/>
     <li><A HREF="https://github.com/TomONeill/Seriesfeed-Season-Separator">Season Separator</A></li>
 </ul>
 
-# About userscripts
-This is a userscript which you can use in combination with a browser extension to inject JavaScript (Greasemonkey, Tampermonkey).
-This means new functionality can be added, or bugs can be fixed on (discontinued) websites.<BR />
-DO NOT INSTALL USERSCRIPTS YOU DON'T TRUST! Check always for urls like the @domain tag at the top of a script before installation. Sensitive data (like usernames, passwords, or banktransactions even), may be sent to other sources.
+# Development
+If you want to help with the development, you can. From now on I'll be working in the `src/Seriesfeed-Importer-TS` directory, in which a TypeScript project is located. You can use this for development. To setup the dev in combination with Tampermonkey/other, do the following:
+- Open the `src/Seriesfeed-Importer-TS` folder in Visual Studio Code.
+- Open the terminal using CTRL + `
+- Type: `tsc --watch` to run the TypeScript compiler. The `tsconfig.json` file will determine the location of the output.
+- Add a userscript and add `// @require   YOUR_CLONE_LOCATION/src/Seriesfeed-Importer-TS/SeriesfeedImport.user.js`
+
+Any change will compile (some would say transpile) and a browser refresh will do the rest.
 
 # Donate
 If you like my work so much you feel like doing something nice for me, a complete stranger of the internet, you can.<BR />

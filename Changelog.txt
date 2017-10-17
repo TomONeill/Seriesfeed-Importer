@@ -1,5 +1,8 @@
 Seriesfeed Importer Changelog
 
+Version 2.3.1 (17 October 2017)
+Fixed status messages per imported series.
+
 Version 2.3 (2 October 2017)
 Added compatibility for Seriesfeed v2.5.
 

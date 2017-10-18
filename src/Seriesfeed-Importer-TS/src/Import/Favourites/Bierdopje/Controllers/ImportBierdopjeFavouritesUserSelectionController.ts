@@ -53,11 +53,11 @@ module SeriesfeedImporter.Controllers {
             Services.BierdopjeService.getUsername()
                 .then((username) => {
                     if (username == null) {
-                        this.user.setClick();
+                        this.user.onClick = null;
                         this.user.setAvatarUrl();
                         this.user.setUsername("Niet ingelogd");
                     } else {
-                        this.user.setClick(() => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username));
+                        this.user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
                         this.user.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
@@ -122,10 +122,10 @@ module SeriesfeedImporter.Controllers {
             return Services.BierdopjeService.isExistingUser(username)
                 .then((isExistingUser) => {
                     if (!isExistingUser) {
-                        this.customUser.setClick();
+                        this.customUser.onClick = null;
                         this.customUser.setAvatarUrl();
                     } else {
-                        this.customUser.setClick(() => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username));
+                        this.customUser.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
                         this.customUser.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {

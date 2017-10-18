@@ -69,7 +69,7 @@ module SeriesfeedImporter.Models {
             });
         }
 
-        public setClick(action?: () => void): void {
+        public set onClick(action: () => void) {
             this.instance.css({ cursor: 'default' }).unbind('mouseenter mouseleave click');
 
             if (action == null) {

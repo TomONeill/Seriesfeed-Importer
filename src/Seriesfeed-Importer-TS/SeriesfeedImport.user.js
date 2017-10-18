@@ -377,12 +377,12 @@ var SeriesfeedImporter;
                 SeriesfeedImporter.Services.BierdopjeService.getUsername()
                     .then((username) => {
                     if (username == null) {
-                        this.user.setClick();
+                        this.user.onClick = null;
                         this.user.setAvatarUrl();
                         this.user.setUsername("Niet ingelogd");
                     }
                     else {
-                        this.user.setClick(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username));
+                        this.user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
                         this.user.setUsername(username);
                         SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
@@ -440,11 +440,11 @@ var SeriesfeedImporter;
                 return SeriesfeedImporter.Services.BierdopjeService.isExistingUser(username)
                     .then((isExistingUser) => {
                     if (!isExistingUser) {
-                        this.customUser.setClick();
+                        this.customUser.onClick = null;
                         this.customUser.setAvatarUrl();
                     }
                     else {
-                        this.customUser.setClick(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username));
+                        this.customUser.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
                         this.customUser.setUsername(username);
                         SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {
@@ -1329,7 +1329,7 @@ var SeriesfeedImporter;
                     width: width != null ? width : 'auto'
                 });
             }
-            setClick(action) {
+            set onClick(action) {
                 this.instance.css({ cursor: 'default' }).unbind('mouseenter mouseleave click');
                 if (action == null) {
                     return;

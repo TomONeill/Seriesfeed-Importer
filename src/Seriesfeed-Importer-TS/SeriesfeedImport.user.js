@@ -990,6 +990,9 @@ var SeriesfeedImporter;
                 window.history.pushState({ "shortUrl": url }, "", url);
             }
             static import() {
+                document.title = "Series importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.ImportController();
             }
             static importSourceSelection() {
                 document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";

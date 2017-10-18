@@ -34,6 +34,10 @@ module SeriesfeedImporter.Services {
         }
 
         private static import(): void {
+            document.title = "Series importeren | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.ImportController();
         }
 
         private static importSourceSelection(): void {

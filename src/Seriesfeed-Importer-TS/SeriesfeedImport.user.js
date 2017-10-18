@@ -1135,6 +1135,10 @@ var SeriesfeedImporter;
                 this.currentIconClass = iconClass;
             }
             setText(text) {
+                if (text == null) {
+                    this.text.text('');
+                    return;
+                }
                 this.text.text(text);
             }
             setWidth(width) {

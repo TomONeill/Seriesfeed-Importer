@@ -34,7 +34,7 @@ module SeriesfeedImporter.Models {
 
         public setClick(action?: (event: any) => void): void {
             this.instance.unbind('click');
-            
+
             if (action == null) {
                 return;
             }
@@ -52,7 +52,12 @@ module SeriesfeedImporter.Models {
         }
 
         public setText(text: string): void {
-            this.text.text(text)
+            if (text == null) {
+                this.text.text('');
+                return;
+            }
+            
+            this.text.text(text);
         }
 
         public setWidth(width: string): void {

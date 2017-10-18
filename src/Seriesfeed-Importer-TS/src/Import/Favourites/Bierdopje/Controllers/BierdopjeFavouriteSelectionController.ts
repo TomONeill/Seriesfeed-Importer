@@ -29,14 +29,14 @@ module SeriesfeedImporter.Controllers {
         private initialise(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            const formElement = $('<div/>').html(`Favorieten van ${this.username}:`);
-            const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;"><tbody>');
+            const table = new Models.Table();
             const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
-            const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
+            const selectAll = $('<th/>').append(checkboxAll);
+            const series = $('<th/>').text('Serie');
+            table.addTheadItems([selectAll, series]);
             const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
 
             cardContent.append(loadingData);
-            listsTable.append(tableHeader);
 
             Services.BierdopjeService.getFavouritesByUsername(this.username).then((favourites) => {
                 favourites.each((index, favourite) => {
@@ -45,13 +45,13 @@ module SeriesfeedImporter.Controllers {
                     const bdShowUrl = Config.BierdopjeBaseUrl + bdShowSlug;
 
                     const checkbox = '<fieldset><input type="checkbox" name="show_' + index + '" id="show_' + index + '" class="hideCheckbox"><label for="show_' + index + '" class="checkbox-label"><span class="check" data-list-id="' + index + '" data-list-name="' + bdShowName + '" data-list-url="' + bdShowUrl + '"></span></label></fieldset>';
-                    const item = '<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>';
+                    const item = $('<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>');
 
-                    tableHeader.after(item);
+                    table.addRow(item);
                 });
-                loadingData.html(<any>listsTable)
+                loadingData.html(<any>table.instance)
 
-                //checkboxAll.click(() => this.toggleAllCheckboxes());
+                checkboxAll.click(() => this.toggleAllCheckboxes());
 
                 // $('.checkbox-label').on('click', (event) => {
                 //     const checkbox = $(event.currentTarget).find(".check");
@@ -79,6 +79,10 @@ module SeriesfeedImporter.Controllers {
                 //     }
                 // });
             });
+        }
+
+        private toggleAllCheckboxes(): void {
+            console.log("check all");
         }
     }
 }

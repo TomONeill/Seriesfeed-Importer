@@ -138,24 +138,28 @@ var SeriesfeedImporter;
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const formElement = $('<div/>').html(`Favorieten van ${this.username}:`);
-                const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;"><tbody>');
+                const table = new SeriesfeedImporter.Models.Table();
                 const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
-                const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
+                const selectAll = $('<th/>').append(checkboxAll);
+                const series = $('<th/>').text('Serie');
+                table.addTheadItems([selectAll, series]);
                 const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
                 cardContent.append(loadingData);
-                listsTable.append(tableHeader);
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this.username).then((favourites) => {
                     favourites.each((index, favourite) => {
                         const bdShowName = $(favourite).text();
                         const bdShowSlug = $(favourite).attr('href');
                         const bdShowUrl = SeriesfeedImporter.Config.BierdopjeBaseUrl + bdShowSlug;
                         const checkbox = '<fieldset><input type="checkbox" name="show_' + index + '" id="show_' + index + '" class="hideCheckbox"><label for="show_' + index + '" class="checkbox-label"><span class="check" data-list-id="' + index + '" data-list-name="' + bdShowName + '" data-list-url="' + bdShowUrl + '"></span></label></fieldset>';
-                        const item = '<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>';
-                        tableHeader.after(item);
+                        const item = $('<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>');
+                        table.addRow(item);
                     });
-                    loadingData.html(listsTable);
+                    loadingData.html(table.instance);
+                    checkboxAll.click(() => this.toggleAllCheckboxes());
                 });
+            }
+            toggleAllCheckboxes() {
+                console.log("check all");
             }
         }
         Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;
@@ -398,7 +402,7 @@ var SeriesfeedImporter;
             getUserSearchBox() {
                 const userInputWrapper = $('<div/>').css({ textAlign: 'center' });
                 userInputWrapper.click((event) => event.stopPropagation());
-                const userInput = SeriesfeedImporter.Providers.InputProvider.provide('85%', "Gebruikersnaam");
+                const userInput = SeriesfeedImporter.Providers.TextInputProvider.provide('85%', "Gebruikersnaam");
                 userInput.css({ margin: '0 auto', display: 'inline-block' });
                 userInput.on('keyup', (event) => {
                     const key = event.keyCode || event.which;
@@ -1243,6 +1247,33 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Models;
     (function (Models) {
+        class Table {
+            constructor() {
+                this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only');
+                const thead = $('<thead/>');
+                this.headerRow = $('<tr/>');
+                this.tbody = $('<tbody/>');
+                thead.append(this.headerRow);
+                this.instance.append(thead);
+                this.instance.append(this.tbody);
+            }
+            addHeaderItem(th) {
+                this.headerRow.append(th);
+            }
+            addTheadItems(thCollection) {
+                thCollection.map((th) => this.headerRow.append(th));
+            }
+            addRow(tr) {
+                this.tbody.append(tr);
+            }
+        }
+        Models.Table = Table;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
         class User {
             constructor() {
                 this.unknownUserAvatarUrl = "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg";
@@ -1319,22 +1350,6 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
     (function (Providers) {
-        class InputProvider {
-            static provide(width, placeholder, value) {
-                return $('<input type="text"/>')
-                    .addClass('form-control')
-                    .attr('placeholder', placeholder)
-                    .attr('value', value)
-                    .css({ maxWidth: width });
-            }
-        }
-        Providers.InputProvider = InputProvider;
-    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Providers;
-    (function (Providers) {
         class SourceProvider {
             static provide(name, image, imageSize, url, colour) {
                 const portfolio = $('<div/>').addClass("portfolio mix_all");
@@ -1383,6 +1398,22 @@ var SeriesfeedImporter;
             }
         }
         Providers.SourceProvider = SourceProvider;
+    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Providers;
+    (function (Providers) {
+        class TextInputProvider {
+            static provide(width, placeholder, value) {
+                return $('<input type="text"/>')
+                    .addClass('form-control')
+                    .attr('placeholder', placeholder)
+                    .attr('value', value)
+                    .css({ maxWidth: width });
+            }
+        }
+        Providers.TextInputProvider = TextInputProvider;
     })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1449,7 +1480,11 @@ var SeriesfeedImporter;
                     + '        border-bottom: 3px solid #447C6F;'
                     + '    }'
                     + '    input[type="checkbox"] + label span {'
-                    + '        position: initial !important'
+                    + '        margin-top: -3px;'
+                    + '    }'
+                    + '    '
+                    + '    fieldset {'
+                    + '        margin-top: 0px !important;'
                     + '    }'
                     + '    '
                     + '    .progress {'

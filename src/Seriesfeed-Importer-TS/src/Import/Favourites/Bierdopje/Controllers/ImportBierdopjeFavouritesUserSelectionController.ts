@@ -81,7 +81,7 @@ module SeriesfeedImporter.Controllers {
         private getUserSearchBox(): JQuery<HTMLElement> {
             const userInputWrapper = $('<div/>').css({ textAlign: 'center' });
             userInputWrapper.click((event: any) => event.stopPropagation());
-            const userInput = Providers.InputProvider.provide('85%', "Gebruikersnaam");
+            const userInput = Providers.TextInputProvider.provide('85%', "Gebruikersnaam");
             userInput.css({ margin: '0 auto', display: 'inline-block' });
             userInput.on('keyup', (event: any) => {
                 const key = event.keyCode || event.which;

@@ -2,9 +2,13 @@
 
 module SeriesfeedImporter.Controllers {
     export class BierdopjeFavouriteSelectionController {
+        private username: string;
+
         constructor(username: string) {
+            this.username = username;
+
             this.initialiseCard();
-            this.initialise(username);
+            this.initialise();
         }
 
         private initialiseCard(): void {
@@ -14,17 +18,18 @@ module SeriesfeedImporter.Controllers {
             const breadcrumbs = [
                 new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportBierdopje)
+                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje),
+                new Models.Breadcrumb(this.username, `${Enums.ShortUrl.ImportBierdopje}${this.username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
             card.setContent();
         }
 
-        private initialise(username: string): void {
+        private initialise(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            const formElement = $('<div/>').html(`Favorieten van ${username}:`);
+            const formElement = $('<div/>').html(`Favorieten van ${this.username}:`);
             const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;"><tbody>');
             const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
             const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
@@ -33,7 +38,7 @@ module SeriesfeedImporter.Controllers {
             cardContent.append(loadingData);
             listsTable.append(tableHeader);
 
-            Services.BierdopjeService.getFavouritesByUsername(username).then((favourites) => {
+            Services.BierdopjeService.getFavouritesByUsername(this.username).then((favourites) => {
                 favourites.each((index, favourite) => {
                     const bdShowName = $(favourite).text();
                     const bdShowSlug = $(favourite).attr('href');

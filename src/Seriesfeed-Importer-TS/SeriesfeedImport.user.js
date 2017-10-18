@@ -118,8 +118,9 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class BierdopjeFavouriteSelectionController {
             constructor(username) {
+                this.username = username;
                 this.initialiseCard();
-                this.initialise(username);
+                this.initialise();
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -128,22 +129,23 @@ var SeriesfeedImporter;
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
+                    new SeriesfeedImporter.Models.Breadcrumb(this.username, `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this.username}`)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
                 card.setContent();
             }
-            initialise(username) {
+            initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const formElement = $('<div/>').html(`Favorieten van ${username}:`);
+                const formElement = $('<div/>').html(`Favorieten van ${this.username}:`);
                 const listsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" style="margin-bottom: 20px;"><tbody>');
                 const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
                 const tableHeader = $('<tr><th style="padding-left: 30px;">' + checkboxAll[0].outerHTML + '</th><th>Lijst</th></tr>');
                 const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
                 cardContent.append(loadingData);
                 listsTable.append(tableHeader);
-                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username).then((favourites) => {
+                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this.username).then((favourites) => {
                     favourites.each((index, favourite) => {
                         const bdShowName = $(favourite).text();
                         const bdShowSlug = $(favourite).attr('href');
@@ -341,7 +343,7 @@ var SeriesfeedImporter;
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth('700px');
@@ -376,15 +378,12 @@ var SeriesfeedImporter;
                         this.user.setUsername("Niet ingelogd");
                     }
                     else {
-                        this.user.setClick(() => this.continue(username));
+                        this.user.setClick(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username));
                         this.user.setUsername(username);
                         SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
                     }
                 });
-            }
-            continue(username) {
-                new Controllers.BierdopjeFavouriteSelectionController(username);
             }
             initialiseCustomUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
@@ -393,6 +392,10 @@ var SeriesfeedImporter;
                 this.customUser.setWidth('49%');
                 this.customUser.instance.css({ marginLeft: '1%' });
                 cardContent.append(this.customUser.instance);
+                const userInputWrapper = this.getUserSearchBox();
+                this.customUser.replaceUsername(userInputWrapper);
+            }
+            getUserSearchBox() {
                 const userInputWrapper = $('<div/>').css({ textAlign: 'center' });
                 userInputWrapper.click((event) => event.stopPropagation());
                 const userInput = SeriesfeedImporter.Providers.InputProvider.provide('85%', "Gebruikersnaam");
@@ -427,7 +430,7 @@ var SeriesfeedImporter;
                 userInputWrapper.append(userInput);
                 userInputWrapper.append(searchButton.instance);
                 userInputWrapper.append(notFoundMessage);
-                this.customUser.replaceUsername(userInputWrapper);
+                return userInputWrapper;
             }
             searchUser(username) {
                 return SeriesfeedImporter.Services.BierdopjeService.isExistingUser(username)
@@ -437,7 +440,7 @@ var SeriesfeedImporter;
                         this.customUser.setAvatarUrl();
                     }
                     else {
-                        this.customUser.setClick(() => this.continue(username));
+                        this.customUser.setClick(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username));
                         this.customUser.setUsername(username);
                         SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {
@@ -921,27 +924,11 @@ var SeriesfeedImporter;
                 this.respondToBrowserNavigationChanges();
             }
             initialVisitRouting() {
-                switch (window.location.href) {
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Import:
-                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.Import);
-                        SeriesfeedImporter.Services.RouterService.import();
-                        break;
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection:
-                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
-                        SeriesfeedImporter.Services.RouterService.importSourceSelection();
-                        break;
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
-                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
-                        SeriesfeedImporter.Services.RouterService.importBierdopje();
-                        break;
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
-                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.ImportImdb);
-                        SeriesfeedImporter.Services.RouterService.importImdb();
-                        break;
-                    case SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Export:
-                        this.initialiseInitialVisit(SeriesfeedImporter.Enums.ShortUrl.Export);
-                        SeriesfeedImporter.Services.RouterService.export();
-                        break;
+                if (window.location.href.startsWith(SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Import)
+                    || window.location.href.startsWith(SeriesfeedImporter.Config.BaseUrl + SeriesfeedImporter.Enums.ShortUrl.Export)) {
+                    const url = window.location.href.replace(SeriesfeedImporter.Config.BaseUrl, '');
+                    this.initialiseInitialVisit(url);
+                    SeriesfeedImporter.Services.RouterService.navigate(url);
                 }
             }
             initialiseInitialVisit(url) {
@@ -962,23 +949,7 @@ var SeriesfeedImporter;
                     if (event.state == null) {
                         return;
                     }
-                    switch (event.state.shortUrl) {
-                        case SeriesfeedImporter.Enums.ShortUrl.Import:
-                            SeriesfeedImporter.Services.RouterService.import();
-                            break;
-                        case SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection:
-                            SeriesfeedImporter.Services.RouterService.importSourceSelection();
-                            break;
-                        case SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje:
-                            SeriesfeedImporter.Services.RouterService.importBierdopje();
-                            break;
-                        case SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
-                            SeriesfeedImporter.Services.RouterService.importImdb();
-                            break;
-                        case SeriesfeedImporter.Enums.ShortUrl.Export:
-                            SeriesfeedImporter.Services.RouterService.export();
-                            break;
-                    }
+                    SeriesfeedImporter.Services.RouterService.navigate(event.state.shortUrl);
                 };
             }
         }
@@ -1007,14 +978,14 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.Export:
                         this.export();
                         break;
+                    default:
+                        this.navigateOther(url);
+                        break;
                 }
                 window.scrollTo(0, 0);
                 window.history.pushState({ "shortUrl": url }, "", url);
             }
             static import() {
-                document.title = "Series importeren | Seriesfeed";
-                Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImportController();
             }
             static importSourceSelection() {
                 document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
@@ -1026,6 +997,11 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportBierdopjeFavouritesUserSelectionController();
             }
+            static importBierdopjeUser(username) {
+                document.title = "Bierdopje favorieten importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.BierdopjeFavouriteSelectionController(username);
+            }
             static importImdb() {
                 document.title = "IMDb series importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
@@ -1035,6 +1011,13 @@ var SeriesfeedImporter;
                 document.title = "Series exporteren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ExportController();
+            }
+            static navigateOther(url) {
+                if (url.length > SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje.length) {
+                    const username = url.substr(url.lastIndexOf('/') + 1);
+                    this.importBierdopjeUser(username);
+                    return;
+                }
             }
         }
         Services.RouterService = RouterService;

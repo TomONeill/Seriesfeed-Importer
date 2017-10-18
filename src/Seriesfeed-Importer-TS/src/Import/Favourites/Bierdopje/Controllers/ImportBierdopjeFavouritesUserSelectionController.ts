@@ -18,7 +18,7 @@ module SeriesfeedImporter.Controllers {
             const breadcrumbs = [
                 new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportBierdopje)
+                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth('700px');
@@ -57,16 +57,12 @@ module SeriesfeedImporter.Controllers {
                         this.user.setAvatarUrl();
                         this.user.setUsername("Niet ingelogd");
                     } else {
-                        this.user.setClick(() => this.continue(username));
+                        this.user.setClick(() => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username));
                         this.user.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
                     }
                 });
-        }
-
-        private continue(username: string): void {
-            new BierdopjeFavouriteSelectionController(username);
         }
 
         private initialiseCustomUser(): void {
@@ -78,6 +74,11 @@ module SeriesfeedImporter.Controllers {
             this.customUser.instance.css({ marginLeft: '1%' });
             cardContent.append(this.customUser.instance);
 
+            const userInputWrapper = this.getUserSearchBox();
+            this.customUser.replaceUsername(userInputWrapper);
+        }
+
+        private getUserSearchBox(): JQuery<HTMLElement> {
             const userInputWrapper = $('<div/>').css({ textAlign: 'center' });
             userInputWrapper.click((event: any) => event.stopPropagation());
             const userInput = Providers.InputProvider.provide('85%', "Gebruikersnaam");
@@ -114,7 +115,7 @@ module SeriesfeedImporter.Controllers {
             userInputWrapper.append(searchButton.instance);
             userInputWrapper.append(notFoundMessage);
 
-            this.customUser.replaceUsername(userInputWrapper);
+            return userInputWrapper;
         }
 
         private searchUser(username: string): Promise<boolean> {
@@ -124,7 +125,7 @@ module SeriesfeedImporter.Controllers {
                         this.customUser.setClick();
                         this.customUser.setAvatarUrl();
                     } else {
-                        this.customUser.setClick(() => this.continue(username));
+                        this.customUser.setClick(() => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username));
                         this.customUser.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {

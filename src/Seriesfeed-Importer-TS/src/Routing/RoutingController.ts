@@ -8,31 +8,11 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialVisitRouting(): void {
-            switch (window.location.href) {
-                case Config.BaseUrl + Enums.ShortUrl.Import:
-                    this.initialiseInitialVisit(Enums.ShortUrl.Import);
-                    Services.RouterService.import();
-                    break;
-
-                case Config.BaseUrl + Enums.ShortUrl.ImportSourceSelection:
-                    this.initialiseInitialVisit(Enums.ShortUrl.ImportSourceSelection);
-                    Services.RouterService.importSourceSelection();
-                    break;
-
-                case Config.BaseUrl + Enums.ShortUrl.ImportBierdopje:
-                    this.initialiseInitialVisit(Enums.ShortUrl.ImportBierdopje);
-                    Services.RouterService.importBierdopje();
-                    break;
-
-                case Config.BaseUrl + Enums.ShortUrl.ImportImdb:
-                    this.initialiseInitialVisit(Enums.ShortUrl.ImportImdb);
-                    Services.RouterService.importImdb();
-                    break;
-
-                case Config.BaseUrl + Enums.ShortUrl.Export:
-                    this.initialiseInitialVisit(Enums.ShortUrl.Export);
-                    Services.RouterService.export();
-                    break;
+            if (window.location.href.startsWith(Config.BaseUrl + Enums.ShortUrl.Import)
+                || window.location.href.startsWith(Config.BaseUrl + Enums.ShortUrl.Export)) {
+                const url = window.location.href.replace(Config.BaseUrl, '') as Enums.ShortUrl;
+                this.initialiseInitialVisit(url);
+                Services.RouterService.navigate(url);
             }
         }
 
@@ -57,27 +37,7 @@ module SeriesfeedImporter.Controllers {
                     return;
                 }
 
-                switch (event.state.shortUrl) {
-                    case Enums.ShortUrl.Import:
-                        Services.RouterService.import();
-                        break;
-
-                    case Enums.ShortUrl.ImportSourceSelection:
-                        Services.RouterService.importSourceSelection();
-                        break;
-
-                    case Enums.ShortUrl.ImportBierdopje:
-                        Services.RouterService.importBierdopje();
-                        break;
-
-                    case Enums.ShortUrl.ImportImdb:
-                        Services.RouterService.importImdb();
-                        break;
-
-                    case Enums.ShortUrl.Export:
-                        Services.RouterService.export();
-                        break;
-                }
+                Services.RouterService.navigate(event.state.shortUrl);
             }
         }
     }

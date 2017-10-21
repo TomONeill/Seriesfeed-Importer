@@ -2,8 +2,8 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeFavouritesUserSelectionController {
-        private user: Models.User;
-        private customUser: Models.User;
+        private _user: Models.User;
+        private _customUser: Models.User;
 
         constructor() {
             this.initialiseCard();
@@ -27,13 +27,13 @@ module SeriesfeedImporter.Controllers {
         private initialiseCurrentUser(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            this.user = new Models.User();
-            this.user.setTopText("Huidige gebruiker");
-            this.user.setWidth('49%');
-            this.user.setUsername("Laden...");
-            this.user.instance.css({ marginRight: '1%' });
+            this._user = new Models.User();
+            this._user.setTopText("Huidige gebruiker");
+            this._user.setWidth('49%');
+            this._user.setUsername("Laden...");
+            this._user.instance.css({ marginRight: '1%' });
 
-            cardContent.append(this.user.instance);
+            cardContent.append(this._user.instance);
 
             const refreshButtonAction = (event: MouseEvent) => {
                 event.stopPropagation();
@@ -45,7 +45,7 @@ module SeriesfeedImporter.Controllers {
                 left: '0',
                 bottom: '0'
             });
-            this.user.instance.append(refreshButton.instance);
+            this._user.instance.append(refreshButton.instance);
             this.loadUser();
         }
 
@@ -53,14 +53,14 @@ module SeriesfeedImporter.Controllers {
             Services.BierdopjeService.getUsername()
                 .then((username) => {
                     if (username == null) {
-                        this.user.onClick = null;
-                        this.user.setAvatarUrl();
-                        this.user.setUsername("Niet ingelogd");
+                        this._user.onClick = null;
+                        this._user.setAvatarUrl();
+                        this._user.setUsername("Niet ingelogd");
                     } else {
-                        this.user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
-                        this.user.setUsername(username);
+                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
+                        this._user.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
-                            .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
+                            .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
                     }
                 });
         }
@@ -68,14 +68,14 @@ module SeriesfeedImporter.Controllers {
         private initialiseCustomUser(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            this.customUser = new Models.User();
-            this.customUser.setTopText("Andere gebruiker");
-            this.customUser.setWidth('49%');
-            this.customUser.instance.css({ marginLeft: '1%' });
-            cardContent.append(this.customUser.instance);
+            this._customUser = new Models.User();
+            this._customUser.setTopText("Andere gebruiker");
+            this._customUser.setWidth('49%');
+            this._customUser.instance.css({ marginLeft: '1%' });
+            cardContent.append(this._customUser.instance);
 
             const userInputWrapper = this.getUserSearchBox();
-            this.customUser.replaceUsername(userInputWrapper);
+            this._customUser.replaceUsername(userInputWrapper);
         }
 
         private getUserSearchBox(): JQuery<HTMLElement> {
@@ -122,18 +122,18 @@ module SeriesfeedImporter.Controllers {
             return Services.BierdopjeService.isExistingUser(username)
                 .then((isExistingUser) => {
                     if (!isExistingUser) {
-                        this.customUser.onClick = null;
-                        this.customUser.setAvatarUrl();
+                        this._customUser.onClick = null;
+                        this._customUser.setAvatarUrl();
                     } else {
-                        this.customUser.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
-                        this.customUser.setUsername(username);
+                        this._customUser.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
+                        this._customUser.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {
                                 if (avatarUrl == null || avatarUrl == "") {
-                                    this.customUser.setAvatarUrl("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAD0lEQVQYV2NkgALGocMAAAgWABX8twh4AAAAAElFTkSuQmCC");
+                                    this._customUser.setAvatarUrl("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAD0lEQVQYV2NkgALGocMAAAgWABX8twh4AAAAAElFTkSuQmCC");
                                     return;
                                 }
-                                this.customUser.setAvatarUrl(avatarUrl);
+                                this._customUser.setAvatarUrl(avatarUrl);
                             });
                     }
                     return isExistingUser;

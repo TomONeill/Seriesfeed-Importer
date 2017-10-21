@@ -4,10 +4,13 @@ module SeriesfeedImporter.Controllers {
     export class BierdopjeFavouriteSelectionController {
         private _username: string;
         private _selectedSeries: Array<Models.Show>;
+        private _nextButton: JQuery<HTMLElement>;
 
         constructor(username: string) {
             this._username = username;
             this._selectedSeries = [];
+            this._nextButton = Providers.ReadMoreButtonProvider.provide("Doorgaan");
+            this._nextButton.hide();
 
             this.initialiseCard();
             this.initialise();
@@ -33,9 +36,10 @@ module SeriesfeedImporter.Controllers {
 
             const table = new Models.Table();
             const checkboxAll = new Models.Checkbox('select-all');
-            const selectAll = $('<th/>').append(checkboxAll.instance);
-            const series = $('<th/>').text('Serie');
-            table.addTheadItems([selectAll, series]);
+            checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+            const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+            const seriesColumn = $('<th/>').text('Serie');
+            table.addTheadItems([selectAllColumn, seriesColumn]);
             const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
 
             cardContent.append(loadingData);
@@ -61,9 +65,9 @@ module SeriesfeedImporter.Controllers {
                         }
 
                         if (this._selectedSeries.length > 0) {
-                            //nextStep.show();
+                            this._nextButton.show();
                         } else {
-                            //nextStep.hide();
+                            this._nextButton.hide();
                         }
 
                         console.log("new", this._selectedSeries);
@@ -78,8 +82,7 @@ module SeriesfeedImporter.Controllers {
                     table.addRow(row);
                 });
                 loadingData.replaceWith(table.instance);
-
-                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                cardContent.append(this._nextButton);
             });
         }
 

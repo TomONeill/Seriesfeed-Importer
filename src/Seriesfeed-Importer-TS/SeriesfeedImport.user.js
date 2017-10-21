@@ -120,6 +120,8 @@ var SeriesfeedImporter;
             constructor(username) {
                 this._username = username;
                 this._selectedSeries = [];
+                this._nextButton = SeriesfeedImporter.Providers.ReadMoreButtonProvider.provide("Doorgaan");
+                this._nextButton.hide();
                 this.initialiseCard();
                 this.initialise();
             }
@@ -141,9 +143,10 @@ var SeriesfeedImporter;
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const table = new SeriesfeedImporter.Models.Table();
                 const checkboxAll = new SeriesfeedImporter.Models.Checkbox('select-all');
-                const selectAll = $('<th/>').append(checkboxAll.instance);
-                const series = $('<th/>').text('Serie');
-                table.addTheadItems([selectAll, series]);
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([selectAllColumn, seriesColumn]);
                 const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
                 cardContent.append(loadingData);
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
@@ -165,8 +168,10 @@ var SeriesfeedImporter;
                                 this._selectedSeries.splice(position, 1);
                             }
                             if (this._selectedSeries.length > 0) {
+                                this._nextButton.show();
                             }
                             else {
+                                this._nextButton.hide();
                             }
                             console.log("new", this._selectedSeries);
                         });
@@ -177,7 +182,7 @@ var SeriesfeedImporter;
                         table.addRow(row);
                     });
                     loadingData.replaceWith(table.instance);
-                    checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                    cardContent.append(this._nextButton);
                 });
             }
             toggleAllCheckboxes(result) {
@@ -192,8 +197,6 @@ var SeriesfeedImporter;
     var Controllers;
     (function (Controllers) {
         class ImportBierdopjeFavouritesController {
-            constructor() {
-            }
             initialise(username) {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const formElement = $('<div/>').html("Favorieten van " + username);
@@ -376,12 +379,12 @@ var SeriesfeedImporter;
             }
             initialiseCurrentUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this.user = new SeriesfeedImporter.Models.User();
-                this.user.setTopText("Huidige gebruiker");
-                this.user.setWidth('49%');
-                this.user.setUsername("Laden...");
-                this.user.instance.css({ marginRight: '1%' });
-                cardContent.append(this.user.instance);
+                this._user = new SeriesfeedImporter.Models.User();
+                this._user.setTopText("Huidige gebruiker");
+                this._user.setWidth('49%');
+                this._user.setUsername("Laden...");
+                this._user.instance.css({ marginRight: '1%' });
+                cardContent.append(this._user.instance);
                 const refreshButtonAction = (event) => {
                     event.stopPropagation();
                     this.loadUser();
@@ -392,34 +395,34 @@ var SeriesfeedImporter;
                     left: '0',
                     bottom: '0'
                 });
-                this.user.instance.append(refreshButton.instance);
+                this._user.instance.append(refreshButton.instance);
                 this.loadUser();
             }
             loadUser() {
                 SeriesfeedImporter.Services.BierdopjeService.getUsername()
                     .then((username) => {
                     if (username == null) {
-                        this.user.onClick = null;
-                        this.user.setAvatarUrl();
-                        this.user.setUsername("Niet ingelogd");
+                        this._user.onClick = null;
+                        this._user.setAvatarUrl();
+                        this._user.setUsername("Niet ingelogd");
                     }
                     else {
-                        this.user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
-                        this.user.setUsername(username);
+                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
+                        this._user.setUsername(username);
                         SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
-                            .then((avatarUrl) => this.user.setAvatarUrl(avatarUrl));
+                            .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
                     }
                 });
             }
             initialiseCustomUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this.customUser = new SeriesfeedImporter.Models.User();
-                this.customUser.setTopText("Andere gebruiker");
-                this.customUser.setWidth('49%');
-                this.customUser.instance.css({ marginLeft: '1%' });
-                cardContent.append(this.customUser.instance);
+                this._customUser = new SeriesfeedImporter.Models.User();
+                this._customUser.setTopText("Andere gebruiker");
+                this._customUser.setWidth('49%');
+                this._customUser.instance.css({ marginLeft: '1%' });
+                cardContent.append(this._customUser.instance);
                 const userInputWrapper = this.getUserSearchBox();
-                this.customUser.replaceUsername(userInputWrapper);
+                this._customUser.replaceUsername(userInputWrapper);
             }
             getUserSearchBox() {
                 const userInputWrapper = $('<div/>').css({ textAlign: 'center' });
@@ -462,19 +465,19 @@ var SeriesfeedImporter;
                 return SeriesfeedImporter.Services.BierdopjeService.isExistingUser(username)
                     .then((isExistingUser) => {
                     if (!isExistingUser) {
-                        this.customUser.onClick = null;
-                        this.customUser.setAvatarUrl();
+                        this._customUser.onClick = null;
+                        this._customUser.setAvatarUrl();
                     }
                     else {
-                        this.customUser.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
-                        this.customUser.setUsername(username);
+                        this._customUser.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
+                        this._customUser.setUsername(username);
                         SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {
                             if (avatarUrl == null || avatarUrl == "") {
-                                this.customUser.setAvatarUrl("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAD0lEQVQYV2NkgALGocMAAAgWABX8twh4AAAAAElFTkSuQmCC");
+                                this._customUser.setAvatarUrl("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAD0lEQVQYV2NkgALGocMAAAgWABX8twh4AAAAAElFTkSuQmCC");
                                 return;
                             }
-                            this.customUser.setAvatarUrl(avatarUrl);
+                            this._customUser.setAvatarUrl(avatarUrl);
                         });
                     }
                     return isExistingUser;
@@ -1433,6 +1436,23 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
     (function (Providers) {
+        class ReadMoreButtonProvider {
+            static provide(value) {
+                const button = $('<div/>').addClass('readMore').css({ cursor: 'pointer', paddingRight: '10px' });
+                const innerButton = $('<div/>').css({ textAlign: 'right' });
+                const link = $('<a/>').text(value);
+                button.append(innerButton);
+                innerButton.append(link);
+                return button;
+            }
+        }
+        Providers.ReadMoreButtonProvider = ReadMoreButtonProvider;
+    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Providers;
+    (function (Providers) {
         class SourceProvider {
             static provide(name, image, imageSize, url, colour) {
                 const portfolio = $('<div/>').addClass("portfolio mix_all");
@@ -1489,10 +1509,11 @@ var SeriesfeedImporter;
     (function (Providers) {
         class TextInputProvider {
             static provide(width, placeholder, value) {
-                return $('<input type="text"/>')
-                    .addClass('form-control')
+                return $('<input/>')
+                    .attr('type', 'text')
                     .attr('placeholder', placeholder)
                     .attr('value', value)
+                    .addClass('form-control')
                     .css({ maxWidth: width });
             }
         }

@@ -2,9 +2,6 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeFavouritesController {
-        constructor() {
-        }
-        
         private initialise(username: string): void {
             const cardContent = $('#' + Config.Id.CardContent);
             const formElement = $('<div/>').html("Favorieten van " + username);

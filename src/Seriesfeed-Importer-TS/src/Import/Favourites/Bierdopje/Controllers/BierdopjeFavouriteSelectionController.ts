@@ -2,10 +2,12 @@
 
 module SeriesfeedImporter.Controllers {
     export class BierdopjeFavouriteSelectionController {
-        private username: string;
+        private _username: string;
+        private _selectedSeries: Array<Models.Show>;
 
         constructor(username: string) {
-            this.username = username;
+            this._username = username;
+            this._selectedSeries = [];
 
             this.initialiseCard();
             this.initialise();
@@ -19,7 +21,7 @@ module SeriesfeedImporter.Controllers {
                 new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
                 new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje),
-                new Models.Breadcrumb(this.username, `${Enums.ShortUrl.ImportBierdopje}${this.username}`)
+                new Models.Breadcrumb(this._username, `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
@@ -30,59 +32,58 @@ module SeriesfeedImporter.Controllers {
             const cardContent = $('#' + Config.Id.CardContent);
 
             const table = new Models.Table();
-            const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
-            const selectAll = $('<th/>').append(checkboxAll);
+            const checkboxAll = new Models.Checkbox('select-all');
+            const selectAll = $('<th/>').append(checkboxAll.instance);
             const series = $('<th/>').text('Serie');
             table.addTheadItems([selectAll, series]);
-            const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
+            const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
 
             cardContent.append(loadingData);
 
-            Services.BierdopjeService.getFavouritesByUsername(this.username).then((favourites) => {
+            Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                 favourites.each((index, favourite) => {
-                    const bdShowName = $(favourite).text();
-                    const bdShowSlug = $(favourite).attr('href');
-                    const bdShowUrl = Config.BierdopjeBaseUrl + bdShowSlug;
+                    const show = new Models.Show();
+                    show.id = index;
+                    show.name = $(favourite).text();
+                    show.slug = $(favourite).attr('href');
 
-                    const checkbox = '<fieldset><input type="checkbox" name="show_' + index + '" id="show_' + index + '" class="hideCheckbox"><label for="show_' + index + '" class="checkbox-label"><span class="check" data-list-id="' + index + '" data-list-name="' + bdShowName + '" data-list-url="' + bdShowUrl + '"></span></label></fieldset>';
-                    const item = $('<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>');
+                    const row = $('<tr/>');
+                    const selectColumn = $('<td/>');
+                    const showColumn = $('<td/>');
 
-                    table.addRow(item);
+                    const checkbox = new Models.Checkbox(`show_${index}`);
+                    checkbox.subscribe((isEnabled) => {
+                        if (isEnabled) {
+                            this._selectedSeries.push(show);
+                        } else {
+                            this._selectedSeries.splice(show.id, 1);
+                        }
+
+                        if (this._selectedSeries.length > 0) {
+                            //nextStep.show();
+                        } else {
+                            //nextStep.hide();
+                        }
+
+                        console.log("new", this._selectedSeries);
+                    });
+
+                    selectColumn.append(checkbox.instance);
+                    showColumn.append($('<a href="' + Config.BierdopjeBaseUrl + show.slug + '" target="_blank">' + show.name + '</a>'));
+
+                    row.append(selectColumn);
+                    row.append(showColumn);
+
+                    table.addRow(row);
                 });
-                loadingData.html(<any>table.instance)
+                loadingData.replaceWith(table.instance);
 
-                checkboxAll.click(() => this.toggleAllCheckboxes());
-
-                // $('.checkbox-label').on('click', (event) => {
-                //     const checkbox = $(event.currentTarget).find(".check");
-
-                //     if (!checkbox.hasClass("checked")) {
-                //         const listItem = {
-                //             id: checkbox.data("list-id"),
-                //             name: checkbox.data("list-name"),
-                //             url: checkbox.data("list-url")
-                //         };
-
-                //         this._selectedLists.push(listItem);
-
-                //         checkbox.addClass("checked");
-                //     } else {
-                //         const pos = this._selectedLists.map((list: any) => list.id).indexOf(checkbox.data("list-id"));
-                //         this._selectedLists.splice(pos, 1);
-                //         checkbox.removeClass("checked");
-                //     }
-
-                //     if (this._selectedLists.length > 0) {
-                //         nextStep.show();
-                //     } else {
-                //         nextStep.hide();
-                //     }
-                // });
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
             });
         }
 
-        private toggleAllCheckboxes(): void {
-            console.log("check all");
+        private toggleAllCheckboxes(result: boolean): void {
+            console.log("check all?", result);
         }
     }
 }

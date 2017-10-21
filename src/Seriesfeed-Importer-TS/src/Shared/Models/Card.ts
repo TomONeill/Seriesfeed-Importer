@@ -28,8 +28,10 @@ module SeriesfeedImporter.Models {
                 display: 'none',
                 float: 'left',
                 padding: '5px',
-                margin: '-5px',
-                cursor: 'pointer'
+                margin: '-4px',
+                cursor: 'pointer',
+                position: 'relative',
+                left: '10px'
             }).addClass("fa fa-arrow-left");
         }
 

@@ -118,7 +118,8 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class BierdopjeFavouriteSelectionController {
             constructor(username) {
-                this.username = username;
+                this._username = username;
+                this._selectedSeries = [];
                 this.initialiseCard();
                 this.initialise();
             }
@@ -130,7 +131,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
                     new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
-                    new SeriesfeedImporter.Models.Breadcrumb(this.username, `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this.username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this._username}`)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
@@ -139,27 +140,47 @@ var SeriesfeedImporter;
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const table = new SeriesfeedImporter.Models.Table();
-                const checkboxAll = $('<fieldset><input type="checkbox" name="select-all" class="hideCheckbox"><label for="select-all"><span class="check"></span></label></fieldset>');
-                const selectAll = $('<th/>').append(checkboxAll);
+                const checkboxAll = new SeriesfeedImporter.Models.Checkbox('select-all');
+                const selectAll = $('<th/>').append(checkboxAll.instance);
                 const series = $('<th/>').text('Serie');
                 table.addTheadItems([selectAll, series]);
-                const loadingData = $('<div><h4 style="margin-bottom: 15px;">Favorieten ophalen...</h4></div>');
+                const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
                 cardContent.append(loadingData);
-                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this.username).then((favourites) => {
+                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                     favourites.each((index, favourite) => {
-                        const bdShowName = $(favourite).text();
-                        const bdShowSlug = $(favourite).attr('href');
-                        const bdShowUrl = SeriesfeedImporter.Config.BierdopjeBaseUrl + bdShowSlug;
-                        const checkbox = '<fieldset><input type="checkbox" name="show_' + index + '" id="show_' + index + '" class="hideCheckbox"><label for="show_' + index + '" class="checkbox-label"><span class="check" data-list-id="' + index + '" data-list-name="' + bdShowName + '" data-list-url="' + bdShowUrl + '"></span></label></fieldset>';
-                        const item = $('<tr><td>' + checkbox + '</td><td><a href="' + bdShowUrl + '" target="_blank">' + bdShowName + '</a></td></tr>');
-                        table.addRow(item);
+                        const show = new SeriesfeedImporter.Models.Show();
+                        show.id = index;
+                        show.name = $(favourite).text();
+                        show.slug = $(favourite).attr('href');
+                        const row = $('<tr/>');
+                        const selectColumn = $('<td/>');
+                        const showColumn = $('<td/>');
+                        const checkbox = new SeriesfeedImporter.Models.Checkbox(`show_${index}`);
+                        checkbox.subscribe((isEnabled) => {
+                            if (isEnabled) {
+                                this._selectedSeries.push(show);
+                            }
+                            else {
+                                this._selectedSeries.splice(show.id, 1);
+                            }
+                            if (this._selectedSeries.length > 0) {
+                            }
+                            else {
+                            }
+                            console.log("new", this._selectedSeries);
+                        });
+                        selectColumn.append(checkbox.instance);
+                        showColumn.append($('<a href="' + SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug + '" target="_blank">' + show.name + '</a>'));
+                        row.append(selectColumn);
+                        row.append(showColumn);
+                        table.addRow(row);
                     });
-                    loadingData.html(table.instance);
-                    checkboxAll.click(() => this.toggleAllCheckboxes());
+                    loadingData.replaceWith(table.instance);
+                    checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
                 });
             }
-            toggleAllCheckboxes() {
-                console.log("check all");
+            toggleAllCheckboxes(result) {
+                console.log("check all?", result);
             }
         }
         Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;
@@ -1163,8 +1184,10 @@ var SeriesfeedImporter;
                     display: 'none',
                     float: 'left',
                     padding: '5px',
-                    margin: '-5px',
-                    cursor: 'pointer'
+                    margin: '-4px',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    left: '10px'
                 }).addClass("fa fa-arrow-left");
             }
             createBreadcrumbs() {
@@ -1244,6 +1267,62 @@ var SeriesfeedImporter;
             }
         }
         Models.Card = Card;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class Checkbox {
+            constructor(name) {
+                this.instance = $('<fieldset/>');
+                this.input = $('<input/>').attr('type', 'checkbox').addClass('hideCheckbox');
+                this.label = $('<label/>');
+                const span = $('<span/>').addClass('check');
+                this.instance.append(this.input);
+                this.instance.append(this.label);
+                this.label.append(span);
+                if (name != null && name !== '') {
+                    this.name = name;
+                }
+                this.subscribers = [];
+                this.input.click(() => this.toggleCheck());
+            }
+            set name(value) {
+                this.input
+                    .attr('id', value)
+                    .attr('name', value);
+                this.label.attr('for', value);
+            }
+            toggleCheck() {
+                if (this.input.attr('checked') == null) {
+                    this.input.attr('checked', 'checked');
+                    this.callSubscribers(true);
+                }
+                else {
+                    this.input.removeAttr('checked');
+                    this.callSubscribers(false);
+                }
+            }
+            callSubscribers(isEnabled) {
+                this.subscribers.forEach((subscriber) => {
+                    subscriber(isEnabled);
+                });
+            }
+            subscribe(subscriber) {
+                this.subscribers.push(subscriber);
+            }
+        }
+        Models.Checkbox = Checkbox;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class Show {
+        }
+        Models.Show = Show;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

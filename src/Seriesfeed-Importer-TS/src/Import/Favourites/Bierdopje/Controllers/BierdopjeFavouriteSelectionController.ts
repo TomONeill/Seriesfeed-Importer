@@ -4,13 +4,14 @@ module SeriesfeedImporter.Controllers {
     export class BierdopjeFavouriteSelectionController {
         private _username: string;
         private _selectedSeries: Array<Models.Show>;
+        private _checkboxes: Array<Models.Checkbox>;
         private _nextButton: JQuery<HTMLElement>;
 
         constructor(username: string) {
             this._username = username;
+            this._checkboxes = [];
             this._selectedSeries = [];
-            this._nextButton = Providers.ReadMoreButtonProvider.provide("Doorgaan");
-            this._nextButton.hide();
+            this._nextButton = Providers.ReadMoreButtonProvider.provide("Doorgaan").hide();
 
             this.initialiseCard();
             this.initialise();
@@ -40,9 +41,10 @@ module SeriesfeedImporter.Controllers {
             const selectAllColumn = $('<th/>').append(checkboxAll.instance);
             const seriesColumn = $('<th/>').text('Serie');
             table.addTheadItems([selectAllColumn, seriesColumn]);
-            const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
 
+            const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
             cardContent.append(loadingData);
+            cardContent.append(this._nextButton);
 
             Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                 favourites.each((index, favourite) => {
@@ -69,12 +71,12 @@ module SeriesfeedImporter.Controllers {
                         } else {
                             this._nextButton.hide();
                         }
-
-                        console.log("new", this._selectedSeries);
                     });
-
                     selectColumn.append(checkbox.instance);
-                    showColumn.append($('<a href="' + Config.BierdopjeBaseUrl + show.slug + '" target="_blank">' + show.name + '</a>'));
+                    this._checkboxes.push(checkbox);
+
+                    const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                    showColumn.append(showLink);
 
                     row.append(selectColumn);
                     row.append(showColumn);
@@ -82,12 +84,17 @@ module SeriesfeedImporter.Controllers {
                     table.addRow(row);
                 });
                 loadingData.replaceWith(table.instance);
-                cardContent.append(this._nextButton);
             });
         }
 
-        private toggleAllCheckboxes(result: boolean): void {
-            console.log("check all?", result);
+        private toggleAllCheckboxes(isEnabled: boolean): void {
+            this._checkboxes.forEach((checkbox) => {
+                if (isEnabled) {
+                    checkbox.check();
+                } else {
+                    checkbox.uncheck();
+                }
+            });
         }
     }
 }

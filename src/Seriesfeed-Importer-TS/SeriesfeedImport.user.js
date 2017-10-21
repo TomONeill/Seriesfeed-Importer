@@ -119,9 +119,9 @@ var SeriesfeedImporter;
         class BierdopjeFavouriteSelectionController {
             constructor(username) {
                 this._username = username;
+                this._checkboxes = [];
                 this._selectedSeries = [];
-                this._nextButton = SeriesfeedImporter.Providers.ReadMoreButtonProvider.provide("Doorgaan");
-                this._nextButton.hide();
+                this._nextButton = SeriesfeedImporter.Providers.ReadMoreButtonProvider.provide("Doorgaan").hide();
                 this.initialiseCard();
                 this.initialise();
             }
@@ -149,6 +149,7 @@ var SeriesfeedImporter;
                 table.addTheadItems([selectAllColumn, seriesColumn]);
                 const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
                 cardContent.append(loadingData);
+                cardContent.append(this._nextButton);
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                     favourites.each((index, favourite) => {
                         const show = new SeriesfeedImporter.Models.Show();
@@ -173,20 +174,27 @@ var SeriesfeedImporter;
                             else {
                                 this._nextButton.hide();
                             }
-                            console.log("new", this._selectedSeries);
                         });
                         selectColumn.append(checkbox.instance);
-                        showColumn.append($('<a href="' + SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug + '" target="_blank">' + show.name + '</a>'));
+                        this._checkboxes.push(checkbox);
+                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                        showColumn.append(showLink);
                         row.append(selectColumn);
                         row.append(showColumn);
                         table.addRow(row);
                     });
                     loadingData.replaceWith(table.instance);
-                    cardContent.append(this._nextButton);
                 });
             }
-            toggleAllCheckboxes(result) {
-                console.log("check all?", result);
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
             }
         }
         Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;
@@ -1315,6 +1323,18 @@ var SeriesfeedImporter;
             }
             subscribe(subscriber) {
                 this.subscribers.push(subscriber);
+            }
+            check() {
+                if (this.input.attr('checked') == null) {
+                    this.input.click();
+                    this.input.attr('checked', 'checked');
+                }
+            }
+            uncheck() {
+                if (this.input.attr('checked') != null) {
+                    this.input.click();
+                    this.input.removeAttr('checked');
+                }
             }
         }
         Models.Checkbox = Checkbox;

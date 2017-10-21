@@ -51,5 +51,19 @@ module SeriesfeedImporter.Models {
         public subscribe(subscriber: (isEnabled: boolean) => void): void {
             this.subscribers.push(subscriber);
         }
+
+        public check(): void {
+            if (this.input.attr('checked') == null) {
+                this.input.click();
+                this.input.attr('checked', 'checked');
+            }
+        }
+
+        public uncheck(): void {
+            if (this.input.attr('checked') != null) {
+                this.input.click();
+                this.input.removeAttr('checked');
+            }
+        }
     }
 }

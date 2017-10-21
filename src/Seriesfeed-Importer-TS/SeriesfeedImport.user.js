@@ -161,7 +161,8 @@ var SeriesfeedImporter;
                                 this._selectedSeries.push(show);
                             }
                             else {
-                                this._selectedSeries.splice(show.id, 1);
+                                const position = this._selectedSeries.map((show) => show.id).indexOf(show.id);
+                                this._selectedSeries.splice(position, 1);
                             }
                             if (this._selectedSeries.length > 0) {
                             }

@@ -124,10 +124,20 @@ var SeriesfeedImporter;
                 this._username = username;
                 this._checkboxes = [];
                 this._selectedShows = [];
-                this._nextButton = new SeriesfeedImporter.Models.ReadMoreButton("Importeren");
-                this._nextButton.instance.hide().click(() => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
+                this._currentCalls = [];
+                this.initialiseNextButton();
+                this.initialiseCollectingData();
                 this.initialiseCard();
                 this.initialise();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.Models.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
+                this._nextButton.instance.hide();
+            }
+            initialiseCollectingData() {
+                this._collectingData = new SeriesfeedImporter.Models.ReadMoreButton("Gegevens verzamelen...");
+                this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' });
+                this._collectingData.instance.hide();
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -151,9 +161,18 @@ var SeriesfeedImporter;
                 const selectAllColumn = $('<th/>').append(checkboxAll.instance);
                 const seriesColumn = $('<th/>').text('Serie');
                 table.addTheadItems([selectAllColumn, seriesColumn]);
-                const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
-                cardContent.append(loadingData);
-                cardContent.append(this._nextButton.instance);
+                const loadingData = $('<div/>');
+                const loadingFavourites = $('<h4/>').css({ padding: '15px' });
+                const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Favorieten ophalen...");
+                const starIcon = $('<i/>').addClass('fa fa-star-o fa-spin');
+                loadingData.append(loadingFavourites);
+                loadingFavourites
+                    .append(starIcon)
+                    .append(loadingText);
+                cardContent
+                    .append(loadingData)
+                    .append(this._collectingData.instance)
+                    .append(this._nextButton.instance);
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                     favourites.each((index, favourite) => {
                         const show = new SeriesfeedImporter.Models.Show();
@@ -165,24 +184,20 @@ var SeriesfeedImporter;
                         const checkbox = new SeriesfeedImporter.Models.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => show.theTvdbId = theTvdbId);
+                                this._currentCalls.push(index);
+                                SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
+                                    show.theTvdbId = theTvdbId;
+                                    const position = this._currentCalls.indexOf(index);
+                                    this._currentCalls.splice(position, 1);
+                                    this.setCollectingData();
+                                });
                                 this._selectedShows.push(show);
                             }
                             else {
                                 const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
                                 this._selectedShows.splice(position, 1);
                             }
-                            if (this._selectedShows.length === 1) {
-                                this._nextButton.text = `${this._selectedShows.length} serie importeren`;
-                                this._nextButton.instance.show();
-                            }
-                            else if (this._selectedShows.length > 1) {
-                                this._nextButton.text = `${this._selectedShows.length} series importeren`;
-                                this._nextButton.instance.show();
-                            }
-                            else {
-                                this._nextButton.instance.hide();
-                            }
+                            this.setNextButton();
                         });
                         selectColumn.append(checkbox.instance);
                         this._checkboxes.push(checkbox);
@@ -194,6 +209,38 @@ var SeriesfeedImporter;
                     });
                     loadingData.replaceWith(table.instance);
                 });
+            }
+            setCollectingData() {
+                if (this._currentCalls.length === 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
+                    this._collectingData.instance.show();
+                    return;
+                }
+                else if (this._currentCalls.length > 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} series)...`;
+                    this._collectingData.instance.show();
+                }
+                else {
+                    this._collectingData.instance.hide();
+                    this.setNextButton();
+                }
+            }
+            setNextButton() {
+                if (this._currentCalls.length > 0) {
+                    this._nextButton.instance.hide();
+                    return;
+                }
+                if (this._selectedShows.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie importeren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series importeren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {
@@ -1486,18 +1533,30 @@ var SeriesfeedImporter;
     var Models;
     (function (Models) {
         class ReadMoreButton {
-            constructor(text) {
-                this.instance = $('<div/>').addClass('readMore').css({ cursor: 'pointer', paddingRight: '10px' });
+            constructor(text, action) {
+                this.instance = $('<div/>').addClass('readMore').css({ paddingRight: '10px' });
                 const innerButton = $('<div/>').css({ textAlign: 'right' });
                 this.link = $('<a/>');
                 this.instance.append(innerButton);
                 innerButton.append(this.link);
-                if (text != null || text !== '') {
-                    this.link.text(text);
-                }
+                this.text = text;
+                this.setClick(action);
             }
             set text(value) {
+                if (value == null) {
+                    this.link.text('');
+                    return;
+                }
                 this.link.text(value);
+            }
+            setClick(action) {
+                this.instance.css({ cursor: 'default' }).unbind('click');
+                if (action == null) {
+                    return;
+                }
+                this.instance
+                    .css({ cursor: 'pointer' })
+                    .click(action);
             }
         }
         Models.ReadMoreButton = ReadMoreButton;

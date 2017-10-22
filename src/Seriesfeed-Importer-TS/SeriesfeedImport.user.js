@@ -1752,8 +1752,6 @@ var SeriesfeedImporter;
             }
             static clearAll() {
                 for (const key in SeriesfeedImporter.Enums.LocalStorageKey) {
-                    console.log("key", key);
-                    console.log("Enums.LocalStorageKey[key]", SeriesfeedImporter.Enums.LocalStorageKey[key]);
                     localStorage.removeItem(SeriesfeedImporter.Enums.LocalStorageKey[key]);
                 }
             }

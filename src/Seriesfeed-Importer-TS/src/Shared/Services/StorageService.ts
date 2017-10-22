@@ -14,8 +14,6 @@ module SeriesfeedImporter.Services {
 
         public static clearAll(): void {
             for (const key in Enums.LocalStorageKey) {
-                console.log("key", key);
-                console.log("Enums.LocalStorageKey[key]", (<any>Enums.LocalStorageKey)[key]);
                 localStorage.removeItem((<any>Enums.LocalStorageKey)[key]);
             }
         }

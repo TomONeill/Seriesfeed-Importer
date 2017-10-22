@@ -50,7 +50,6 @@ module SeriesfeedImporter.Controllers {
             Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                 favourites.each((index, favourite) => {
                     const show = new Models.Show();
-                    show.id = index;
                     show.name = $(favourite).text();
                     show.slug = $(favourite).attr('href');
 
@@ -63,7 +62,7 @@ module SeriesfeedImporter.Controllers {
                         if (isEnabled) {
                             this._selectedShows.push(show);
                         } else {
-                            const position = this._selectedShows.map((show) => show.id).indexOf(show.id);
+                            const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
                             this._selectedShows.splice(position, 1);
                         }
 

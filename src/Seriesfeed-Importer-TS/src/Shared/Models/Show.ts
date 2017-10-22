@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Models {
     export class Show {
-        public id: number;
+        public tvdbId: number;
         public name: string;
         public slug: string;
     }

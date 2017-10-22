@@ -27,7 +27,7 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("Bierdopje favorieten importeren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje + this._username);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportSourceSelection),

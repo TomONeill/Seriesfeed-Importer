@@ -155,7 +155,6 @@ var SeriesfeedImporter;
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                     favourites.each((index, favourite) => {
                         const show = new SeriesfeedImporter.Models.Show();
-                        show.id = index;
                         show.name = $(favourite).text();
                         show.slug = $(favourite).attr('href');
                         const row = $('<tr/>');
@@ -167,7 +166,7 @@ var SeriesfeedImporter;
                                 this._selectedShows.push(show);
                             }
                             else {
-                                const position = this._selectedShows.map((show) => show.id).indexOf(show.id);
+                                const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
                                 this._selectedShows.splice(position, 1);
                             }
                             if (this._selectedShows.length === 1) {
@@ -233,7 +232,7 @@ var SeriesfeedImporter;
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Bierdopje favorieten importeren");
-                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + this._username);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),

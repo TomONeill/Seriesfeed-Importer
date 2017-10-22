@@ -7,11 +7,21 @@ module SeriesfeedImporter.Controllers {
 
         constructor(username: string, selectedSeries: Array<Models.Show>) {
             this._username = username;
-            this._selectedShows = selectedSeries;
+            this._selectedShows = selectedSeries.sort(this.sortSelectedSeriesByName);
             window.scrollTo(0, 0);
 
             this.initialiseCard();
             this.initialise();
+        }
+
+        private sortSelectedSeriesByName(showA: Models.Show, showB: Models.Show): number {
+            if (showA.name < showB.name) {
+                return -1;
+            } else if (showA.name === showB.name) {
+                return 0;
+            } else {
+                return 1;
+            }
         }
 
         private initialiseCard(): void {
@@ -19,13 +29,13 @@ module SeriesfeedImporter.Controllers {
             card.setTitle("Bierdopje favorieten importeren");
             card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
             const breadcrumbs = [
-                new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje),
-                new Models.Breadcrumb(this._username, `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
+                new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
+                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportSourceSelection),
+                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportBierdopje),
+                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
-            card.setWidth();
+            card.setWidth('600px');
             card.setContent();
         }
 
@@ -34,16 +44,19 @@ module SeriesfeedImporter.Controllers {
 
             const table = new Models.Table();
             const seriesColumn = $('<th/>').text('Serie');
-            table.addTheadItems([seriesColumn]);
+            const statusColumn = $('<th/>').text('Status');
+            table.addTheadItems([seriesColumn, statusColumn]);
 
             this._selectedShows.forEach((show) => {
                 const row = $('<tr/>');
                 const showColumn = $('<td/>');
+                const statusColumn = $('<td/>');
                 
                 const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
                 showColumn.append(showLink);
     
                 row.append(showColumn);
+                row.append(statusColumn);
     
                 table.addRow(row);
             });

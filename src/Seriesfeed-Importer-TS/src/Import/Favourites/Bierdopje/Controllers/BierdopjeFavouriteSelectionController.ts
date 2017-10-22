@@ -23,10 +23,10 @@ module SeriesfeedImporter.Controllers {
             card.setTitle("Bierdopje favorieten selecteren");
             card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
             const breadcrumbs = [
-                new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje),
-                new Models.Breadcrumb(this._username, `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
+                new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
+                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportSourceSelection),
+                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportBierdopje),
+                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
@@ -77,6 +77,7 @@ module SeriesfeedImporter.Controllers {
                             this._nextButton.instance.hide();
                         }
                     });
+                    
                     selectColumn.append(checkbox.instance);
                     this._checkboxes.push(checkbox);
 

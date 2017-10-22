@@ -96,7 +96,7 @@ var SeriesfeedImporter;
                 card.setTitle("Favorieten importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
@@ -132,10 +132,10 @@ var SeriesfeedImporter;
                 card.setTitle("Bierdopje favorieten selecteren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
-                    new SeriesfeedImporter.Models.Breadcrumb(this._username, `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this._username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this._username}`)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
@@ -214,36 +214,50 @@ var SeriesfeedImporter;
         class ImportBierdopjeFavouritesController {
             constructor(username, selectedSeries) {
                 this._username = username;
-                this._selectedShows = selectedSeries;
+                this._selectedShows = selectedSeries.sort(this.sortSelectedSeriesByName);
                 window.scrollTo(0, 0);
                 this.initialiseCard();
                 this.initialise();
+            }
+            sortSelectedSeriesByName(showA, showB) {
+                if (showA.name < showB.name) {
+                    return -1;
+                }
+                else if (showA.name === showB.name) {
+                    return 0;
+                }
+                else {
+                    return 1;
+                }
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Bierdopje favorieten importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
-                    new SeriesfeedImporter.Models.Breadcrumb(this._username, `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this._username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this._username}`)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
-                card.setWidth();
+                card.setWidth('600px');
                 card.setContent();
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const table = new SeriesfeedImporter.Models.Table();
                 const seriesColumn = $('<th/>').text('Serie');
-                table.addTheadItems([seriesColumn]);
+                const statusColumn = $('<th/>').text('Status');
+                table.addTheadItems([seriesColumn, statusColumn]);
                 this._selectedShows.forEach((show) => {
                     const row = $('<tr/>');
                     const showColumn = $('<td/>');
+                    const statusColumn = $('<td/>');
                     const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
                     showColumn.append(showLink);
                     row.append(showColumn);
+                    row.append(statusColumn);
                     table.addRow(row);
                 });
                 cardContent.append(table.instance);
@@ -421,8 +435,8 @@ var SeriesfeedImporter;
                 card.setTitle("Bierdopje favorieten importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
                     new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
                 ];
                 card.setBreadcrumbs(breadcrumbs);

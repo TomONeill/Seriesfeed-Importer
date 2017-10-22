@@ -15,7 +15,7 @@ module SeriesfeedImporter.Controllers {
             card.setTitle("Favorieten importeren");
             card.setBackButtonUrl(Enums.ShortUrl.Import);
             const breadcrumbs = [
-                new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
+                new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection)
             ];
             card.setBreadcrumbs(breadcrumbs);

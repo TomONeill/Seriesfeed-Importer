@@ -23,7 +23,7 @@ module SeriesfeedImporter.Services {
                     throw `Could not check for existing user on Bierdopje.com: ${error}`;
                 });
         }
-        
+
         public static getAvatarUrlByUsername(username: string): Promise<string> {
             return Services.AjaxService.get(Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
                 .then((pageData) => {
@@ -50,16 +50,52 @@ module SeriesfeedImporter.Services {
         }
 
         public static getTvdbIdByShowSlug(showSlug: string): Promise<string> {
+            const localTheTvdbId = this.getTvdbIdByShowSlugFromStorage(showSlug);
+
+            if (localTheTvdbId != null) {
+                return Promise.resolve(localTheTvdbId);
+            }
+
+            return this.getTvdbIdByShowSlugFromBierdopje(showSlug).then((theTvdbId) => {
+                this.addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug);
+                return theTvdbId;
+            });
+        }
+
+        private static getTvdbIdByShowSlugFromStorage(showSlug: string): string | null {
+            const showSlugTvdb = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId) as Array<Models.Show>;
+
+            for (let i = 0; i < showSlugTvdb.length; i++) {
+                if (showSlugTvdb[i].slug === showSlug) {
+                    return showSlugTvdb[i].theTvdbId;
+                }
+            }
+
+            return null;
+        }
+
+        private static getTvdbIdByShowSlugFromBierdopje(showSlug: string): Promise<string> {
             const url = Config.BierdopjeBaseUrl + showSlug;
 
             return Services.AjaxService.get(url)
                 .then((pageData) => {
                     const favouriteData = $(pageData.responseText);
-                    return favouriteData.find(`a[href^='${Config.TheTvdbBaseUrl}']`).html();
+                    const theTvdbId = favouriteData.find(`a[href^='${Config.TheTvdbBaseUrl}']`).html();
+
+                    return theTvdbId;
                 })
                 .catch((error) => {
                     throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
                 });
+        }
+
+        private static addTvdbIdWithShowSlugToStorage(theTvdbId: string, showSlug: string): void {
+            let localIds = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId) as Array<Models.Show> | null;
+            if (localIds == null) {
+                localIds = new Array<Models.Show>();
+            }
+            localIds.push({ theTvdbId: theTvdbId, slug: showSlug } as Models.Show);
+            Services.StorageService.set(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId, localIds);
         }
     }
 }

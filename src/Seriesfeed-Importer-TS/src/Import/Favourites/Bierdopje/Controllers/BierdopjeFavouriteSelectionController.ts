@@ -60,6 +60,7 @@ module SeriesfeedImporter.Controllers {
                     const checkbox = new Models.Checkbox(`show_${index}`);
                     checkbox.subscribe((isEnabled) => {
                         if (isEnabled) {
+                            Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => show.theTvdbId = theTvdbId);
                             this._selectedShows.push(show);
                         } else {
                             const position = this._selectedShows.map((show) => show.name).indexOf(show.name);

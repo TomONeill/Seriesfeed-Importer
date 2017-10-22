@@ -10,6 +10,8 @@ var SeriesfeedImporter;
                 .initialise();
             new SeriesfeedImporter.Controllers.RoutingController()
                 .initialise();
+            new SeriesfeedImporter.Controllers.SettingsController()
+                .initialise();
         }
     }
     App.main();
@@ -163,6 +165,7 @@ var SeriesfeedImporter;
                         const checkbox = new SeriesfeedImporter.Models.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
+                                SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => show.theTvdbId = theTvdbId);
                                 this._selectedShows.push(show);
                             }
                             else {
@@ -599,15 +602,43 @@ var SeriesfeedImporter;
                 });
             }
             static getTvdbIdByShowSlug(showSlug) {
+                const localTheTvdbId = this.getTvdbIdByShowSlugFromStorage(showSlug);
+                if (localTheTvdbId != null) {
+                    return Promise.resolve(localTheTvdbId);
+                }
+                return this.getTvdbIdByShowSlugFromBierdopje(showSlug).then((theTvdbId) => {
+                    this.addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug);
+                    return theTvdbId;
+                });
+            }
+            static getTvdbIdByShowSlugFromStorage(showSlug) {
+                const showSlugTvdb = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId);
+                for (let i = 0; i < showSlugTvdb.length; i++) {
+                    if (showSlugTvdb[i].slug === showSlug) {
+                        return showSlugTvdb[i].theTvdbId;
+                    }
+                }
+                return null;
+            }
+            static getTvdbIdByShowSlugFromBierdopje(showSlug) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + showSlug;
                 return Services.AjaxService.get(url)
                     .then((pageData) => {
                     const favouriteData = $(pageData.responseText);
-                    return favouriteData.find(`a[href^='${SeriesfeedImporter.Config.TheTvdbBaseUrl}']`).html();
+                    const theTvdbId = favouriteData.find(`a[href^='${SeriesfeedImporter.Config.TheTvdbBaseUrl}']`).html();
+                    return theTvdbId;
                 })
                     .catch((error) => {
                     throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
                 });
+            }
+            static addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug) {
+                let localIds = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId);
+                if (localIds == null) {
+                    localIds = new Array();
+                }
+                localIds.push({ theTvdbId: theTvdbId, slug: showSlug });
+                Services.StorageService.set(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId, localIds);
             }
         }
         Services.BierdopjeService = BierdopjeService;
@@ -1124,6 +1155,44 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class SettingsController {
+            initialise() {
+                if (!window.location.href.includes("users") && !window.location.href.includes("edit")) {
+                    return;
+                }
+                const settingBlocks = $('.container.content .row');
+                const localStorageBlock = this.getLocalStorageBlock();
+                settingBlocks.append(localStorageBlock);
+            }
+            getLocalStorageBlock() {
+                const block = $('<div/>').addClass('col-xs-12 col-md-6');
+                const card = $('<div/>').attr('id', 'userscriptTool').addClass('blog-left cardStyle cardForm');
+                const cardContent = $('<div/>').addClass('blog-content');
+                const cardTitle = $('<h3/>').text("Userscripts");
+                const cardParagraph = $('<p/>').text("Je maakt gebruik van het userscript \"Seriesfeed Importer\". Dit script slaat id's en adressen van geïmporteerde series op om de druk op de betreffende servers te verlagen. Deze data wordt gebruikt om bij terugkerende imports bekende data niet opnieuw op te halen. Je kunt de lokale gegevens wissen als je problemen ondervindt met het importeren van bepaalde series.");
+                const dataDeleted = $('<p/>').text("De gegevens zijn gewist.").css({ marginBottom: '0', paddingTop: '5px' }).hide();
+                const buttonAction = () => {
+                    dataDeleted.hide();
+                    SeriesfeedImporter.Services.StorageService.clearAll();
+                    setTimeout(() => dataDeleted.show(), 100);
+                };
+                const button = new SeriesfeedImporter.Models.Button('btn-success', 'fa-trash', "Lokale gegevens wissen", buttonAction);
+                block.append(card);
+                card.append(cardContent);
+                cardContent.append(cardTitle);
+                cardContent.append(cardParagraph);
+                cardContent.append(button.instance);
+                cardContent.append(dataDeleted);
+                return block;
+            }
+        }
+        Controllers.SettingsController = SettingsController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
     var Enums;
     (function (Enums) {
         Enums.ButtonType = {
@@ -1134,6 +1203,15 @@ var SeriesfeedImporter;
             Warning: "btn-warning",
             Danger: "btn-danger",
             Link: "btn-link"
+        };
+    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Enums;
+    (function (Enums) {
+        Enums.LocalStorageKey = {
+            BierdopjeShowSlugTvdbId: "bierdopje.showSlug_tvdbId"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -1657,6 +1735,30 @@ var SeriesfeedImporter;
             }
         }
         Services.CardService = CardService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class StorageService {
+            static get(key) {
+                const jsonValue = localStorage.getItem(key);
+                return JSON.parse(jsonValue);
+            }
+            static set(key, value) {
+                const jsonValue = JSON.stringify(value);
+                localStorage.setItem(key, jsonValue);
+            }
+            static clearAll() {
+                for (const key in SeriesfeedImporter.Enums.LocalStorageKey) {
+                    console.log("key", key);
+                    console.log("Enums.LocalStorageKey[key]", SeriesfeedImporter.Enums.LocalStorageKey[key]);
+                    localStorage.removeItem(SeriesfeedImporter.Enums.LocalStorageKey[key]);
+                }
+            }
+        }
+        Services.StorageService = StorageService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

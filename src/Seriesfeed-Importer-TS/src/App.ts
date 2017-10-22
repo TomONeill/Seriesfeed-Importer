@@ -14,6 +14,9 @@ module SeriesfeedImporter {
 
             new Controllers.RoutingController()
                 .initialise();
+
+            new Controllers.SettingsController()
+                .initialise();
         }
     }
 

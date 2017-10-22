@@ -210,6 +210,16 @@ var SeriesfeedImporter;
                     loadingData.replaceWith(table.instance);
                 });
             }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
             setCollectingData() {
                 if (this._currentCalls.length === 1) {
                     this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
@@ -241,16 +251,6 @@ var SeriesfeedImporter;
                 else {
                     this._nextButton.instance.hide();
                 }
-            }
-            toggleAllCheckboxes(isEnabled) {
-                this._checkboxes.forEach((checkbox) => {
-                    if (isEnabled) {
-                        checkbox.check();
-                    }
-                    else {
-                        checkbox.uncheck();
-                    }
-                });
             }
         }
         Controllers.BierdopjeFavouriteSelectionController = BierdopjeFavouriteSelectionController;

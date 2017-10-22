@@ -114,6 +114,16 @@ module SeriesfeedImporter.Controllers {
             });
         }
 
+        private toggleAllCheckboxes(isEnabled: boolean): void {
+            this._checkboxes.forEach((checkbox) => {
+                if (isEnabled) {
+                    checkbox.check();
+                } else {
+                    checkbox.uncheck();
+                }
+            });
+        }
+
         private setCollectingData(): void {
             if (this._currentCalls.length === 1) {
                 this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
@@ -143,16 +153,6 @@ module SeriesfeedImporter.Controllers {
             } else {
                 this._nextButton.instance.hide();
             }
-        }
-
-        private toggleAllCheckboxes(isEnabled: boolean): void {
-            this._checkboxes.forEach((checkbox) => {
-                if (isEnabled) {
-                    checkbox.check();
-                } else {
-                    checkbox.uncheck();
-                }
-            });
         }
     }
 }

@@ -2,7 +2,54 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeFavouritesController {
-        private initialise(username: string): void {
+        private _username: string;
+        private _selectedShows: Array<Models.Show>;
+
+        constructor(username: string, selectedSeries: Array<Models.Show>) {
+            this._username = username;
+            this._selectedShows = selectedSeries;
+
+            this.initialiseCard();
+            this.initialise();
+        }
+
+        private initialiseCard(): void {
+            const card = Services.CardService.getCard();
+            card.setTitle("Bierdopje favorieten importeren");
+            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
+            const breadcrumbs = [
+                new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import),
+                new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection),
+                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje),
+                new Models.Breadcrumb(this._username, `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
+            ];
+            card.setBreadcrumbs(breadcrumbs);
+            card.setWidth();
+            card.setContent();
+        }
+        private initialise(): void {
+            const cardContent = $('#' + Config.Id.CardContent);
+
+            const table = new Models.Table();
+            const seriesColumn = $('<th/>').text('Serie');
+            table.addTheadItems([seriesColumn]);
+
+            this._selectedShows.forEach((show) => {
+                const row = $('<tr/>');
+                const showColumn = $('<td/>');
+                
+                const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                showColumn.append(showLink);
+    
+                row.append(showColumn);
+    
+                table.addRow(row);
+            });
+
+            cardContent.append(table.instance);
+        }
+
+        private old(username: string): void {
             const cardContent = $('#' + Config.Id.CardContent);
             const formElement = $('<div/>').html("Favorieten van " + username);
             const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');

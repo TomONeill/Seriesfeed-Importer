@@ -3,15 +3,16 @@
 module SeriesfeedImporter.Controllers {
     export class BierdopjeFavouriteSelectionController {
         private _username: string;
-        private _selectedSeries: Array<Models.Show>;
+        private _selectedShows: Array<Models.Show>;
         private _checkboxes: Array<Models.Checkbox>;
-        private _nextButton: JQuery<HTMLElement>;
+        private _nextButton: Models.ReadMoreButton;
 
         constructor(username: string) {
             this._username = username;
             this._checkboxes = [];
-            this._selectedSeries = [];
-            this._nextButton = Providers.ReadMoreButtonProvider.provide("Doorgaan").hide();
+            this._selectedShows = [];
+            this._nextButton = new Models.ReadMoreButton("Importeren");
+            this._nextButton.instance.hide().click(() => new ImportBierdopjeFavouritesController(this._username, this._selectedShows));
 
             this.initialiseCard();
             this.initialise();
@@ -44,7 +45,7 @@ module SeriesfeedImporter.Controllers {
 
             const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
             cardContent.append(loadingData);
-            cardContent.append(this._nextButton);
+            cardContent.append(this._nextButton.instance);
 
             Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                 favourites.each((index, favourite) => {
@@ -60,16 +61,20 @@ module SeriesfeedImporter.Controllers {
                     const checkbox = new Models.Checkbox(`show_${index}`);
                     checkbox.subscribe((isEnabled) => {
                         if (isEnabled) {
-                            this._selectedSeries.push(show);
+                            this._selectedShows.push(show);
                         } else {
-                            const position = this._selectedSeries.map((show) => show.id).indexOf(show.id);
-                            this._selectedSeries.splice(position, 1);
+                            const position = this._selectedShows.map((show) => show.id).indexOf(show.id);
+                            this._selectedShows.splice(position, 1);
                         }
 
-                        if (this._selectedSeries.length > 0) {
-                            this._nextButton.show();
+                        if (this._selectedShows.length === 1) {
+                            this._nextButton.text = `${this._selectedShows.length} serie importeren`;
+                            this._nextButton.instance.show();
+                        } else if (this._selectedShows.length > 1) {
+                            this._nextButton.text = `${this._selectedShows.length} series importeren`;
+                            this._nextButton.instance.show();
                         } else {
-                            this._nextButton.hide();
+                            this._nextButton.instance.hide();
                         }
                     });
                     selectColumn.append(checkbox.instance);

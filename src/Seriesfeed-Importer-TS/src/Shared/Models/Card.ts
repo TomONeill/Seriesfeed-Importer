@@ -52,7 +52,7 @@ module SeriesfeedImporter.Models {
         public setBackButtonUrl(url: Enums.ShortUrl): void {
             this.backButton.hide();
             this.backButton.click(() => { });
-            
+
             if (url == null) {
                 return;
             }
@@ -79,10 +79,12 @@ module SeriesfeedImporter.Models {
 
             for (let i = 0; i < breadcrumbs.length; i++) {
                 const breadcrumb = breadcrumbs[i];
-                const link = $('<span/>')
-                    .css({ cursor: 'pointer', color: '#bfc6d2' })
-                    .text(breadcrumb.text)
-                    .click(() => Services.RouterService.navigate(breadcrumb.shortUrl));
+                const link = $('<span/>').text(breadcrumb.text);
+                if (breadcrumb.shortUrl != null) {
+                    link
+                        .css({ cursor: 'pointer', color: '#bfc6d2' })
+                        .click(() => Services.RouterService.navigate(breadcrumb.shortUrl));
+                }
                 this.breadcrumbs.append(link);
 
                 if (i < breadcrumbs.length - 1) {

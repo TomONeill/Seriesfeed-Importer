@@ -3,6 +3,10 @@
 module SeriesfeedImporter.Services {
     export class RouterService {
         public static navigate(url: Enums.ShortUrl): void {
+            if (url == null) {
+                return;
+            }
+            
             switch (url) {
                 case Enums.ShortUrl.Import:
                     this.import();

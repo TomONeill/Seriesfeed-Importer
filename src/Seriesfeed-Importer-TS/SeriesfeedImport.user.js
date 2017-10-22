@@ -120,8 +120,9 @@ var SeriesfeedImporter;
             constructor(username) {
                 this._username = username;
                 this._checkboxes = [];
-                this._selectedSeries = [];
-                this._nextButton = SeriesfeedImporter.Providers.ReadMoreButtonProvider.provide("Doorgaan").hide();
+                this._selectedShows = [];
+                this._nextButton = new SeriesfeedImporter.Models.ReadMoreButton("Importeren");
+                this._nextButton.instance.hide().click(() => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
                 this.initialiseCard();
                 this.initialise();
             }
@@ -149,7 +150,7 @@ var SeriesfeedImporter;
                 table.addTheadItems([selectAllColumn, seriesColumn]);
                 const loadingData = $('<div><h4 style="padding: 15px;">Favorieten ophalen...</h4></div>');
                 cardContent.append(loadingData);
-                cardContent.append(this._nextButton);
+                cardContent.append(this._nextButton.instance);
                 SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
                     favourites.each((index, favourite) => {
                         const show = new SeriesfeedImporter.Models.Show();
@@ -162,17 +163,22 @@ var SeriesfeedImporter;
                         const checkbox = new SeriesfeedImporter.Models.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                this._selectedSeries.push(show);
+                                this._selectedShows.push(show);
                             }
                             else {
-                                const position = this._selectedSeries.map((show) => show.id).indexOf(show.id);
-                                this._selectedSeries.splice(position, 1);
+                                const position = this._selectedShows.map((show) => show.id).indexOf(show.id);
+                                this._selectedShows.splice(position, 1);
                             }
-                            if (this._selectedSeries.length > 0) {
-                                this._nextButton.show();
+                            if (this._selectedShows.length === 1) {
+                                this._nextButton.text = `${this._selectedShows.length} serie importeren`;
+                                this._nextButton.instance.show();
+                            }
+                            else if (this._selectedShows.length > 1) {
+                                this._nextButton.text = `${this._selectedShows.length} series importeren`;
+                                this._nextButton.instance.show();
                             }
                             else {
-                                this._nextButton.hide();
+                                this._nextButton.instance.hide();
                             }
                         });
                         selectColumn.append(checkbox.instance);
@@ -205,7 +211,42 @@ var SeriesfeedImporter;
     var Controllers;
     (function (Controllers) {
         class ImportBierdopjeFavouritesController {
-            initialise(username) {
+            constructor(username, selectedSeries) {
+                this._username = username;
+                this._selectedShows = selectedSeries;
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, `${SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje}${this._username}`)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.Models.Table();
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([seriesColumn]);
+                this._selectedShows.forEach((show) => {
+                    const row = $('<tr/>');
+                    const showColumn = $('<td/>');
+                    const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                    showColumn.append(showLink);
+                    row.append(showColumn);
+                    table.addRow(row);
+                });
+                cardContent.append(table.instance);
+            }
+            old(username) {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const formElement = $('<div/>').html("Favorieten van " + username);
                 const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');
@@ -999,6 +1040,9 @@ var SeriesfeedImporter;
     (function (Services) {
         class RouterService {
             static navigate(url) {
+                if (url == null) {
+                    return;
+                }
                 switch (url) {
                     case SeriesfeedImporter.Enums.ShortUrl.Import:
                         this.import();
@@ -1237,10 +1281,12 @@ var SeriesfeedImporter;
                 }
                 for (let i = 0; i < breadcrumbs.length; i++) {
                     const breadcrumb = breadcrumbs[i];
-                    const link = $('<span/>')
-                        .css({ cursor: 'pointer', color: '#bfc6d2' })
-                        .text(breadcrumb.text)
-                        .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadcrumb.shortUrl));
+                    const link = $('<span/>').text(breadcrumb.text);
+                    if (breadcrumb.shortUrl != null) {
+                        link
+                            .css({ cursor: 'pointer', color: '#bfc6d2' })
+                            .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadcrumb.shortUrl));
+                    }
                     this.breadcrumbs.append(link);
                     if (i < breadcrumbs.length - 1) {
                         const chevronRight = $('<i/>')
@@ -1338,6 +1384,28 @@ var SeriesfeedImporter;
             }
         }
         Models.Checkbox = Checkbox;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class ReadMoreButton {
+            constructor(text) {
+                this.instance = $('<div/>').addClass('readMore').css({ cursor: 'pointer', paddingRight: '10px' });
+                const innerButton = $('<div/>').css({ textAlign: 'right' });
+                this.link = $('<a/>');
+                this.instance.append(innerButton);
+                innerButton.append(this.link);
+                if (text != null || text !== '') {
+                    this.link.text(text);
+                }
+            }
+            set text(value) {
+                this.link.text(value);
+            }
+        }
+        Models.ReadMoreButton = ReadMoreButton;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1451,23 +1519,6 @@ var SeriesfeedImporter;
         }
         Models.User = User;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Providers;
-    (function (Providers) {
-        class ReadMoreButtonProvider {
-            static provide(value) {
-                const button = $('<div/>').addClass('readMore').css({ cursor: 'pointer', paddingRight: '10px' });
-                const innerButton = $('<div/>').css({ textAlign: 'right' });
-                const link = $('<a/>').text(value);
-                button.append(innerButton);
-                innerButton.append(link);
-                return button;
-            }
-        }
-        Providers.ReadMoreButtonProvider = ReadMoreButtonProvider;
-    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {

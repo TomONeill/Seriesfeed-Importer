@@ -21,6 +21,7 @@ var SeriesfeedImporter;
         Config.BaseUrl = "https://www.seriesfeed.com";
         Config.BierdopjeBaseUrl = "http://www.bierdopje.com";
         Config.ImdbBaseUrl = "http://www.imdb.com";
+        Config.TheTvdbBaseUrl = "http://www.thetvdb.com";
         Config.Id = {
             MainContent: "mainContent",
             CardContent: "cardContent"
@@ -214,6 +215,7 @@ var SeriesfeedImporter;
             constructor(username, selectedSeries) {
                 this._username = username;
                 this._selectedShows = selectedSeries;
+                window.scrollTo(0, 0);
                 this.initialiseCard();
                 this.initialise();
             }
@@ -572,7 +574,7 @@ var SeriesfeedImporter;
                 });
             }
             static getFavouritesByUsername(username) {
-                const url = "http://www.bierdopje.com/users/" + username + "/shows";
+                const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + "/users/" + username + "/shows";
                 return Services.AjaxService.get(url)
                     .then((pageData) => {
                     const data = $(pageData.responseText);
@@ -584,11 +586,11 @@ var SeriesfeedImporter;
                 });
             }
             static getTvdbIdByShowSlug(showSlug) {
-                const url = "http://www.bierdopje.com" + showSlug;
+                const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + showSlug;
                 return Services.AjaxService.get(url)
                     .then((pageData) => {
                     const favouriteData = $(pageData.responseText);
-                    return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
+                    return favouriteData.find(`a[href^='${SeriesfeedImporter.Config.TheTvdbBaseUrl}']`).html();
                 })
                     .catch((error) => {
                     throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;

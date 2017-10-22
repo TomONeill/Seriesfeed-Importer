@@ -36,7 +36,7 @@ module SeriesfeedImporter.Services {
         }
 
         public static getFavouritesByUsername(username: string): Promise<JQuery> {
-            const url = "http://www.bierdopje.com/users/" + username + "/shows";
+            const url = Config.BierdopjeBaseUrl + "/users/" + username + "/shows";
 
             return Services.AjaxService.get(url)
                 .then((pageData) => {
@@ -50,12 +50,12 @@ module SeriesfeedImporter.Services {
         }
 
         public static getTvdbIdByShowSlug(showSlug: string): Promise<string> {
-            const url = "http://www.bierdopje.com" + showSlug;
+            const url = Config.BierdopjeBaseUrl + showSlug;
 
             return Services.AjaxService.get(url)
                 .then((pageData) => {
                     const favouriteData = $(pageData.responseText);
-                    return favouriteData.find("a[href^='http://www.thetvdb.com']").html();
+                    return favouriteData.find(`a[href^='${Config.TheTvdbBaseUrl}']`).html();
                 })
                 .catch((error) => {
                     throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;

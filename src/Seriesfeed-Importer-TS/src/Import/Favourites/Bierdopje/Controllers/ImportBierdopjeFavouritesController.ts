@@ -8,6 +8,7 @@ module SeriesfeedImporter.Controllers {
         constructor(username: string, selectedSeries: Array<Models.Show>) {
             this._username = username;
             this._selectedShows = selectedSeries;
+            window.scrollTo(0, 0);
 
             this.initialiseCard();
             this.initialise();
@@ -27,6 +28,7 @@ module SeriesfeedImporter.Controllers {
             card.setWidth();
             card.setContent();
         }
+
         private initialise(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 

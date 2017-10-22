@@ -63,11 +63,12 @@ module SeriesfeedImporter.Services {
         }
 
         private static getTvdbIdByShowSlugFromStorage(showSlug: string): string | null {
-            const showSlugTvdb = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId) as Array<Models.Show>;
-
-            for (let i = 0; i < showSlugTvdb.length; i++) {
-                if (showSlugTvdb[i].slug === showSlug) {
-                    return showSlugTvdb[i].theTvdbId;
+            const localShow = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId) as Array<Models.Show>;
+            if (localShow != null) {
+                for (let i = 0; i < localShow.length; i++) {
+                    if (localShow[i].slug === showSlug) {
+                        return localShow[i].theTvdbId;
+                    }
                 }
             }
 

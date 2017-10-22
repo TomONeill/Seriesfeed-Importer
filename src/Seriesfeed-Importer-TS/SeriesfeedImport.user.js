@@ -612,10 +612,12 @@ var SeriesfeedImporter;
                 });
             }
             static getTvdbIdByShowSlugFromStorage(showSlug) {
-                const showSlugTvdb = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId);
-                for (let i = 0; i < showSlugTvdb.length; i++) {
-                    if (showSlugTvdb[i].slug === showSlug) {
-                        return showSlugTvdb[i].theTvdbId;
+                const localShow = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId);
+                if (localShow != null) {
+                    for (let i = 0; i < localShow.length; i++) {
+                        if (localShow[i].slug === showSlug) {
+                            return localShow[i].theTvdbId;
+                        }
                     }
                 }
                 return null;

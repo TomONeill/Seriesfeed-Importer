@@ -185,6 +185,7 @@ var SeriesfeedImporter;
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
                                 this._currentCalls.push(index);
+                                this.setCollectingData();
                                 SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
                                     show.theTvdbId = theTvdbId;
                                     const position = this._currentCalls.indexOf(index);

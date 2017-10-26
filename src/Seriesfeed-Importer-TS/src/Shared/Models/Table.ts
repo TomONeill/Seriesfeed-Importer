@@ -28,5 +28,15 @@ module SeriesfeedImporter.Models {
         public addRow(tr: JQuery<HTMLElement>): void {
             this.tbody.append(tr);
         }
+
+        public getRow(index: number): JQuery<HTMLElement> {
+            const row = this.tbody.children()[index];
+            return $(row);
+        }
+
+        public updateRow(index: number, value: JQuery<HTMLElement>): JQuery<HTMLElement> {
+            const row = this.tbody.children()[index];
+            return $(row).replaceWith(value);
+        }
     }
 }

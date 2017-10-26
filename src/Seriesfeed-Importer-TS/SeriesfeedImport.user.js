@@ -268,6 +268,7 @@ var SeriesfeedImporter;
                 window.scrollTo(0, 0);
                 this.initialiseCard();
                 this.initialise();
+                this.startImport();
             }
             sortSelectedSeriesByName(showA, showB) {
                 if (showA.name < showB.name) {
@@ -296,173 +297,166 @@ var SeriesfeedImporter;
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const table = new SeriesfeedImporter.Models.Table();
+                this._table = new SeriesfeedImporter.Models.Table();
+                const seriesStatusIcon = $('<th/>');
                 const seriesColumn = $('<th/>').text('Serie');
                 const statusColumn = $('<th/>').text('Status');
-                table.addTheadItems([seriesColumn, statusColumn]);
+                this._table.addTheadItems([seriesStatusIcon, seriesColumn, statusColumn]);
                 this._selectedShows.forEach((show) => {
                     const row = $('<tr/>');
+                    const showStatusIcon = $('<td/>');
                     const showColumn = $('<td/>');
                     const statusColumn = $('<td/>');
+                    const loadingIcon = $("<i/>").addClass("fa fa-circle-o-notch fa-spin").css({ color: "#676767", fontSize: "16px" });
+                    showStatusIcon.append(loadingIcon);
                     const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
                     showColumn.append(showLink);
+                    row.append(showStatusIcon);
                     row.append(showColumn);
                     row.append(statusColumn);
-                    table.addRow(row);
+                    this._table.addRow(row);
                 });
-                cardContent.append(table.instance);
+                cardContent.append(this._table.instance);
+            }
+            startImport() {
+                this._selectedShows.forEach((show, index) => {
+                    const currentRow = this._table.getRow(index);
+                    SeriesfeedImporter.Services.SeriesfeedService.getShowIdByTvdbId(show.theTvdbId)
+                        .then((seriesfeedShow) => SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
+                        .then(() => {
+                        const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
+                        currentRow.children().first().find("i").replaceWith(checkmarkIcon);
+                        const addedFavourite = $("<span/>").text("Toegevoegd als favoriet.");
+                        currentRow.children().last().append(addedFavourite);
+                    })
+                        .catch((error) => {
+                        const parsedError = error.responseJSON[0];
+                        let errorIcon;
+                        let errorMessage;
+                        switch (parsedError) {
+                            case SeriesfeedImporter.Enums.SeriesfeedError.CouldNotUpdateStatus:
+                                errorIcon = $("<i/>").addClass("fa fa-info-circle").css({ color: "#5f7192", fontSize: "16px" });
+                                errorMessage = $("<span/>").text("Deze serie is al een favoriet.");
+                                break;
+                            case SeriesfeedImporter.Enums.SeriesfeedError.NotFound:
+                                errorIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1.5px" });
+                                errorMessage = $('<a/>').attr('href', SeriesfeedImporter.Config.BaseUrl + "/voorstellen/").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
+                                break;
+                            default:
+                                errorIcon = $("<i/>").addClass("fa fa-exclamation-circle").css({ color: "#8e2f2f", fontSize: "16px" });
+                                errorMessage = $("<span/>").text("Kon deze serie niet als favoriet instellen.");
+                                break;
+                        }
+                        currentRow.children().first().find("i").replaceWith(errorIcon);
+                        currentRow.children().last().append(errorMessage);
+                        this._table.updateRow(index, currentRow);
+                    });
+                });
+            }
+            convertErrorToMessage(error) {
+                const parsedError = error.responseJSON[0];
+                switch (parsedError) {
+                    case SeriesfeedImporter.Enums.SeriesfeedError.CouldNotUpdateStatus:
+                        return $("<span/>").text("Deze serie is al een favoriet.");
+                    case SeriesfeedImporter.Enums.SeriesfeedError.NotFound:
+                        return $('<a/>').attr('href', SeriesfeedImporter.Config.BaseUrl + "/voorstellen/").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
+                    default:
+                        return $("<span/>").text("Kon deze serie niet als favoriet instellen.");
+                }
+            }
+            a(index) {
+                var MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
+                return new Promise((resolve) => {
+                    const bdShowUrl = 'http://www.bierdopje.com';
+                    SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug("bdShowSlug")
+                        .then((tvdbId) => {
+                        SeriesfeedImporter.Services.SeriesfeedService.getShowIdByTvdbId(tvdbId)
+                            .then((sfShowData) => {
+                            let sfSeriesName = sfShowData.name;
+                            const sfSeriesSlug = sfShowData.slug;
+                            const sfSeriesUrl = 'https://www.seriesfeed.com/series/';
+                            const MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
+                            let current_retries = 0;
+                            function addFavouriteByShowId(sfSeriesId) {
+                                SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
+                                    .then((result) => {
+                                    let item = "<tr></tr>";
+                                    let status = "-";
+                                    let showUrl = sfSeriesUrl + sfSeriesSlug;
+                                    if (sfSeriesId === -1) {
+                                        sfSeriesId = "Onbekend";
+                                    }
+                                    if (!sfSeriesName) {
+                                    }
+                                    resolve();
+                                })
+                                    .catch(() => {
+                                    console.log(`Retrying to favourite ${sfSeriesName} (${sfSeriesId}). ${current_retries + 1}/${MAX_RETRIES})`);
+                                    current_retries++;
+                                    if (current_retries === MAX_RETRIES) {
+                                        const status = "Kon deze serie niet als favoriet instellen.";
+                                        const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
+                                        resolve();
+                                    }
+                                    else {
+                                        addFavouriteByShowId(index);
+                                        resolve();
+                                    }
+                                });
+                            }
+                        }).catch(() => {
+                            const status = 'Het id kan niet van Seriesfeed worden opgehaald.</a>';
+                            resolve();
+                        });
+                    }).catch((error) => {
+                        const status = 'Deze serie kan niet gevonden worden op Bierdopje.';
+                        resolve();
+                    });
+                });
             }
             old(username) {
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const formElement = $('<div/>').html("Favorieten van " + username);
-                const submitInput = $('<div/>').append('<input type="button" class="btn btn-success btn-block" value="Favorieten Importeren" />');
-                const bottomPane = $('<div/>').addClass('blog-left');
-                const detailsTable = $('<table class="table table-hover responsiveTable favourites stacktable large-only" id="details">');
-                const colGroup = $('<colgroup/>').append('<col width="15%"><col width="35%"><col width="50%">');
-                const detailsHeader = $('<tr/>').append('<th style="padding-left: 30px;">Id</th><th>Serie</th><th>Status</th>');
-                const showDetails = $('<div class="blog-content" id="details-content"><input type="button" id="show-details" class="btn btn-block" value="Details" /></div>');
-                cardContent.append(formElement);
-                formElement.addClass('blog-left cardStyle cardForm formBlock');
-                bottomPane.addClass('cardStyle');
-                detailsTable.addClass('cardStyle');
-                formElement.css('padding', '10px');
-                formElement.append(submitInput);
-                detailsTable.append(colGroup);
-                detailsTable.append(detailsHeader);
-                bottomPane.append(showDetails);
-                showDetails.append(detailsTable);
-                submitInput.click((event) => {
-                    const favImportBtn = $(event.currentTarget);
-                    const outerProgress = $('<div/>').addClass('progress');
-                    const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
-                    favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
-                    outerProgress.append(progressBar);
-                    formElement.append(outerProgress);
-                    formElement.after(bottomPane);
-                    const favourites = $('#details');
-                    $("#show-details").click(() => detailsTable.toggle());
-                    SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username)
-                        .then((bdFavouriteLinks) => {
-                        const bdFavouritesLength = bdFavouriteLinks.length;
-                        var MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
-                        function getBierdopjeFavourite(index) {
+                const favImportBtn = $(event.currentTarget);
+                const outerProgress = $('<div/>').addClass('progress');
+                const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
+                favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
+                outerProgress.append(progressBar);
+                const favourites = $('#details');
+                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username)
+                    .then((bdFavouriteLinks) => {
+                    const bdFavouritesLength = bdFavouriteLinks.length;
+                    var MAX_ASYNC_CALLS = SeriesfeedImporter.Config.MaxAsyncCalls;
+                    let current_async_calls = 0;
+                    Promise.resolve(1)
+                        .then(function loop(i) {
+                        if (current_async_calls < MAX_ASYNC_CALLS) {
+                            if (i < bdFavouritesLength) {
+                                current_async_calls += 1;
+                                return loop(i + 1);
+                            }
+                        }
+                        else {
                             return new Promise((resolve) => {
-                                const bdShowName = $(bdFavouriteLinks[index]).text();
-                                const bdShowSlug = $(bdFavouriteLinks[index]).attr('href');
-                                const bdShowUrl = 'http://www.bierdopje.com';
-                                SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(bdShowSlug)
-                                    .then((tvdbId) => {
-                                    SeriesfeedImporter.Services.SeriesfeedService.getShowIdByTvdbId(tvdbId)
-                                        .then((sfShowData) => {
-                                        let sfSeriesId = sfShowData.id;
-                                        let sfSeriesName = sfShowData.name;
-                                        const sfSeriesSlug = sfShowData.slug;
-                                        const sfSeriesUrl = 'https://www.seriesfeed.com/series/';
-                                        const MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
-                                        let current_retries = 0;
-                                        function addFavouriteByShowId(sfSeriesId) {
-                                            SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
-                                                .then((result) => {
-                                                const resultStatus = result.status;
-                                                let item = "<tr></tr>";
-                                                let status = "-";
-                                                let showUrl = sfSeriesUrl + sfSeriesSlug;
-                                                if (sfSeriesId === -1) {
-                                                    sfSeriesId = "Onbekend";
-                                                }
-                                                if (!sfSeriesName) {
-                                                    showUrl = bdShowUrl + bdShowSlug;
-                                                    sfSeriesName = bdShowName;
-                                                }
-                                                if (resultStatus === "success") {
-                                                    status = "Toegevoegd als favoriet.";
-                                                    item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                }
-                                                else if (resultStatus === "failed" && sfSeriesId === "Onbekend") {
-                                                    status = '<a href="' + sfSeriesUrl + 'voorstellen/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
-                                                    item = '<tr class="row-warning"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                }
-                                                else {
-                                                    status = "Deze serie is al een favoriet.";
-                                                    item = '<tr class="row-info"><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                }
-                                                favourites.append(item);
-                                                const progress = (index / bdFavouritesLength) * 100;
-                                                progressBar.css('width', Math.round(progress) + "%");
-                                                resolve();
-                                            })
-                                                .catch(() => {
-                                                console.log(`Retrying to favourite ${sfSeriesName} (${sfSeriesId}). ${current_retries + 1}/${MAX_RETRIES})`);
-                                                current_retries++;
-                                                if (current_retries === MAX_RETRIES) {
-                                                    const status = "Kon deze serie niet als favoriet instellen.";
-                                                    const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                                    favourites.append(item);
-                                                    const progress = (index / bdFavouritesLength) * 100;
-                                                    progressBar.css('width', Math.round(progress) + "%");
-                                                    resolve();
-                                                }
-                                                else {
-                                                    addFavouriteByShowId(index);
-                                                    resolve();
-                                                }
-                                            });
-                                        }
-                                        addFavouriteByShowId(sfSeriesId);
-                                    }).catch(() => {
-                                        const status = 'Het id kan niet van Seriesfeed worden opgehaald.</a>';
-                                        const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-                                        favourites.append(item);
-                                        const progress = (index / bdFavouritesLength) * 100;
-                                        progressBar.css('width', Math.round(progress) + "%");
-                                        resolve();
-                                    });
-                                }).catch((error) => {
-                                    const status = 'Deze serie kan niet gevonden worden op Bierdopje.';
-                                    const item = '<tr class="row-error"><td>Onbekend</td><td><a href="' + bdShowUrl + bdShowSlug + '" target="_blank">' + bdShowName + '</a></td><td>' + status + '</td></tr>';
-                                    favourites.append(item);
-                                    const progress = (index / bdFavouritesLength) * 100;
-                                    progressBar.css('width', Math.round(progress) + "%");
-                                    resolve();
-                                });
+                                setTimeout(() => {
+                                    resolve(loop(i));
+                                }, 80);
                             });
                         }
-                        var MAX_ASYNC_CALLS = SeriesfeedImporter.Config.MaxAsyncCalls;
-                        let current_async_calls = 0;
-                        Promise.resolve(1)
-                            .then(function loop(i) {
-                            if (current_async_calls < MAX_ASYNC_CALLS) {
-                                if (i < bdFavouritesLength) {
-                                    current_async_calls += 1;
-                                    getBierdopjeFavourite(i)
-                                        .then(() => current_async_calls -= 1);
-                                    return loop(i + 1);
-                                }
+                    })
+                        .then(() => {
+                        function checkActiveCalls() {
+                            if (current_async_calls === 0) {
+                                favImportBtn.prop('disabled', false);
+                                favImportBtn.attr('value', "Favorieten Importeren");
+                                outerProgress.removeClass('progress');
+                                progressBar.replaceWith("Importeren voltooid.");
                             }
                             else {
-                                return new Promise((resolve) => {
-                                    setTimeout(() => {
-                                        resolve(loop(i));
-                                    }, 80);
-                                });
+                                setTimeout(checkActiveCalls, 80);
                             }
-                        })
-                            .then(() => {
-                            function checkActiveCalls() {
-                                if (current_async_calls === 0) {
-                                    favImportBtn.prop('disabled', false);
-                                    favImportBtn.attr('value', "Favorieten Importeren");
-                                    outerProgress.removeClass('progress');
-                                    progressBar.replaceWith("Importeren voltooid.");
-                                }
-                                else {
-                                    setTimeout(checkActiveCalls, 80);
-                                }
-                            }
-                            checkActiveCalls();
-                        }).catch((error) => {
-                            throw `Unknown error: ${error}`;
-                        });
+                        }
+                        checkActiveCalls();
+                    }).catch((error) => {
+                        throw `Unknown error: ${error}`;
                     });
                 });
             }
@@ -1046,8 +1040,16 @@ var SeriesfeedImporter;
                     data: tvdbId
                 };
                 return Services.AjaxService.post("/ajax/serie/find-by", postData)
+                    .then((result) => {
+                    const show = new SeriesfeedImporter.Models.Show();
+                    show.seriesfeedId = result.id;
+                    show.name = result.name;
+                    show.slug = result.slug;
+                    return show;
+                })
                     .catch((error) => {
-                    throw `Could not convert TVDB id ${tvdbId} on Seriesfeed.com: ${error}`;
+                    console.error(`Could not convert TVDB id ${tvdbId} on Seriesfeed.com: ${error.responseText}`);
+                    return error;
                 });
             }
             static addFavouriteByShowId(showId) {
@@ -1056,7 +1058,11 @@ var SeriesfeedImporter;
                     type: 'favourite',
                     selected: '0'
                 };
-                return Services.AjaxService.post("/ajax/serie/favourite", postData);
+                return Services.AjaxService.post("/ajax/serie/favourite", postData)
+                    .catch((error) => {
+                    console.error(`Could not favourite show Seriesfeed id ${showId}: ${error.responseText}`);
+                    return error;
+                });
             }
         }
         Services.SeriesfeedService = SeriesfeedService;
@@ -1276,6 +1282,17 @@ var SeriesfeedImporter;
             NavigationType[NavigationType["Nieuws"] = 2] = "Nieuws";
             NavigationType[NavigationType["Community"] = 3] = "Community";
         })(NavigationType = Enums.NavigationType || (Enums.NavigationType = {}));
+    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Enums;
+    (function (Enums) {
+        Enums.SeriesfeedError = {
+            Unknown: "Unknown",
+            NotFound: "Geen serie gevonden voor de gegeven data",
+            CouldNotUpdateStatus: "Kon favorietenstatus niet bijwerken!"
+        };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1594,6 +1611,14 @@ var SeriesfeedImporter;
             }
             addRow(tr) {
                 this.tbody.append(tr);
+            }
+            getRow(index) {
+                const row = this.tbody.children()[index];
+                return $(row);
+            }
+            updateRow(index, value) {
+                const row = this.tbody.children()[index];
+                return $(row).replaceWith(value);
             }
         }
         Models.Table = Table;

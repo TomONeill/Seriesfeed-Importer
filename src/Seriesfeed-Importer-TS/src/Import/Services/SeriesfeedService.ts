@@ -2,26 +2,38 @@
 
 module SeriesfeedImporter.Services {
     export class SeriesfeedService {
-        public static getShowIdByTvdbId(tvdbId: string): Promise<any> {
+        public static getShowIdByTvdbId(tvdbId: string): Promise<Models.Show> {
             const postData = {
                 type: 'tvdb_id',
- 				data: tvdbId
+                data: tvdbId
             };
 
             return Services.AjaxService.post("/ajax/serie/find-by", postData)
+                .then((result: any) => {
+                    const show = new Models.Show();
+                    show.seriesfeedId = result.id;
+                    show.name = result.name;
+                    show.slug = result.slug;
+                    return show;
+                })
                 .catch((error) => {
-                    throw `Could not convert TVDB id ${tvdbId} on Seriesfeed.com: ${error}`;
+                    console.error(`Could not convert TVDB id ${tvdbId} on Seriesfeed.com: ${error.responseText}`);
+                    return error;
                 });
         }
 
-        public static addFavouriteByShowId(showId: string): Promise<any> {
+        public static addFavouriteByShowId(showId: number): Promise<void> {
             const postData = {
                 series: showId,
                 type: 'favourite',
                 selected: '0'
             };
 
-            return Services.AjaxService.post("/ajax/serie/favourite", postData);
+            return Services.AjaxService.post("/ajax/serie/favourite", postData)
+                .catch((error) => {
+                    console.error(`Could not favourite show Seriesfeed id ${showId}: ${error.responseText}`);
+                    return error;
+                });
         }
     }
 }

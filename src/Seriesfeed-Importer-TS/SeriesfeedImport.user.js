@@ -339,7 +339,7 @@ var SeriesfeedImporter;
                                 errorMessage = $("<span/>").text("Deze serie is al een favoriet.");
                                 break;
                             case SeriesfeedImporter.Enums.SeriesfeedError.NotFound:
-                                errorIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1.5px" });
+                                errorIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1px" });
                                 errorMessage = $('<a/>').attr('href', SeriesfeedImporter.Config.BaseUrl + "/voorstellen/").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
                                 break;
                             default:

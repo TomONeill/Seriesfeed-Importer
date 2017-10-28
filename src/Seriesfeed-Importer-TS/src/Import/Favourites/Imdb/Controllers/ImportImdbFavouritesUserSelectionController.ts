@@ -11,12 +11,12 @@ module SeriesfeedImporter.Controllers {
 
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
-            card.setTitle("Imdb favorieten importeren");
+            card.setTitle("IMDb favorieten importeren");
             card.setBackButtonUrl(Enums.ShortUrl.ImportSourceSelection);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("Imdb", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje)
+                new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportSourceSelection),
+                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportImdb)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
@@ -26,8 +26,6 @@ module SeriesfeedImporter.Controllers {
             const cardContent = $('#' + Config.Id.CardContent);
 
             this._user = new Models.User();
-            this._user.setTopText("Huidige gebruiker");
-            this._user.setWidth('49%');
             this._user.setUsername("Laden...");
             this._user.instance.css({ marginRight: '1%' });
 
@@ -48,7 +46,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private loadUser(): void {
-            Services.BierdopjeService.getUsername()
+            Services.ImdbService.getUser()
                 .then((username) => {
                     if (username == null) {
                         this._user.onClick = null;

@@ -985,12 +985,12 @@ var SeriesfeedImporter;
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Imdb favorieten importeren");
+                card.setTitle("IMDb favorieten importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("Imdb", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
+                    new SeriesfeedImporter.Models.Breadcrumb("IMDb", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportImdb)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
@@ -998,8 +998,6 @@ var SeriesfeedImporter;
             initialiseCurrentUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 this._user = new SeriesfeedImporter.Models.User();
-                this._user.setTopText("Huidige gebruiker");
-                this._user.setWidth('49%');
                 this._user.setUsername("Laden...");
                 this._user.instance.css({ marginRight: '1%' });
                 cardContent.append(this._user.instance);
@@ -1017,7 +1015,7 @@ var SeriesfeedImporter;
                 this.loadUser();
             }
             loadUser() {
-                SeriesfeedImporter.Services.BierdopjeService.getUsername()
+                SeriesfeedImporter.Services.ImdbService.getUser()
                     .then((username) => {
                     if (username == null) {
                         this._user.onClick = null;
@@ -1263,7 +1261,7 @@ var SeriesfeedImporter;
             static importImdb() {
                 document.title = "IMDb series importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImportImdbController();
+                new SeriesfeedImporter.Controllers.ImportImdbFavouritesUserSelectionController();
             }
             static export() {
                 document.title = "Series exporteren | Seriesfeed";

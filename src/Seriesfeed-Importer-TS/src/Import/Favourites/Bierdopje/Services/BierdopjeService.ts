@@ -35,7 +35,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        public static getFavouritesByUsername(username: string): Promise<JQuery> {
+        public static getFavouritesByUsername(username: string): Promise<JQuery<HTMLElement>> {
             const url = Config.BierdopjeBaseUrl + "/users/" + username + "/shows";
 
             return Services.AjaxService.get(url)

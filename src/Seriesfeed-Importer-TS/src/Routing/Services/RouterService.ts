@@ -69,7 +69,7 @@ module SeriesfeedImporter.Services {
             document.title = "IMDb series importeren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImportImdbController();
+            new Controllers.ImportImdbFavouritesUserSelectionController();
         }
 
         private static export(): void {

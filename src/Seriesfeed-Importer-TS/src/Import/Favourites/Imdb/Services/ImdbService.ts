@@ -2,14 +2,14 @@
 
 module SeriesfeedImporter.Services {
     export class ImdbService {
-        public static getUser(): Promise<any> {
+        public static getUser(): Promise<Models.ImdbUser> {
             return Services.AjaxService.get(Config.ImdbBaseUrl + "/helpdesk/contact")
                 .then((pageData) => {
                     const data = $(pageData.responseText);
-                    return {
-                        id: data.find('#navUserMenu p a').attr('href').split('/')[4],
-                        username: data.find('#navUserMenu p a').html().trim()
-                    };
+                    const imdbUser = new Models.ImdbUser();
+                    imdbUser.id = data.find('#navUserMenu p a').attr('href').split('/')[4];
+                    imdbUser.username = data.find('#navUserMenu p a').html().trim();
+                    return imdbUser;
                 })
                 .catch((error) => {
                     throw `Could not get user from ${Config.ImdbBaseUrl}: ${error}`;

@@ -6,7 +6,7 @@ module SeriesfeedImporter.Services {
             if (url == null) {
                 return;
             }
-            
+
             switch (url) {
                 case Enums.ShortUrl.Import:
                     this.import();
@@ -72,6 +72,13 @@ module SeriesfeedImporter.Services {
             new Controllers.ImportImdbFavouritesUserSelectionController();
         }
 
+        private static importImdbUser(username: string): void {
+            document.title = "IMDb lijsten selecteren | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.ImdbListSelectionControllerController(username);
+        }
+
         private static export(): void {
             document.title = "Series exporteren | Seriesfeed";
             CardService.getCard().clear();
@@ -80,9 +87,15 @@ module SeriesfeedImporter.Services {
         }
 
         private static navigateOther(url: Enums.ShortUrl): void {
-            if (url.length > Enums.ShortUrl.ImportBierdopje.length) {
+            if (url.startsWith(Enums.ShortUrl.ImportBierdopje)) {
                 const username = url.substr(url.lastIndexOf('/') + 1);
                 this.importBierdopjeUser(username);
+                return;
+            }
+
+            if (url.startsWith(Enums.ShortUrl.ImportImdb)) {
+                const username = url.substr(url.lastIndexOf('/') + 1);
+                this.importImdbUser(username);
                 return;
             }
         }

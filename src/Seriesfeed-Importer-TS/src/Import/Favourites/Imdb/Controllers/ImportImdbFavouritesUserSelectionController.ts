@@ -47,15 +47,15 @@ module SeriesfeedImporter.Controllers {
 
         private loadUser(): void {
             Services.ImdbService.getUser()
-                .then((username) => {
-                    if (username == null) {
+                .then((user) => {
+                    if (user == null) {
                         this._user.onClick = null;
                         this._user.setAvatarUrl();
                         this._user.setUsername("Niet ingelogd");
                     } else {
-                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
-                        this._user.setUsername(username);
-                        Services.BierdopjeService.getAvatarUrlByUsername(username)
+                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb + user.username);
+                        this._user.setUsername(user.username);
+                        Services.ImdbService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
                     }
                 });

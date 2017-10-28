@@ -692,7 +692,112 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class ImportImdbController {
+        class ImdbListSelectionControllerController {
+            constructor(username) {
+                this._username = username;
+                this._checkboxes = [];
+                this._selectedLists = [];
+                this._currentCalls = [];
+                this.initialiseNextButton();
+                this.initialiseCollectingData();
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedLists));
+                this._nextButton.instance.hide();
+            }
+            initialiseCollectingData() {
+                this._collectingData = new SeriesfeedImporter.ViewModels.ReadMoreButton("Gegevens verzamelen...");
+                this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' });
+                this._collectingData.instance.hide();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("IMDb lijsten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("IMDb", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportImdb),
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportImdb}${this._username}`)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const loadingData = $('<div/>');
+                const loadingFavourites = $('<h4/>').css({ padding: '15px' });
+                const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Lijsten ophalen...");
+                const starIcon = $('<i/>').addClass('fa fa-list-ul fa-spin');
+                loadingData.append(loadingFavourites);
+                loadingFavourites
+                    .append(starIcon)
+                    .append(loadingText);
+                cardContent
+                    .append(loadingData)
+                    .append(this._collectingData.instance)
+                    .append(this._nextButton.instance);
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setCollectingData() {
+                if (this._currentCalls.length === 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} lijst)...`;
+                    this._collectingData.instance.show();
+                    return;
+                }
+                else if (this._currentCalls.length > 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} lijsten)...`;
+                    this._collectingData.instance.show();
+                }
+                else {
+                    this._collectingData.instance.hide();
+                    this.setNextButton();
+                }
+            }
+            setNextButton() {
+                if (this._currentCalls.length > 0) {
+                    this._nextButton.instance.hide();
+                    return;
+                }
+                if (this._selectedLists.length === 1) {
+                    this._nextButton.text = `${this._selectedLists.length} lijst selecteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedLists.length > 1) {
+                    this._nextButton.text = `${this._selectedLists.length} lijsten selecteren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.ImdbListSelectionControllerController = ImdbListSelectionControllerController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImdbOld {
             constructor() {
                 this._selectedLists = [];
                 this._selectedSeries = [];
@@ -971,7 +1076,7 @@ var SeriesfeedImporter;
                 });
             }
         }
-        Controllers.ImportImdbController = ImportImdbController;
+        Controllers.ImdbOld = ImdbOld;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1016,16 +1121,16 @@ var SeriesfeedImporter;
             }
             loadUser() {
                 SeriesfeedImporter.Services.ImdbService.getUser()
-                    .then((username) => {
-                    if (username == null) {
+                    .then((user) => {
+                    if (user == null) {
                         this._user.onClick = null;
                         this._user.setAvatarUrl();
                         this._user.setUsername("Niet ingelogd");
                     }
                     else {
-                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
-                        this._user.setUsername(username);
-                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
+                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportImdb + user.username);
+                        this._user.setUsername(user.username);
+                        SeriesfeedImporter.Services.ImdbService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
                     }
                 });
@@ -1036,6 +1141,15 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class ImdbUser {
+        }
+        Models.ImdbUser = ImdbUser;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class ImdbService {
@@ -1043,10 +1157,10 @@ var SeriesfeedImporter;
                 return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/helpdesk/contact")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
-                    return {
-                        id: data.find('#navUserMenu p a').attr('href').split('/')[4],
-                        username: data.find('#navUserMenu p a').html().trim()
-                    };
+                    const imdbUser = new SeriesfeedImporter.Models.ImdbUser();
+                    imdbUser.id = data.find('#navUserMenu p a').attr('href').split('/')[4];
+                    imdbUser.username = data.find('#navUserMenu p a').html().trim();
+                    return imdbUser;
                 })
                     .catch((error) => {
                     throw `Could not get user from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
@@ -1263,15 +1377,25 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportImdbFavouritesUserSelectionController();
             }
+            static importImdbUser(username) {
+                document.title = "IMDb lijsten selecteren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(username);
+            }
             static export() {
                 document.title = "Series exporteren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ExportController();
             }
             static navigateOther(url) {
-                if (url.length > SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje.length) {
+                if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)) {
                     const username = url.substr(url.lastIndexOf('/') + 1);
                     this.importBierdopjeUser(username);
+                    return;
+                }
+                if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportImdb)) {
+                    const username = url.substr(url.lastIndexOf('/') + 1);
+                    this.importImdbUser(username);
                     return;
                 }
             }

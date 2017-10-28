@@ -1,7 +1,7 @@
 /// <reference path="../../../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class ImportImdbController {
+    export class ImdbOld {
         private _userId: string;
         private _username: string;
         private _selectedLists: any[];

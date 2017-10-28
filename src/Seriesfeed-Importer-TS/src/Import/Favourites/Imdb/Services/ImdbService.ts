@@ -3,33 +3,38 @@
 module SeriesfeedImporter.Services {
     export class ImdbService {
         public static getUser(): Promise<any> {
-            return Services.AjaxService.get("http://www.imdb.com/helpdesk/contact")
+            return Services.AjaxService.get(Config.ImdbBaseUrl + "/helpdesk/contact")
                 .then((pageData) => {
                     const data = $(pageData.responseText);
                     return {
                         id: data.find('#navUserMenu p a').attr('href').split('/')[4],
                         username: data.find('#navUserMenu p a').html().trim()
                     };
+                })
+                .catch((error) => {
+                    throw `Could not get user from ${Config.ImdbBaseUrl}: ${error}`;
                 });
         }
 
         public static getAvatarUrlByUserId(userId: string): Promise<string> {
-            const url = "http://www.imdb.com/user/" + userId + "/";
-
-            return Services.AjaxService.get(url)
+            return Services.AjaxService.get(Config.ImdbBaseUrl + "/user/" + userId + "/")
                 .then((pageData) => {
                     const data = $(pageData.responseText);
                     return data.find('#avatar').attr('src');
+                })
+                .catch((error) => {
+                    throw `Could not get avatar for user id ${userId} from ${Config.ImdbBaseUrl}: ${error}`;
                 });
         }
 
         public static getListsById(userId: string): Promise<JQuery> {
-            const url = "http://www.imdb.com/user/" + userId + "/lists";
-
-            return Services.AjaxService.get(url)
+            return Services.AjaxService.get(Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                 .then((pageData) => {
                     const data = $(pageData.responseText);
                     return data.find('table.lists tr.row');
+                })
+                .catch((error) => {
+                    throw `Could not get lists for user id ${userId} from ${Config.ImdbBaseUrl}: ${error}`;
                 });
         }
 
@@ -46,7 +51,7 @@ module SeriesfeedImporter.Services {
                     seriesItems.each((index, seriesItem) => {
                         var series = {
                             name: $(seriesItem).find(".title a").html(),
-                            url: "http://www.imdb.com" + $(seriesItem).find(".title a").attr("href"),
+                            url: Config.ImdbBaseUrl + $(seriesItem).find(".title a").attr("href"),
                             type: $(seriesItem).find(".title_type").html()
                         };
 
@@ -56,6 +61,9 @@ module SeriesfeedImporter.Services {
                     });
 
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
+                })
+                .catch((error) => {
+                    throw `Could not get series from ${listUrl}: ${error}`;
                 });
         }
     }

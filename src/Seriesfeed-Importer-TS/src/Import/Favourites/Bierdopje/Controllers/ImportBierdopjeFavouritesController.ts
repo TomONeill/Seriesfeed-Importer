@@ -86,9 +86,9 @@ module SeriesfeedImporter.Controllers {
                     })
                     .catch((error) => {
                         const parsedError = error.responseJSON[0];
-
                         let errorIcon;
                         let errorMessage;
+
                         switch (parsedError) {
                             case Enums.SeriesfeedError.CouldNotUpdateStatus:
                                 errorIcon = $("<i/>").addClass("fa fa-info-circle").css({ color: "#5f7192", fontSize: "16px" });
@@ -105,6 +105,7 @@ module SeriesfeedImporter.Controllers {
                                 errorMessage = $("<span/>").text("Kon deze serie niet als favoriet instellen.");
                                 break;
                         }
+                        
                         currentRow.children().first().find("i").replaceWith(errorIcon);
                         currentRow.children().last().append(errorMessage);
                         this._table.updateRow(index, currentRow);

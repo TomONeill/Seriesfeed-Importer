@@ -9,7 +9,7 @@ module SeriesfeedImporter.Services {
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                 .catch((error) => {
-                    throw `Could not get username from Bierdopje.com: ${error}`;
+                    throw `Could not get username from ${Config.BierdopjeBaseUrl}: ${error}`;
                 });
         }
 
@@ -20,7 +20,7 @@ module SeriesfeedImporter.Services {
                     return data.find("#page .maincontent .content-links .content h3").html() !== "Fout - Pagina niet gevonden";
                 })
                 .catch((error) => {
-                    throw `Could not check for existing user on Bierdopje.com: ${error}`;
+                    throw `Could not check for existing user on ${Config.BierdopjeBaseUrl}: ${error}`;
                 });
         }
 
@@ -31,7 +31,7 @@ module SeriesfeedImporter.Services {
                     return data.find('img.avatar').attr('src');
                 })
                 .catch((error) => {
-                    throw `Could not get avatar url from Bierdopje.com: ${error}`;
+                    throw `Could not get avatar url from ${Config.BierdopjeBaseUrl}: ${error}`;
                 });
         }
 
@@ -45,7 +45,7 @@ module SeriesfeedImporter.Services {
                 })
                 .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
-                    throw `Could not get favourites from Bierdopje.com: ${error}`;
+                    throw `Could not get favourites from ${Config.BierdopjeBaseUrl}: ${error}`;
                 });
         }
 
@@ -86,7 +86,7 @@ module SeriesfeedImporter.Services {
                     return theTvdbId;
                 })
                 .catch((error) => {
-                    throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
+                    throw `Could not get the TVDB of ${showSlug} from ${Config.BierdopjeBaseUrl}: ${error}`;
                 });
         }
 

@@ -608,7 +608,7 @@ var SeriesfeedImporter;
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                     .catch((error) => {
-                    throw `Could not get username from Bierdopje.com: ${error}`;
+                    throw `Could not get username from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
                 });
             }
             static isExistingUser(username) {
@@ -618,7 +618,7 @@ var SeriesfeedImporter;
                     return data.find("#page .maincontent .content-links .content h3").html() !== "Fout - Pagina niet gevonden";
                 })
                     .catch((error) => {
-                    throw `Could not check for existing user on Bierdopje.com: ${error}`;
+                    throw `Could not check for existing user on ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
                 });
             }
             static getAvatarUrlByUsername(username) {
@@ -628,7 +628,7 @@ var SeriesfeedImporter;
                     return data.find('img.avatar').attr('src');
                 })
                     .catch((error) => {
-                    throw `Could not get avatar url from Bierdopje.com: ${error}`;
+                    throw `Could not get avatar url from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
                 });
             }
             static getFavouritesByUsername(username) {
@@ -640,7 +640,7 @@ var SeriesfeedImporter;
                 })
                     .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
-                    throw `Could not get favourites from Bierdopje.com: ${error}`;
+                    throw `Could not get favourites from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
                 });
             }
             static getTvdbIdByShowSlug(showSlug) {
@@ -673,7 +673,7 @@ var SeriesfeedImporter;
                     return theTvdbId;
                 })
                     .catch((error) => {
-                    throw `Could not get the TVDB of ${showSlug} from Bierdopje.com: ${error}`;
+                    throw `Could not get the TVDB of ${showSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
                 });
             }
             static addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug) {
@@ -976,33 +976,102 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportImdbFavouritesUserSelectionController {
+            constructor() {
+                this.initialiseCard();
+                this.initialiseCurrentUser();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Imdb favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Imdb", SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+            }
+            initialiseCurrentUser() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this._user = new SeriesfeedImporter.Models.User();
+                this._user.setTopText("Huidige gebruiker");
+                this._user.setWidth('49%');
+                this._user.setUsername("Laden...");
+                this._user.instance.css({ marginRight: '1%' });
+                cardContent.append(this._user.instance);
+                const refreshButtonAction = (event) => {
+                    event.stopPropagation();
+                    this.loadUser();
+                };
+                const refreshButton = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+                refreshButton.instance.css({
+                    position: 'absolute',
+                    left: '0',
+                    bottom: '0'
+                });
+                this._user.instance.append(refreshButton.instance);
+                this.loadUser();
+            }
+            loadUser() {
+                SeriesfeedImporter.Services.BierdopjeService.getUsername()
+                    .then((username) => {
+                    if (username == null) {
+                        this._user.onClick = null;
+                        this._user.setAvatarUrl();
+                        this._user.setUsername("Niet ingelogd");
+                    }
+                    else {
+                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje + username);
+                        this._user.setUsername(username);
+                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
+                            .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
+                    }
+                });
+            }
+        }
+        Controllers.ImportImdbFavouritesUserSelectionController = ImportImdbFavouritesUserSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class ImdbService {
             static getUser() {
-                return Services.AjaxService.get("http://www.imdb.com/helpdesk/contact")
+                return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/helpdesk/contact")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
                     return {
                         id: data.find('#navUserMenu p a').attr('href').split('/')[4],
                         username: data.find('#navUserMenu p a').html().trim()
                     };
+                })
+                    .catch((error) => {
+                    throw `Could not get user from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
                 });
             }
             static getAvatarUrlByUserId(userId) {
-                const url = "http://www.imdb.com/user/" + userId + "/";
-                return Services.AjaxService.get(url)
+                return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/user/" + userId + "/")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
                     return data.find('#avatar').attr('src');
+                })
+                    .catch((error) => {
+                    throw `Could not get avatar for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
                 });
             }
             static getListsById(userId) {
-                const url = "http://www.imdb.com/user/" + userId + "/lists";
-                return Services.AjaxService.get(url)
+                return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
                     return data.find('table.lists tr.row');
+                })
+                    .catch((error) => {
+                    throw `Could not get lists for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
                 });
             }
             static getSeriesByListUrl(listUrl) {
@@ -1015,7 +1084,7 @@ var SeriesfeedImporter;
                     seriesItems.each((index, seriesItem) => {
                         var series = {
                             name: $(seriesItem).find(".title a").html(),
-                            url: "http://www.imdb.com" + $(seriesItem).find(".title a").attr("href"),
+                            url: SeriesfeedImporter.Config.ImdbBaseUrl + $(seriesItem).find(".title a").attr("href"),
                             type: $(seriesItem).find(".title_type").html()
                         };
                         if (series.type !== "Feature") {
@@ -1023,6 +1092,9 @@ var SeriesfeedImporter;
                         }
                     });
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
+                })
+                    .catch((error) => {
+                    throw `Could not get series from ${listUrl}: ${error}`;
                 });
             }
         }

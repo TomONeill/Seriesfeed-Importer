@@ -4,9 +4,9 @@ module SeriesfeedImporter.Controllers {
     export class BierdopjeFavouriteSelectionController {
         private _username: string;
         private _selectedShows: Array<Models.Show>;
-        private _checkboxes: Array<Models.Checkbox>;
-        private _nextButton: Models.ReadMoreButton;
-        private _collectingData: Models.ReadMoreButton;
+        private _checkboxes: Array<ViewModels.Checkbox>;
+        private _nextButton: ViewModels.ReadMoreButton;
+        private _collectingData: ViewModels.ReadMoreButton;
         private _currentCalls: Array<number>;
 
         constructor(username: string) {
@@ -22,12 +22,12 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new Models.ReadMoreButton("Importeren", () => new ImportBierdopjeFavouritesController(this._username, this._selectedShows));
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => new ImportBierdopjeFavouritesController(this._username, this._selectedShows));
             this._nextButton.instance.hide();
         }
 
         private initialiseCollectingData(): void {
-            this._collectingData = new Models.ReadMoreButton("Gegevens verzamelen...");
+            this._collectingData = new ViewModels.ReadMoreButton("Gegevens verzamelen...");
             this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' })
             this._collectingData.instance.hide();
         }
@@ -50,8 +50,8 @@ module SeriesfeedImporter.Controllers {
         private initialise(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            const table = new Models.Table();
-            const checkboxAll = new Models.Checkbox('select-all');
+            const table = new ViewModels.Table();
+            const checkboxAll = new ViewModels.Checkbox('select-all');
             checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
             const selectAllColumn = $('<th/>').append(checkboxAll.instance);
             const seriesColumn = $('<th/>').text('Serie');
@@ -80,7 +80,7 @@ module SeriesfeedImporter.Controllers {
                     const selectColumn = $('<td/>');
                     const showColumn = $('<td/>');
 
-                    const checkbox = new Models.Checkbox(`show_${index}`);
+                    const checkbox = new ViewModels.Checkbox(`show_${index}`);
                     checkbox.subscribe((isEnabled) => {
                         if (isEnabled) {
                             this._currentCalls.push(index);

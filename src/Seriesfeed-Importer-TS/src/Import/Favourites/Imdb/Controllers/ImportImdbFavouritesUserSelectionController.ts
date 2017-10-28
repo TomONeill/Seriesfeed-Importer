@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImportImdbFavouritesUserSelectionController {
-        private _user: Models.User;
+        private _user: ViewModels.User;
 
         constructor() {
             this.initialiseCard();
@@ -25,7 +25,7 @@ module SeriesfeedImporter.Controllers {
         private initialiseCurrentUser(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            this._user = new Models.User();
+            this._user = new ViewModels.User();
             this._user.setUsername("Laden...");
             this._user.instance.css({ marginRight: '1%' });
 
@@ -35,7 +35,7 @@ module SeriesfeedImporter.Controllers {
                 event.stopPropagation();
                 this.loadUser();
             };
-            const refreshButton = new Models.Button(Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+            const refreshButton = new ViewModels.Button(Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
             refreshButton.instance.css({
                 position: 'absolute',
                 left: '0',

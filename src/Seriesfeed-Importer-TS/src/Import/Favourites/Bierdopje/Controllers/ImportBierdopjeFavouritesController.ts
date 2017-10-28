@@ -4,7 +4,7 @@ module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeFavouritesController {
         private _username: string;
         private _selectedShows: Array<Models.Show>;
-        private _table: Models.Table;
+        private _table: ViewModels.Table;
 
         constructor(username: string, selectedSeries: Array<Models.Show>) {
             this._username = username;
@@ -44,7 +44,7 @@ module SeriesfeedImporter.Controllers {
         private initialise(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            this._table = new Models.Table();
+            this._table = new ViewModels.Table();
             const seriesStatusIcon = $('<th/>');
             const seriesColumn = $('<th/>').text('Serie');
             const statusColumn = $('<th/>').text('Status');

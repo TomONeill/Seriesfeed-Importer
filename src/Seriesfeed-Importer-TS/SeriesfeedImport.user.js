@@ -70,12 +70,12 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(breadcrumbs);
             }
             addFavourites(cardContent) {
-                const favourites = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection), "100%");
+                const favourites = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection), "100%");
                 favourites.instance.css({ marginTop: '0px' });
                 cardContent.append(favourites.instance);
             }
             addTimeWasted(cardContent) {
-                const timeWasted = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje), "100%");
+                const timeWasted = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje), "100%");
                 cardContent.append(timeWasted.instance);
             }
         }
@@ -131,11 +131,11 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.Models.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
                 this._nextButton.instance.hide();
             }
             initialiseCollectingData() {
-                this._collectingData = new SeriesfeedImporter.Models.ReadMoreButton("Gegevens verzamelen...");
+                this._collectingData = new SeriesfeedImporter.ViewModels.ReadMoreButton("Gegevens verzamelen...");
                 this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' });
                 this._collectingData.instance.hide();
             }
@@ -155,8 +155,8 @@ var SeriesfeedImporter;
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const table = new SeriesfeedImporter.Models.Table();
-                const checkboxAll = new SeriesfeedImporter.Models.Checkbox('select-all');
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
                 checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
                 const selectAllColumn = $('<th/>').append(checkboxAll.instance);
                 const seriesColumn = $('<th/>').text('Serie');
@@ -181,7 +181,7 @@ var SeriesfeedImporter;
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>');
                         const showColumn = $('<td/>');
-                        const checkbox = new SeriesfeedImporter.Models.Checkbox(`show_${index}`);
+                        const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
                                 this._currentCalls.push(index);
@@ -297,7 +297,7 @@ var SeriesfeedImporter;
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this._table = new SeriesfeedImporter.Models.Table();
+                this._table = new SeriesfeedImporter.ViewModels.Table();
                 const seriesStatusIcon = $('<th/>');
                 const seriesColumn = $('<th/>').text('Serie');
                 const statusColumn = $('<th/>').text('Status');
@@ -488,7 +488,7 @@ var SeriesfeedImporter;
             }
             initialiseCurrentUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this._user = new SeriesfeedImporter.Models.User();
+                this._user = new SeriesfeedImporter.ViewModels.User();
                 this._user.setTopText("Huidige gebruiker");
                 this._user.setWidth('49%');
                 this._user.setUsername("Laden...");
@@ -498,7 +498,7 @@ var SeriesfeedImporter;
                     event.stopPropagation();
                     this.loadUser();
                 };
-                const refreshButton = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+                const refreshButton = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
                 refreshButton.instance.css({
                     position: 'absolute',
                     left: '0',
@@ -525,7 +525,7 @@ var SeriesfeedImporter;
             }
             initialiseCustomUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this._customUser = new SeriesfeedImporter.Models.User();
+                this._customUser = new SeriesfeedImporter.ViewModels.User();
                 this._customUser.setTopText("Andere gebruiker");
                 this._customUser.setWidth('49%');
                 this._customUser.instance.css({ marginLeft: '1%' });
@@ -553,7 +553,7 @@ var SeriesfeedImporter;
                         }
                     });
                 };
-                const searchButton = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-search", null, searchButtonAction, "15%");
+                const searchButton = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-search", null, searchButtonAction, "15%");
                 searchButton.instance.css({
                     marginTop: '0',
                     borderRadius: '0px 5px 5px 0px',
@@ -743,7 +743,7 @@ var SeriesfeedImporter;
                     + 'of het onderstaande account waarop je nu bent ingelogd op '
                     + '<a href="http://www.imdb.com/">www.imdb.com</a> het '
                     + 'account is waarvan je wilt importeren.';
-                const userProfile = new SeriesfeedImporter.Models.User();
+                const userProfile = new SeriesfeedImporter.ViewModels.User();
                 userProfile.setUsername("Laden...");
                 this.stepTitle.html(titleCardText);
                 this.stepContent.html(innerCardText);
@@ -997,7 +997,7 @@ var SeriesfeedImporter;
             }
             initialiseCurrentUser() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this._user = new SeriesfeedImporter.Models.User();
+                this._user = new SeriesfeedImporter.ViewModels.User();
                 this._user.setUsername("Laden...");
                 this._user.instance.css({ marginRight: '1%' });
                 cardContent.append(this._user.instance);
@@ -1005,7 +1005,7 @@ var SeriesfeedImporter;
                     event.stopPropagation();
                     this.loadUser();
                 };
-                const refreshButton = new SeriesfeedImporter.Models.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+                const refreshButton = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
                 refreshButton.instance.css({
                     position: 'absolute',
                     left: '0',
@@ -1304,7 +1304,7 @@ var SeriesfeedImporter;
                     SeriesfeedImporter.Services.StorageService.clearAll();
                     setTimeout(() => dataDeleted.show(), 100);
                 };
-                const button = new SeriesfeedImporter.Models.Button('btn-success', 'fa-trash', "Lokale gegevens wissen", buttonAction);
+                const button = new SeriesfeedImporter.ViewModels.Button('btn-success', 'fa-trash', "Lokale gegevens wissen", buttonAction);
                 block.append(card);
                 card.append(cardContent);
                 cardContent.append(cardTitle);
@@ -1395,379 +1395,9 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Models;
     (function (Models) {
-        class Button {
-            constructor(buttonType, iconClass, text, action, width) {
-                this.instance = $('<div/>').addClass('btn');
-                this.icon = $('<i/>').addClass('fa');
-                this.text = $('<span/>');
-                this.setButtonType(buttonType);
-                this.setClick(action);
-                this.setIcon(iconClass);
-                this.setText(text);
-                this.setWidth(width);
-                this.instance.append(this.icon);
-                this.instance.append(this.text);
-            }
-            setButtonType(buttonType) {
-                if (this.currentButtonType != null || this.currentButtonType !== "") {
-                    this.instance.removeClass(this.currentButtonType);
-                    this.currentButtonType = null;
-                }
-                this.instance.addClass(buttonType);
-                this.currentButtonType = buttonType;
-            }
-            setClick(action) {
-                this.instance.unbind('click');
-                if (action == null) {
-                    return;
-                }
-                this.instance.click(action);
-            }
-            setIcon(iconClass) {
-                if (this.currentIconClass != null || this.currentIconClass !== "") {
-                    this.icon.removeClass(this.currentIconClass);
-                    this.currentIconClass = null;
-                }
-                this.icon.addClass(iconClass);
-                this.currentIconClass = iconClass;
-            }
-            setText(text) {
-                if (text == null) {
-                    this.text.text('');
-                    return;
-                }
-                this.text.text(text);
-            }
-            setWidth(width) {
-                this.instance.css({
-                    width: width == null ? 'auto' : width
-                });
-            }
-        }
-        Models.Button = Button;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
-        class Card {
-            constructor() {
-                this.instance = $('<div/>').addClass("cardStyle cardForm formBlock").css({ transition: 'max-width .3s ease-in-out' });
-                this.backButton = this.createBackButton();
-                const titleContainer = $('<h2/>').css({ height: '60px' });
-                this.title = $('<span/>');
-                this.breadcrumbs = this.createBreadcrumbs();
-                this.content = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
-                this.instance.append(titleContainer);
-                titleContainer.append(this.title);
-                titleContainer.append(this.backButton);
-                this.instance.append(this.breadcrumbs);
-                this.instance.append(this.content);
-            }
-            createBackButton() {
-                return $('<i/>').css({
-                    display: 'none',
-                    float: 'left',
-                    padding: '5px',
-                    margin: '-4px',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    left: '10px'
-                }).addClass("fa fa-arrow-left");
-            }
-            createBreadcrumbs() {
-                const breadcrumbs = $('<h2/>').css({
-                    display: 'none',
-                    fontSize: '12px',
-                    padding: '10px 15px',
-                    background: '#5f7192',
-                    borderRadius: '0 0 0 0',
-                    mozBorderRadius: '0 0 0 0',
-                    webkitBorderRadius: '0 0 0 0'
-                });
-                return breadcrumbs;
-            }
-            setBackButtonUrl(url) {
-                this.backButton.hide();
-                this.backButton.click(() => { });
-                if (url == null) {
-                    return;
-                }
-                this.backButton.show();
-                this.backButton.click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
-            }
-            setTitle(title) {
-                if (title == null) {
-                    title = '';
-                }
-                this.title.text(title);
-            }
-            setBreadcrumbs(breadcrumbs) {
-                this.breadcrumbs.hide();
-                this.breadcrumbs.empty();
-                if (breadcrumbs == null || breadcrumbs.length === 0) {
-                    return;
-                }
-                for (let i = 0; i < breadcrumbs.length; i++) {
-                    const breadcrumb = breadcrumbs[i];
-                    const link = $('<span/>').text(breadcrumb.text);
-                    if (breadcrumb.shortUrl != null) {
-                        link
-                            .css({ cursor: 'pointer', color: '#bfc6d2' })
-                            .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadcrumb.shortUrl));
-                    }
-                    this.breadcrumbs.append(link);
-                    if (i < breadcrumbs.length - 1) {
-                        const chevronRight = $('<i/>')
-                            .addClass('fa fa-chevron-right')
-                            .css({
-                            fontSize: '9px',
-                            padding: '0 5px',
-                            cursor: 'default'
-                        });
-                        this.breadcrumbs.append(chevronRight);
-                    }
-                    else {
-                        link.css({ color: '#ffffff' });
-                    }
-                }
-                this.breadcrumbs.show();
-            }
-            setContent(content) {
-                this.content.empty();
-                if (content == null) {
-                    return;
-                }
-                this.content.append(content);
-            }
-            clear() {
-                this.setTitle(null);
-                this.setBackButtonUrl(null);
-                this.setBreadcrumbs(null);
-                this.setContent(null);
-                this.setWidth();
-            }
-            setWidth(width) {
-                this.instance.css({
-                    maxWidth: width != null ? width : '400px'
-                });
-            }
-        }
-        Models.Card = Card;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
-        class Checkbox {
-            constructor(name) {
-                this.instance = $('<fieldset/>');
-                this.input = $('<input/>').attr('type', 'checkbox').addClass('hideCheckbox');
-                this.label = $('<label/>');
-                const span = $('<span/>').addClass('check');
-                this.instance.append(this.input);
-                this.instance.append(this.label);
-                this.label.append(span);
-                if (name != null && name !== '') {
-                    this.name = name;
-                }
-                this.subscribers = [];
-                this.input.click(() => this.toggleCheck());
-            }
-            set name(value) {
-                this.input
-                    .attr('id', value)
-                    .attr('name', value);
-                this.label.attr('for', value);
-            }
-            toggleCheck() {
-                if (this.input.attr('checked') == null) {
-                    this.input.attr('checked', 'checked');
-                    this.callSubscribers(true);
-                }
-                else {
-                    this.input.removeAttr('checked');
-                    this.callSubscribers(false);
-                }
-            }
-            callSubscribers(isEnabled) {
-                this.subscribers.forEach((subscriber) => {
-                    subscriber(isEnabled);
-                });
-            }
-            subscribe(subscriber) {
-                this.subscribers.push(subscriber);
-            }
-            check() {
-                if (this.input.attr('checked') == null) {
-                    this.input.click();
-                    this.input.attr('checked', 'checked');
-                }
-            }
-            uncheck() {
-                if (this.input.attr('checked') != null) {
-                    this.input.click();
-                    this.input.removeAttr('checked');
-                }
-            }
-        }
-        Models.Checkbox = Checkbox;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
-        class ReadMoreButton {
-            constructor(text, action) {
-                this.instance = $('<div/>').addClass('readMore').css({ paddingRight: '10px' });
-                const innerButton = $('<div/>').css({ textAlign: 'right' });
-                this.link = $('<a/>');
-                this.instance.append(innerButton);
-                innerButton.append(this.link);
-                this.text = text;
-                this.setClick(action);
-            }
-            set text(value) {
-                if (value == null) {
-                    this.link.text('');
-                    return;
-                }
-                this.link.text(value);
-            }
-            setClick(action) {
-                this.instance.css({ cursor: 'default' }).unbind('click');
-                if (action == null) {
-                    return;
-                }
-                this.instance
-                    .css({ cursor: 'pointer' })
-                    .click(action);
-            }
-        }
-        Models.ReadMoreButton = ReadMoreButton;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
         class Show {
         }
         Models.Show = Show;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
-        class Table {
-            constructor() {
-                this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only');
-                const thead = $('<thead/>');
-                this.headerRow = $('<tr/>');
-                this.tbody = $('<tbody/>');
-                thead.append(this.headerRow);
-                this.instance.append(thead);
-                this.instance.append(this.tbody);
-            }
-            addHeaderItem(th) {
-                this.headerRow.append(th);
-            }
-            addTheadItems(thCollection) {
-                thCollection.map((th) => this.headerRow.append(th));
-            }
-            addRow(tr) {
-                this.tbody.append(tr);
-            }
-            getRow(index) {
-                const row = this.tbody.children()[index];
-                return $(row);
-            }
-            updateRow(index, value) {
-                const row = this.tbody.children()[index];
-                return $(row).replaceWith(value);
-            }
-        }
-        Models.Table = Table;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
-        class User {
-            constructor() {
-                this.unknownUserAvatarUrl = "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg";
-                this.instance = $('<div/>').addClass("portfolio mix_all");
-                const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle").css({ cursor: 'inherit' });
-                this.topText = $('<h4/>').css({ padding: '15px 0 0 15px' });
-                const hover = $('<div/>').addClass("portfolio-hover").css({ padding: '15px 15px 5px 15px', height: '170px' });
-                this.avatar = $('<img/>').addClass("user-img").css({ maxHeight: '150px' }).attr('src', this.unknownUserAvatarUrl);
-                this.username = $('<h3/>').addClass("user-name");
-                const info = $('<div/>').addClass("portfolio-info").css({ height: '90px' });
-                const title = $('<div/>').addClass("portfolio-title");
-                this.instance
-                    .css({
-                    position: 'relative',
-                    display: 'inline-block',
-                    width: '100%',
-                    transition: 'all .24s ease-in-out'
-                });
-                hover
-                    .css({
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                });
-                this.instance.append(wrapper);
-                wrapper.append(this.topText);
-                wrapper.append(hover);
-                hover.append(this.avatar);
-                wrapper.append(info);
-                info.append(title);
-                title.append(this.username);
-            }
-            setTopText(text) {
-                this.topText.text(text);
-            }
-            setUsername(username) {
-                this.username.text(username);
-            }
-            replaceUsername(element) {
-                this.username.replaceWith(element);
-            }
-            setAvatarUrl(avatarUrl) {
-                if (avatarUrl == null || avatarUrl === "") {
-                    this.avatar.attr('src', this.unknownUserAvatarUrl);
-                }
-                this.avatar.attr('src', avatarUrl);
-            }
-            setWidth(width) {
-                this.instance.css({
-                    width: width != null ? width : 'auto'
-                });
-            }
-            set onClick(action) {
-                this.instance.css({ cursor: 'default' }).unbind('mouseenter mouseleave click');
-                if (action == null) {
-                    return;
-                }
-                this.instance
-                    .css({ cursor: 'pointer' })
-                    .hover(() => this.instance.css({
-                    webkitBoxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)',
-                    boxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)'
-                }), () => this.instance.css({
-                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
-                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
-                }))
-                    .click(action);
-            }
-        }
-        Models.User = User;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1884,7 +1514,7 @@ var SeriesfeedImporter;
     (function (Services) {
         class CardService {
             static initialise() {
-                this.card = new SeriesfeedImporter.Models.Card();
+                this.card = new SeriesfeedImporter.ViewModels.Card();
                 return this.card;
             }
             static getCard() {
@@ -1915,6 +1545,376 @@ var SeriesfeedImporter;
         }
         Services.StorageService = StorageService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class Button {
+            constructor(buttonType, iconClass, text, action, width) {
+                this.instance = $('<div/>').addClass('btn');
+                this.icon = $('<i/>').addClass('fa');
+                this.text = $('<span/>');
+                this.setButtonType(buttonType);
+                this.setClick(action);
+                this.setIcon(iconClass);
+                this.setText(text);
+                this.setWidth(width);
+                this.instance.append(this.icon);
+                this.instance.append(this.text);
+            }
+            setButtonType(buttonType) {
+                if (this.currentButtonType != null || this.currentButtonType !== "") {
+                    this.instance.removeClass(this.currentButtonType);
+                    this.currentButtonType = null;
+                }
+                this.instance.addClass(buttonType);
+                this.currentButtonType = buttonType;
+            }
+            setClick(action) {
+                this.instance.unbind('click');
+                if (action == null) {
+                    return;
+                }
+                this.instance.click(action);
+            }
+            setIcon(iconClass) {
+                if (this.currentIconClass != null || this.currentIconClass !== "") {
+                    this.icon.removeClass(this.currentIconClass);
+                    this.currentIconClass = null;
+                }
+                this.icon.addClass(iconClass);
+                this.currentIconClass = iconClass;
+            }
+            setText(text) {
+                if (text == null) {
+                    this.text.text('');
+                    return;
+                }
+                this.text.text(text);
+            }
+            setWidth(width) {
+                this.instance.css({
+                    width: width == null ? 'auto' : width
+                });
+            }
+        }
+        ViewModels.Button = Button;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class Card {
+            constructor() {
+                this.instance = $('<div/>').addClass("cardStyle cardForm formBlock").css({ transition: 'max-width .3s ease-in-out' });
+                this.backButton = this.createBackButton();
+                const titleContainer = $('<h2/>').css({ height: '60px' });
+                this.title = $('<span/>');
+                this.breadcrumbs = this.createBreadcrumbs();
+                this.content = $('<div/>').attr('id', SeriesfeedImporter.Config.Id.CardContent).addClass("cardFormInner");
+                this.instance.append(titleContainer);
+                titleContainer.append(this.title);
+                titleContainer.append(this.backButton);
+                this.instance.append(this.breadcrumbs);
+                this.instance.append(this.content);
+            }
+            createBackButton() {
+                return $('<i/>').css({
+                    display: 'none',
+                    float: 'left',
+                    padding: '5px',
+                    margin: '-4px',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    left: '10px'
+                }).addClass("fa fa-arrow-left");
+            }
+            createBreadcrumbs() {
+                const breadcrumbs = $('<h2/>').css({
+                    display: 'none',
+                    fontSize: '12px',
+                    padding: '10px 15px',
+                    background: '#5f7192',
+                    borderRadius: '0 0 0 0',
+                    mozBorderRadius: '0 0 0 0',
+                    webkitBorderRadius: '0 0 0 0'
+                });
+                return breadcrumbs;
+            }
+            setBackButtonUrl(url) {
+                this.backButton.hide();
+                this.backButton.click(() => { });
+                if (url == null) {
+                    return;
+                }
+                this.backButton.show();
+                this.backButton.click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
+            }
+            setTitle(title) {
+                if (title == null) {
+                    title = '';
+                }
+                this.title.text(title);
+            }
+            setBreadcrumbs(breadcrumbs) {
+                this.breadcrumbs.hide();
+                this.breadcrumbs.empty();
+                if (breadcrumbs == null || breadcrumbs.length === 0) {
+                    return;
+                }
+                for (let i = 0; i < breadcrumbs.length; i++) {
+                    const breadcrumb = breadcrumbs[i];
+                    const link = $('<span/>').text(breadcrumb.text);
+                    if (breadcrumb.shortUrl != null) {
+                        link
+                            .css({ cursor: 'pointer', color: '#bfc6d2' })
+                            .click(() => SeriesfeedImporter.Services.RouterService.navigate(breadcrumb.shortUrl));
+                    }
+                    this.breadcrumbs.append(link);
+                    if (i < breadcrumbs.length - 1) {
+                        const chevronRight = $('<i/>')
+                            .addClass('fa fa-chevron-right')
+                            .css({
+                            fontSize: '9px',
+                            padding: '0 5px',
+                            cursor: 'default'
+                        });
+                        this.breadcrumbs.append(chevronRight);
+                    }
+                    else {
+                        link.css({ color: '#ffffff' });
+                    }
+                }
+                this.breadcrumbs.show();
+            }
+            setContent(content) {
+                this.content.empty();
+                if (content == null) {
+                    return;
+                }
+                this.content.append(content);
+            }
+            clear() {
+                this.setTitle(null);
+                this.setBackButtonUrl(null);
+                this.setBreadcrumbs(null);
+                this.setContent(null);
+                this.setWidth();
+            }
+            setWidth(width) {
+                this.instance.css({
+                    maxWidth: width != null ? width : '400px'
+                });
+            }
+        }
+        ViewModels.Card = Card;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class Checkbox {
+            constructor(name) {
+                this.instance = $('<fieldset/>');
+                this.input = $('<input/>').attr('type', 'checkbox').addClass('hideCheckbox');
+                this.label = $('<label/>');
+                const span = $('<span/>').addClass('check');
+                this.instance.append(this.input);
+                this.instance.append(this.label);
+                this.label.append(span);
+                if (name != null && name !== '') {
+                    this.name = name;
+                }
+                this.subscribers = [];
+                this.input.click(() => this.toggleCheck());
+            }
+            set name(value) {
+                this.input
+                    .attr('id', value)
+                    .attr('name', value);
+                this.label.attr('for', value);
+            }
+            toggleCheck() {
+                if (this.input.attr('checked') == null) {
+                    this.input.attr('checked', 'checked');
+                    this.callSubscribers(true);
+                }
+                else {
+                    this.input.removeAttr('checked');
+                    this.callSubscribers(false);
+                }
+            }
+            callSubscribers(isEnabled) {
+                this.subscribers.forEach((subscriber) => {
+                    subscriber(isEnabled);
+                });
+            }
+            subscribe(subscriber) {
+                this.subscribers.push(subscriber);
+            }
+            check() {
+                if (this.input.attr('checked') == null) {
+                    this.input.click();
+                    this.input.attr('checked', 'checked');
+                }
+            }
+            uncheck() {
+                if (this.input.attr('checked') != null) {
+                    this.input.click();
+                    this.input.removeAttr('checked');
+                }
+            }
+        }
+        ViewModels.Checkbox = Checkbox;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class ReadMoreButton {
+            constructor(text, action) {
+                this.instance = $('<div/>').addClass('readMore').css({ paddingRight: '10px' });
+                const innerButton = $('<div/>').css({ textAlign: 'right' });
+                this.link = $('<a/>');
+                this.instance.append(innerButton);
+                innerButton.append(this.link);
+                this.text = text;
+                this.setClick(action);
+            }
+            set text(value) {
+                if (value == null) {
+                    this.link.text('');
+                    return;
+                }
+                this.link.text(value);
+            }
+            setClick(action) {
+                this.instance.css({ cursor: 'default' }).unbind('click');
+                if (action == null) {
+                    return;
+                }
+                this.instance
+                    .css({ cursor: 'pointer' })
+                    .click(action);
+            }
+        }
+        ViewModels.ReadMoreButton = ReadMoreButton;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class Table {
+            constructor() {
+                this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only');
+                const thead = $('<thead/>');
+                this.headerRow = $('<tr/>');
+                this.tbody = $('<tbody/>');
+                thead.append(this.headerRow);
+                this.instance.append(thead);
+                this.instance.append(this.tbody);
+            }
+            addHeaderItem(th) {
+                this.headerRow.append(th);
+            }
+            addTheadItems(thCollection) {
+                thCollection.map((th) => this.headerRow.append(th));
+            }
+            addRow(tr) {
+                this.tbody.append(tr);
+            }
+            getRow(index) {
+                const row = this.tbody.children()[index];
+                return $(row);
+            }
+            updateRow(index, value) {
+                const row = this.tbody.children()[index];
+                return $(row).replaceWith(value);
+            }
+        }
+        ViewModels.Table = Table;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class User {
+            constructor() {
+                this.unknownUserAvatarUrl = "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMjI2NDEyMjYyMF5BMl5BanBnXkFtZTcwMzM3MDk0OQ._SY100_SX100__zpshzfut2yd.jpg";
+                this.instance = $('<div/>').addClass("portfolio mix_all");
+                const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle").css({ cursor: 'inherit' });
+                this.topText = $('<h4/>').css({ padding: '15px 0 0 15px' });
+                const hover = $('<div/>').addClass("portfolio-hover").css({ padding: '15px 15px 5px 15px', height: '170px' });
+                this.avatar = $('<img/>').addClass("user-img").css({ maxHeight: '150px' }).attr('src', this.unknownUserAvatarUrl);
+                this.username = $('<h3/>').addClass("user-name");
+                const info = $('<div/>').addClass("portfolio-info").css({ height: '90px' });
+                const title = $('<div/>').addClass("portfolio-title");
+                this.instance
+                    .css({
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '100%',
+                    transition: 'all .24s ease-in-out'
+                });
+                hover
+                    .css({
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                });
+                this.instance.append(wrapper);
+                wrapper.append(this.topText);
+                wrapper.append(hover);
+                hover.append(this.avatar);
+                wrapper.append(info);
+                info.append(title);
+                title.append(this.username);
+            }
+            setTopText(text) {
+                this.topText.text(text);
+            }
+            setUsername(username) {
+                this.username.text(username);
+            }
+            replaceUsername(element) {
+                this.username.replaceWith(element);
+            }
+            setAvatarUrl(avatarUrl) {
+                if (avatarUrl == null || avatarUrl === "") {
+                    this.avatar.attr('src', this.unknownUserAvatarUrl);
+                }
+                this.avatar.attr('src', avatarUrl);
+            }
+            setWidth(width) {
+                this.instance.css({
+                    width: width != null ? width : 'auto'
+                });
+            }
+            set onClick(action) {
+                this.instance.css({ cursor: 'default' }).unbind('mouseenter mouseleave click');
+                if (action == null) {
+                    return;
+                }
+                this.instance
+                    .css({ cursor: 'pointer' })
+                    .hover(() => this.instance.css({
+                    webkitBoxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)'
+                }), () => this.instance.css({
+                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
+                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
+                }))
+                    .click(action);
+            }
+        }
+        ViewModels.User = User;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {

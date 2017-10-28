@@ -1,6 +1,6 @@
 /// <reference path="../../typings/index.d.ts" />
 
-module SeriesfeedImporter.Models {
+module SeriesfeedImporter.ViewModels {
     export class Card {
         public instance: JQuery<HTMLElement>;
         private backButton: JQuery<HTMLElement>;
@@ -69,7 +69,7 @@ module SeriesfeedImporter.Models {
             this.title.text(title);
         }
 
-        public setBreadcrumbs(breadcrumbs: Breadcrumb[]): void {
+        public setBreadcrumbs(breadcrumbs: Models.Breadcrumb[]): void {
             this.breadcrumbs.hide();
             this.breadcrumbs.empty();
 

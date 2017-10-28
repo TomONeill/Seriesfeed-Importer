@@ -75,7 +75,7 @@ module SeriesfeedImporter.Controllers {
                 + 'of het onderstaande account waarop je nu bent ingelogd op '
                 + '<a href="http://www.imdb.com/">www.imdb.com</a> het '
                 + 'account is waarvan je wilt importeren.';
-            const userProfile = new Models.User();
+            const userProfile = new ViewModels.User();
             userProfile.setUsername("Laden...");
 
             this.stepTitle.html(titleCardText);

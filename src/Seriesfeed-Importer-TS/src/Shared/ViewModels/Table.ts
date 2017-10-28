@@ -1,6 +1,6 @@
 /// <reference path="../../typings/index.d.ts" />
 
-module SeriesfeedImporter.Models {
+module SeriesfeedImporter.ViewModels {
     export class Table {
         public instance: JQuery<HTMLElement>;
         private headerRow: JQuery<HTMLElement>;

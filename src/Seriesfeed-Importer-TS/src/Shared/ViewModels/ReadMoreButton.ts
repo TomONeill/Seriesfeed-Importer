@@ -1,6 +1,6 @@
 /// <reference path="../../typings/index.d.ts" />
 
-module SeriesfeedImporter.Models {
+module SeriesfeedImporter.ViewModels {
     export class ReadMoreButton {
         public instance: JQuery<HTMLElement>;
         private link: JQuery<HTMLElement>;

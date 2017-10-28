@@ -23,14 +23,14 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addFavourites(cardContent: JQuery<HTMLElement>): void {
-            const favourites = new Models.Button(Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => Services.RouterService.navigate(Enums.ShortUrl.ImportSourceSelection), "100%");
+            const favourites = new ViewModels.Button(Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => Services.RouterService.navigate(Enums.ShortUrl.ImportSourceSelection), "100%");
             favourites.instance.css({ marginTop: '0px' });
 
             cardContent.append(favourites.instance);
         }
 
         private addTimeWasted(cardContent: JQuery<HTMLElement>): void {
-            const timeWasted = new Models.Button(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje), "100%");
+            const timeWasted = new ViewModels.Button(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje), "100%");
             cardContent.append(timeWasted.instance);
         }
     }

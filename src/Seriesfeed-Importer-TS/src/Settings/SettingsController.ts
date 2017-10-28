@@ -26,7 +26,7 @@ module SeriesfeedImporter.Controllers {
                 Services.StorageService.clearAll();
                 setTimeout(() => dataDeleted.show(), 100);
             };
-            const button = new Models.Button('btn-success', 'fa-trash', "Lokale gegevens wissen", buttonAction);
+            const button = new ViewModels.Button('btn-success', 'fa-trash', "Lokale gegevens wissen", buttonAction);
 
             block.append(card);
             card.append(cardContent);

@@ -2,8 +2,8 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImportBierdopjeFavouritesUserSelectionController {
-        private _user: Models.User;
-        private _customUser: Models.User;
+        private _user: ViewModels.User;
+        private _customUser: ViewModels.User;
 
         constructor() {
             this.initialiseCard();
@@ -27,7 +27,7 @@ module SeriesfeedImporter.Controllers {
         private initialiseCurrentUser(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            this._user = new Models.User();
+            this._user = new ViewModels.User();
             this._user.setTopText("Huidige gebruiker");
             this._user.setWidth('49%');
             this._user.setUsername("Laden...");
@@ -39,7 +39,7 @@ module SeriesfeedImporter.Controllers {
                 event.stopPropagation();
                 this.loadUser();
             };
-            const refreshButton = new Models.Button(Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+            const refreshButton = new ViewModels.Button(Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
             refreshButton.instance.css({
                 position: 'absolute',
                 left: '0',
@@ -68,7 +68,7 @@ module SeriesfeedImporter.Controllers {
         private initialiseCustomUser(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            this._customUser = new Models.User();
+            this._customUser = new ViewModels.User();
             this._customUser.setTopText("Andere gebruiker");
             this._customUser.setWidth('49%');
             this._customUser.instance.css({ marginLeft: '1%' });
@@ -98,7 +98,7 @@ module SeriesfeedImporter.Controllers {
                         }
                     });
             };
-            const searchButton = new Models.Button(Enums.ButtonType.Success, "fa-search", null, searchButtonAction, "15%");
+            const searchButton = new ViewModels.Button(Enums.ButtonType.Success, "fa-search", null, searchButtonAction, "15%");
             searchButton.instance.css({
                 marginTop: '0',
                 borderRadius: '0px 5px 5px 0px',

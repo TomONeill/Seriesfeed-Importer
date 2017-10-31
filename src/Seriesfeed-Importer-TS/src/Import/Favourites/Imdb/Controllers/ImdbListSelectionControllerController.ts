@@ -45,7 +45,7 @@ module SeriesfeedImporter.Controllers {
                 new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportImdb}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
-            card.setWidth('600px');
+            card.setWidth('650px');
             card.setContent();
         }
 
@@ -79,7 +79,7 @@ module SeriesfeedImporter.Controllers {
                 .then((lists) => {
                     lists.each((index, list) => {
                         const imdbList = new Models.ImdbList();
-                        imdbList.name = $(list).find('.name').text();
+                        imdbList.name = $(list).find('.name a').text();
                         imdbList.slug = $(list).find('.name a').attr('href');
                         imdbList.seriesCount = $(list).find('.name span').text();
                         imdbList.createdOn = $(list).find('.created').text();

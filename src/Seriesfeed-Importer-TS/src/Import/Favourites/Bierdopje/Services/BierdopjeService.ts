@@ -35,6 +35,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
+        // TODO: return type to models.
         public static getFavouritesByUsername(username: string): Promise<JQuery<HTMLElement>> {
             const url = Config.BierdopjeBaseUrl + "/users/" + username + "/shows";
 

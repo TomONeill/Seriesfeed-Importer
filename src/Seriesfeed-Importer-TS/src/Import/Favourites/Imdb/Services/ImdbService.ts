@@ -27,6 +27,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
+        // TODO: return type to models.
         public static getListsByUserId(userId: string): Promise<JQuery> {
             return Services.AjaxService.get(Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                 .then((pageData) => {

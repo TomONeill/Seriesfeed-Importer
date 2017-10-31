@@ -89,13 +89,13 @@ module SeriesfeedImporter.Services {
         private static navigateOther(url: Enums.ShortUrl): void {
             if (url.startsWith(Enums.ShortUrl.ImportBierdopje)) {
                 const username = url.substr(url.lastIndexOf('/') + 1);
-                this.importBierdopjeUser(username);
+                this.importBierdopjeUser(decodeURI(username));
                 return;
             }
 
             if (url.startsWith(Enums.ShortUrl.ImportImdb)) {
                 const username = url.substr(url.lastIndexOf('/') + 1);
-                this.importImdbUser(username);
+                this.importImdbUser(decodeURI(username));
                 return;
             }
         }

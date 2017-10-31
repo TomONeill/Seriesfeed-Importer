@@ -737,7 +737,7 @@ var SeriesfeedImporter;
                 const loadingData = $('<div/>');
                 const loadingFavourites = $('<h4/>').css({ padding: '15px' });
                 const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Lijsten ophalen...");
-                const starIcon = $('<i/>').addClass('fa fa-list-ul fa-spin');
+                const starIcon = $('<i/>').addClass('fa fa-list-ul fa-flip');
                 loadingData.append(loadingFavourites);
                 loadingFavourites
                     .append(starIcon)
@@ -1390,12 +1390,12 @@ var SeriesfeedImporter;
             static navigateOther(url) {
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)) {
                     const username = url.substr(url.lastIndexOf('/') + 1);
-                    this.importBierdopjeUser(username);
+                    this.importBierdopjeUser(decodeURI(username));
                     return;
                 }
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportImdb)) {
                     const username = url.substr(url.lastIndexOf('/') + 1);
-                    this.importImdbUser(username);
+                    this.importImdbUser(decodeURI(username));
                     return;
                 }
             }
@@ -2098,6 +2098,19 @@ var SeriesfeedImporter;
                     + '    '
                     + '    tr.row-info {'
                     + '        background-color: rgba(240, 248, 255, 1.00);'
+                    + '    }'
+                    + ''
+                    + '    .fa-flip {'
+                    + '        animation-name: flip;'
+                    + '        animation-duration: 2s;'
+                    + '        animation-iteration-count: infinite;'
+                    + '        animation-direction: alternate;'
+                    + '        animation-timing-function: ease-in-out;'
+                    + '    }'
+                    + ''
+                    + '    @keyframes flip {'
+                    + '        0% { transform: rotateX(0); }'
+                    + '        50% { transform: rotateX(180deg); }'
                     + '    }'
                     + '</style>';
                 $('body').append(css);

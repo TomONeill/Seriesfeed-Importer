@@ -57,6 +57,19 @@ module SeriesfeedImporter.Services {
                 + '    tr.row-info {'
                 + '        background-color: rgba(240, 248, 255, 1.00);'
                 + '    }'
+                + ''
+                + '    .fa-flip {'
+                + '        animation-name: flip;'
+                + '        animation-duration: 2s;'
+                + '        animation-iteration-count: infinite;'
+                + '        animation-direction: alternate;'
+                + '        animation-timing-function: ease-in-out;'
+                + '    }'
+                + ''
+                + '    @keyframes flip {'
+                + '        0% { transform: rotateX(0); }'
+                + '        50% { transform: rotateX(180deg); }'
+                + '    }'
                 + '</style>';
             $('body').append(css);
         }

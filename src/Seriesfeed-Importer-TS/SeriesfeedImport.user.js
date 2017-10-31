@@ -693,7 +693,8 @@ var SeriesfeedImporter;
     var Controllers;
     (function (Controllers) {
         class ImdbListSelectionControllerController {
-            constructor(username) {
+            constructor(userId, username) {
+                this._userId = userId;
                 this._username = username;
                 this._checkboxes = [];
                 this._selectedLists = [];
@@ -723,7 +724,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportImdb}${this._username}`)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
-                card.setWidth();
+                card.setWidth('600px');
                 card.setContent();
             }
             initialise() {
@@ -732,8 +733,11 @@ var SeriesfeedImporter;
                 const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
                 checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
                 const selectAllColumn = $('<th/>').append(checkboxAll.instance);
-                const seriesColumn = $('<th/>').text('Serie');
-                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const listHeaderColumn = $('<th/>').text('Lijst');
+                const seriesCountHeaderColumn = $('<th/>').text('Titels');
+                const createdOnHeaderColumn = $('<th/>').text('Aangemaakt op');
+                const modifiedOnHeaderColumn = $('<th/>').text('Laatst bewerkt');
+                table.addTheadItems([selectAllColumn, listHeaderColumn, seriesCountHeaderColumn, createdOnHeaderColumn, modifiedOnHeaderColumn]);
                 const loadingData = $('<div/>');
                 const loadingFavourites = $('<h4/>').css({ padding: '15px' });
                 const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Lijsten ophalen...");
@@ -746,6 +750,44 @@ var SeriesfeedImporter;
                     .append(loadingData)
                     .append(this._collectingData.instance)
                     .append(this._nextButton.instance);
+                SeriesfeedImporter.Services.ImdbService.getListsByUserId(this._userId)
+                    .then((lists) => {
+                    lists.each((index, list) => {
+                        const imdbList = new SeriesfeedImporter.Models.ImdbList();
+                        imdbList.name = $(list).find('.name').text();
+                        imdbList.slug = $(list).find('.name a').attr('href');
+                        imdbList.seriesCount = $(list).find('.name span').text();
+                        imdbList.createdOn = $(list).find('.created').text();
+                        imdbList.modifiedOn = $(list).find('.modified').text();
+                        const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
+                        checkbox.subscribe((isEnabled) => {
+                            if (isEnabled) {
+                                this.setCollectingData();
+                                this._selectedLists.push(imdbList);
+                            }
+                            else {
+                                const position = this._selectedLists.map((list) => list.name).indexOf(imdbList.name);
+                                this._selectedLists.splice(position, 1);
+                            }
+                            this.setNextButton();
+                        });
+                        this._checkboxes.push(checkbox);
+                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.ImdbBaseUrl + imdbList.slug).attr('target', '_blank').text(imdbList.name);
+                        const row = $('<tr/>');
+                        const selectColumn = $('<td/>').append(checkbox.instance);
+                        const listColumn = $('<td/>').append(showLink);
+                        const seriesCountColumn = $('<td/>').text(imdbList.seriesCount);
+                        const createdOnColumn = $('<td/>').text(imdbList.createdOn);
+                        const modifiedOnColumn = $('<td/>').text(imdbList.modifiedOn);
+                        row.append(selectColumn);
+                        row.append(listColumn);
+                        row.append(seriesCountColumn);
+                        row.append(createdOnColumn);
+                        row.append(modifiedOnColumn);
+                        table.addRow(row);
+                    });
+                    loadingData.replaceWith(table.instance);
+                });
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {
@@ -901,7 +943,7 @@ var SeriesfeedImporter;
                 this.stepTitle.after(this.stepContent);
                 this.stepContent.after(loadingData);
                 listsTable.append(tableHeader);
-                SeriesfeedImporter.Services.ImdbService.getListsById(this._userId)
+                SeriesfeedImporter.Services.ImdbService.getListsByUserId(this._userId)
                     .then((lists) => {
                     lists.each((index, list) => {
                         const listId = $(list).attr("id");
@@ -1128,7 +1170,7 @@ var SeriesfeedImporter;
                         this._user.setUsername("Niet ingelogd");
                     }
                     else {
-                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportImdb + user.username);
+                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportImdb + user.id + "/" + user.username);
                         this._user.setUsername(user.username);
                         SeriesfeedImporter.Services.ImdbService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
@@ -1138,6 +1180,15 @@ var SeriesfeedImporter;
         }
         Controllers.ImportImdbFavouritesUserSelectionController = ImportImdbFavouritesUserSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class ImdbList {
+        }
+        Models.ImdbList = ImdbList;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -1176,7 +1227,7 @@ var SeriesfeedImporter;
                     throw `Could not get avatar for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
                 });
             }
-            static getListsById(userId) {
+            static getListsByUserId(userId) {
                 return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
@@ -1377,10 +1428,10 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportImdbFavouritesUserSelectionController();
             }
-            static importImdbUser(username) {
+            static importImdbUser(userId, username) {
                 document.title = "IMDb lijsten selecteren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(username);
+                new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(userId, username);
             }
             static export() {
                 document.title = "Series exporteren | Seriesfeed";
@@ -1389,13 +1440,16 @@ var SeriesfeedImporter;
             }
             static navigateOther(url) {
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)) {
-                    const username = url.substr(url.lastIndexOf('/') + 1);
+                    const parts = url.split('/');
+                    const username = parts[parts.length - 1];
                     this.importBierdopjeUser(decodeURI(username));
                     return;
                 }
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportImdb)) {
-                    const username = url.substr(url.lastIndexOf('/') + 1);
-                    this.importImdbUser(decodeURI(username));
+                    const parts = url.split('/');
+                    const userId = parts[parts.length - 2];
+                    const username = parts[parts.length - 1];
+                    this.importImdbUser(userId, decodeURI(username));
                     return;
                 }
             }

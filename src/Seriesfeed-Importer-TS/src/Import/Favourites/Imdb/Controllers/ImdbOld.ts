@@ -142,7 +142,7 @@ module SeriesfeedImporter.Controllers {
             this.stepContent.after(loadingData);
             listsTable.append(tableHeader);
 
-            Services.ImdbService.getListsById(this._userId)
+            Services.ImdbService.getListsByUserId(this._userId)
                 .then((lists) => {
                     lists.each((index, list) => {
                         const listId = $(list).attr("id");

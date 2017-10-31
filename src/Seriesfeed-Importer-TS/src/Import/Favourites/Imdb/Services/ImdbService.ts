@@ -27,7 +27,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        public static getListsById(userId: string): Promise<JQuery> {
+        public static getListsByUserId(userId: string): Promise<JQuery> {
             return Services.AjaxService.get(Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                 .then((pageData) => {
                     const data = $(pageData.responseText);

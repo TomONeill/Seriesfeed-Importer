@@ -72,11 +72,11 @@ module SeriesfeedImporter.Services {
             new Controllers.ImportImdbFavouritesUserSelectionController();
         }
 
-        private static importImdbUser(username: string): void {
+        private static importImdbUser(userId: string, username: string): void {
             document.title = "IMDb lijsten selecteren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImdbListSelectionControllerController(username);
+            new Controllers.ImdbListSelectionControllerController(userId, username);
         }
 
         private static export(): void {
@@ -88,14 +88,17 @@ module SeriesfeedImporter.Services {
 
         private static navigateOther(url: Enums.ShortUrl): void {
             if (url.startsWith(Enums.ShortUrl.ImportBierdopje)) {
-                const username = url.substr(url.lastIndexOf('/') + 1);
+                const parts = url.split('/');
+                const username = parts[parts.length - 1];
                 this.importBierdopjeUser(decodeURI(username));
                 return;
             }
 
             if (url.startsWith(Enums.ShortUrl.ImportImdb)) {
-                const username = url.substr(url.lastIndexOf('/') + 1);
-                this.importImdbUser(decodeURI(username));
+                const parts = url.split('/');
+                const userId = parts[parts.length - 2];
+                const username = parts[parts.length - 1];
+                this.importImdbUser(userId, decodeURI(username));
                 return;
             }
         }

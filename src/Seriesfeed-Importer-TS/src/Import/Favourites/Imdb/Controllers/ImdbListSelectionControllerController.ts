@@ -2,6 +2,7 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImdbListSelectionControllerController {
+        private _userId: string;
         private _username: string;
         private _selectedLists: Array<any>;
         private _checkboxes: Array<ViewModels.Checkbox>;
@@ -9,7 +10,8 @@ module SeriesfeedImporter.Controllers {
         private _collectingData: ViewModels.ReadMoreButton;
         private _currentCalls: Array<number>;
 
-        constructor(username: string) {
+        constructor(userId: string, username: string) {
+            this._userId = userId;
             this._username = username;
             this._checkboxes = [];
             this._selectedLists = [];
@@ -43,7 +45,7 @@ module SeriesfeedImporter.Controllers {
                 new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportImdb}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
-            card.setWidth();
+            card.setWidth('600px');
             card.setContent();
         }
 
@@ -54,8 +56,11 @@ module SeriesfeedImporter.Controllers {
             const checkboxAll = new ViewModels.Checkbox('select-all');
             checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
             const selectAllColumn = $('<th/>').append(checkboxAll.instance);
-            const seriesColumn = $('<th/>').text('Serie');
-            table.addTheadItems([selectAllColumn, seriesColumn]);
+            const listHeaderColumn = $('<th/>').text('Lijst');
+            const seriesCountHeaderColumn = $('<th/>').text('Titels');
+            const createdOnHeaderColumn = $('<th/>').text('Aangemaakt op');
+            const modifiedOnHeaderColumn = $('<th/>').text('Laatst bewerkt');
+            table.addTheadItems([selectAllColumn, listHeaderColumn, seriesCountHeaderColumn, createdOnHeaderColumn, modifiedOnHeaderColumn]);
 
             const loadingData = $('<div/>');
             const loadingFavourites = $('<h4/>').css({ padding: '15px' });
@@ -70,49 +75,56 @@ module SeriesfeedImporter.Controllers {
                 .append(this._collectingData.instance)
                 .append(this._nextButton.instance);
 
-            // Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
-            //     favourites.each((index, favourite) => {
-            //         const show = new Models.Show();
-            //         show.name = $(favourite).text();
-            //         show.slug = $(favourite).attr('href');
+            Services.ImdbService.getListsByUserId(this._userId)
+                .then((lists) => {
+                    lists.each((index, list) => {
+                        const imdbList = new Models.ImdbList();
+                        imdbList.name = $(list).find('.name').text();
+                        imdbList.slug = $(list).find('.name a').attr('href');
+                        imdbList.seriesCount = $(list).find('.name span').text();
+                        imdbList.createdOn = $(list).find('.created').text();
+                        imdbList.modifiedOn = $(list).find('.modified').text();
 
-            //         const row = $('<tr/>');
-            //         const selectColumn = $('<td/>');
-            //         const showColumn = $('<td/>');
+                        const checkbox = new ViewModels.Checkbox(`show_${index}`);
+                        checkbox.subscribe((isEnabled) => {
+                            if (isEnabled) {
+                                //this._currentCalls.push(index);
+                                this.setCollectingData();
+                                // Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
+                                //     show.theTvdbId = theTvdbId;
+                                //     const position = this._currentCalls.indexOf(index);
+                                //     this._currentCalls.splice(position, 1);
+                                //     this.setCollectingData();
+                                // });
+                                this._selectedLists.push(imdbList);
+                            } else {
+                                const position = this._selectedLists.map((list) => list.name).indexOf(imdbList.name);
+                                this._selectedLists.splice(position, 1);
+                            }
 
-            //         const checkbox = new ViewModels.Checkbox(`show_${index}`);
-            //         checkbox.subscribe((isEnabled) => {
-            //             if (isEnabled) {
-            //                 this._currentCalls.push(index);
-            //                 this.setCollectingData();
-            //                 Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
-            //                     show.theTvdbId = theTvdbId;
-            //                     const position = this._currentCalls.indexOf(index);
-            //                     this._currentCalls.splice(position, 1);
-            //                     this.setCollectingData();
-            //                 });
-            //                 this._selectedShows.push(show);
-            //             } else {
-            //                 const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
-            //                 this._selectedShows.splice(position, 1);
-            //             }
+                            this.setNextButton();
+                        });
 
-            //             this.setNextButton();
-            //         });
+                        this._checkboxes.push(checkbox);
+                        const showLink = $('<a/>').attr('href', Config.ImdbBaseUrl + imdbList.slug).attr('target', '_blank').text(imdbList.name);
 
-            //         selectColumn.append(checkbox.instance);
-            //         this._checkboxes.push(checkbox);
+                        const row = $('<tr/>');
+                        const selectColumn = $('<td/>').append(checkbox.instance);
+                        const listColumn = $('<td/>').append(showLink);
+                        const seriesCountColumn = $('<td/>').text(imdbList.seriesCount);
+                        const createdOnColumn = $('<td/>').text(imdbList.createdOn);
+                        const modifiedOnColumn = $('<td/>').text(imdbList.modifiedOn);
 
-            //         const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
-            //         showColumn.append(showLink);
+                        row.append(selectColumn);
+                        row.append(listColumn);
+                        row.append(seriesCountColumn);
+                        row.append(createdOnColumn);
+                        row.append(modifiedOnColumn);
 
-            //         row.append(selectColumn);
-            //         row.append(showColumn);
-
-            //         table.addRow(row);
-            //     });
-            //     loadingData.replaceWith(table.instance);
-            // });
+                        table.addRow(row);
+                    });
+                    loadingData.replaceWith(table.instance);
+                });
         }
 
         private toggleAllCheckboxes(isEnabled: boolean): void {

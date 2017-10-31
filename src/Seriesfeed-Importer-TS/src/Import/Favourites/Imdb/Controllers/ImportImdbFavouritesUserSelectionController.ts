@@ -53,7 +53,7 @@ module SeriesfeedImporter.Controllers {
                         this._user.setAvatarUrl();
                         this._user.setUsername("Niet ingelogd");
                     } else {
-                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb + user.username);
+                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb + user.id + "/" + user.username);
                         this._user.setUsername(user.username);
                         Services.ImdbService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));

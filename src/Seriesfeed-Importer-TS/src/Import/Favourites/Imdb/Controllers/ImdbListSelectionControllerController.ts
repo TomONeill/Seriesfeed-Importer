@@ -75,7 +75,7 @@ module SeriesfeedImporter.Controllers {
                 .append(this._collectingData.instance)
                 .append(this._nextButton.instance);
 
-            Services.ImdbService.getListsByUserId(this._userId)
+            Services.ImdbImportService.getListsByUserId(this._userId)
                 .then((imdbLists) => {
                     imdbLists.forEach((imdbList, index) => {
                         const checkbox = new ViewModels.Checkbox(`show_${index}`);

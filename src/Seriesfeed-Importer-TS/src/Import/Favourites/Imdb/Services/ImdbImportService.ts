@@ -1,7 +1,7 @@
 /// <reference path="../../../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Services {
-    export class ImdbService {
+    export class ImdbImportService {
         public static getUser(): Promise<Models.ImdbUser> {
             return Services.AjaxService.get(Config.ImdbBaseUrl + "/helpdesk/contact")
                 .then((pageData) => {

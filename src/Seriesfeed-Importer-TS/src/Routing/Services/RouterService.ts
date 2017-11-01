@@ -28,6 +28,18 @@ module SeriesfeedImporter.Services {
                     this.export();
                     break;
 
+                case Enums.ShortUrl.ExportSourceSelection:
+                    this.exportSourceSelection();
+                    break;
+
+                case Enums.ShortUrl.ExportCsv:
+                    this.exportCsv();
+                    break;
+
+                case Enums.ShortUrl.ExportJson:
+                    this.exportJson();
+                    break;
+
                 default:
                     this.navigateOther(url);
                     break;
@@ -48,7 +60,7 @@ module SeriesfeedImporter.Services {
             document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.FavouritesController();
+            new Controllers.ImportFavouritesController();
         }
 
         private static importBierdopje(): void {
@@ -84,6 +96,34 @@ module SeriesfeedImporter.Services {
             CardService.getCard().clear();
 
             new Controllers.ExportController();
+        }
+
+        private static exportSourceSelection(): void {
+            document.title = "Bronkeuze | Favoriete series exporteren | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.ExportFavouritesController();
+        }
+
+        private static exportCsv(): void {
+            document.title = "Favorieten exporteren als CSV | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.CsvFavouriteSelectionController();
+        }
+
+        private static exportJson(): void {
+            document.title = "Favorieten exporteren als JSON | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.JsonFavouriteSelectionController();
+        }
+
+        private static exportXml(): void {
+            document.title = "Favorieten exporteren als XML | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.XmlFavouriteSelectionController();
         }
 
         private static navigateOther(url: Enums.ShortUrl): void {

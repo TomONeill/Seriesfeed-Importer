@@ -57,7 +57,7 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(null);
             }
             addFavourites(cardContent) {
-                const favourites = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection), "100%");
+                const favourites = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection), "100%");
                 favourites.instance.css({ marginTop: '0px' });
                 cardContent.append(favourites.instance);
             }
@@ -67,6 +67,272 @@ var SeriesfeedImporter;
             }
         }
         Controllers.ExportController = ExportController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ExportFavouritesController {
+            constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this.addCsv(cardContent);
+                this.addJson(cardContent);
+                this.addXml(cardContent);
+            }
+            initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Favorieten exporteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+            }
+            addCsv(cardContent) {
+                const csv = SeriesfeedImporter.Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", SeriesfeedImporter.Enums.ShortUrl.ExportCsv, "#209045");
+                cardContent.append(csv);
+            }
+            addJson(cardContent) {
+                const json = SeriesfeedImporter.Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", SeriesfeedImporter.Enums.ShortUrl.ExportJson, "#FFFFFF");
+                cardContent.append(json);
+            }
+            addXml(cardContent) {
+                const xml = SeriesfeedImporter.Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", SeriesfeedImporter.Enums.ShortUrl.ExportXml, "#FF6600");
+                cardContent.append(xml);
+            }
+        }
+        Controllers.ExportFavouritesController = ExportFavouritesController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class CsvFavouriteSelectionController {
+            constructor() {
+                this._checkboxes = [];
+                this._selectedShows = [];
+                this.initialiseNextButton();
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => { });
+                this._nextButton.instance.hide();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("CSV", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Exporteren", SeriesfeedImporter.Enums.ShortUrl.ExportCsv)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const loadingData = $('<div/>');
+                const loadingFavourites = $('<h4/>').css({ padding: '15px' });
+                const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Favorieten ophalen...");
+                const starIcon = $('<i/>').addClass('fa fa-star-o fa-spin');
+                loadingData.append(loadingFavourites);
+                loadingFavourites
+                    .append(starIcon)
+                    .append(loadingText);
+                cardContent
+                    .append(loadingData)
+                    .append(this._nextButton.instance);
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setNextButton() {
+                if (this._selectedShows.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.CsvFavouriteSelectionController = CsvFavouriteSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class JsonFavouriteSelectionController {
+            constructor() {
+                this._checkboxes = [];
+                this._selectedShows = [];
+                this.initialiseNextButton();
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => { });
+                this._nextButton.instance.hide();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("JSON", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Exporteren", SeriesfeedImporter.Enums.ShortUrl.ExportJson)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const loadingData = $('<div/>');
+                const loadingFavourites = $('<h4/>').css({ padding: '15px' });
+                const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Favorieten ophalen...");
+                const starIcon = $('<i/>').addClass('fa fa-star-o fa-spin');
+                loadingData.append(loadingFavourites);
+                loadingFavourites
+                    .append(starIcon)
+                    .append(loadingText);
+                cardContent
+                    .append(loadingData)
+                    .append(this._nextButton.instance);
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setNextButton() {
+                if (this._selectedShows.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.JsonFavouriteSelectionController = JsonFavouriteSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class XmlFavouriteSelectionController {
+            constructor() {
+                this._checkboxes = [];
+                this._selectedShows = [];
+                this.initialiseNextButton();
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => { });
+                this._nextButton.instance.hide();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("XML", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Exporteren", SeriesfeedImporter.Enums.ShortUrl.ExportXml)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const loadingData = $('<div/>');
+                const loadingFavourites = $('<h4/>').css({ padding: '15px' });
+                const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Favorieten ophalen...");
+                const starIcon = $('<i/>').addClass('fa fa-star-o fa-spin');
+                loadingData.append(loadingFavourites);
+                loadingFavourites
+                    .append(starIcon)
+                    .append(loadingText);
+                cardContent
+                    .append(loadingData)
+                    .append(this._nextButton.instance);
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setNextButton() {
+                if (this._selectedShows.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.XmlFavouriteSelectionController = XmlFavouriteSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -113,7 +379,7 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class FavouritesController {
+        class ImportFavouritesController {
             constructor() {
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
@@ -139,7 +405,7 @@ var SeriesfeedImporter;
                 cardContent.append(imdb);
             }
         }
-        Controllers.FavouritesController = FavouritesController;
+        Controllers.ImportFavouritesController = ImportFavouritesController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -783,7 +1049,7 @@ var SeriesfeedImporter;
                     .append(loadingData)
                     .append(this._collectingData.instance)
                     .append(this._nextButton.instance);
-                SeriesfeedImporter.Services.ImdbService.getListsByUserId(this._userId)
+                SeriesfeedImporter.Services.ImdbImportService.getListsByUserId(this._userId)
                     .then((imdbLists) => {
                     imdbLists.forEach((imdbList, index) => {
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
@@ -924,11 +1190,11 @@ var SeriesfeedImporter;
                 this.content.html(this.stepTitle);
                 this.stepTitle.after(this.stepContent);
                 this.stepContent.after(userProfile.instance);
-                SeriesfeedImporter.Services.ImdbService.getUser()
+                SeriesfeedImporter.Services.ImdbImportService.getUser()
                     .then((user) => {
                     this._userId = user.id;
                     this._username = user.username;
-                    SeriesfeedImporter.Services.ImdbService.getAvatarUrlByUserId(this._userId)
+                    SeriesfeedImporter.Services.ImdbImportService.getAvatarUrlByUserId(this._userId)
                         .then((avatarUrl) => {
                         const login = '<a href="http://www.imdb.com/" target="_blank">Inloggen</a>';
                         if (!avatarUrl) {
@@ -970,7 +1236,7 @@ var SeriesfeedImporter;
                 this.stepTitle.after(this.stepContent);
                 this.stepContent.after(loadingData);
                 listsTable.append(tableHeader);
-                SeriesfeedImporter.Services.ImdbService.getListsByUserId(this._userId)
+                SeriesfeedImporter.Services.ImdbImportService.getListsByUserId(this._userId)
                     .then((lists) => {
                     lists.forEach((list, index) => {
                         const listId = $(list).attr("id");
@@ -1038,7 +1304,7 @@ var SeriesfeedImporter;
                 outerProgress.append(progressBar);
                 loadingData.append(outerProgress);
                 $(this._selectedLists).each((i, list) => {
-                    SeriesfeedImporter.Services.ImdbService.getSeriesByListUrl(list.url)
+                    SeriesfeedImporter.Services.ImdbImportService.getSeriesByListUrl(list.url)
                         .then((series) => {
                         $(series).each((index, seriesItem) => {
                             const seriesName = seriesItem.name;
@@ -1189,7 +1455,7 @@ var SeriesfeedImporter;
                 this.loadUser();
             }
             loadUser() {
-                SeriesfeedImporter.Services.ImdbService.getUser()
+                SeriesfeedImporter.Services.ImdbImportService.getUser()
                     .then((user) => {
                     if (user == null) {
                         this._user.onClick = null;
@@ -1199,7 +1465,7 @@ var SeriesfeedImporter;
                     else {
                         this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportImdb + user.id + "/" + user.username);
                         this._user.setUsername(user.username);
-                        SeriesfeedImporter.Services.ImdbService.getAvatarUrlByUserId(user.id)
+                        SeriesfeedImporter.Services.ImdbImportService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
                     }
                 });
@@ -1230,7 +1496,7 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
-        class ImdbService {
+        class ImdbImportService {
             static getUser() {
                 return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/helpdesk/contact")
                     .then((pageData) => {
@@ -1312,7 +1578,7 @@ var SeriesfeedImporter;
                 });
             }
         }
-        Services.ImdbService = ImdbService;
+        Services.ImdbImportService = ImdbImportService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1447,6 +1713,15 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.Export:
                         this.export();
                         break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection:
+                        this.exportSourceSelection();
+                        break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ExportCsv:
+                        this.exportCsv();
+                        break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ExportJson:
+                        this.exportJson();
+                        break;
                     default:
                         this.navigateOther(url);
                         break;
@@ -1462,7 +1737,7 @@ var SeriesfeedImporter;
             static importSourceSelection() {
                 document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.FavouritesController();
+                new SeriesfeedImporter.Controllers.ImportFavouritesController();
             }
             static importBierdopje() {
                 document.title = "Bierdopje favorieten importeren | Seriesfeed";
@@ -1488,6 +1763,26 @@ var SeriesfeedImporter;
                 document.title = "Series exporteren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ExportController();
+            }
+            static exportSourceSelection() {
+                document.title = "Bronkeuze | Favoriete series exporteren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.ExportFavouritesController();
+            }
+            static exportCsv() {
+                document.title = "Favorieten exporteren als CSV | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.CsvFavouriteSelectionController();
+            }
+            static exportJson() {
+                document.title = "Favorieten exporteren als JSON | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.JsonFavouriteSelectionController();
+            }
+            static exportXml() {
+                document.title = "Favorieten exporteren als XML | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.XmlFavouriteSelectionController();
             }
             static navigateOther(url) {
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)) {
@@ -1603,7 +1898,11 @@ var SeriesfeedImporter;
             ImportSourceSelection: "/series/import/source/",
             ImportBierdopje: "/series/import/source/bierdopje/",
             ImportImdb: "/series/import/source/imdb/",
-            Export: "/series/export/"
+            Export: "/series/export/",
+            ExportSourceSelection: "/series/export/source/",
+            ExportCsv: "/series/export/source/csv/",
+            ExportJson: "/series/export/source/json/",
+            ExportXml: "/series/export/source/xml/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -1638,10 +1937,23 @@ var SeriesfeedImporter;
                 const portfolio = $('<div/>').addClass("portfolio mix_all");
                 const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
                 const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
-                const img = $('<img/>');
                 const info = $('<div/>').addClass("portfolio-info");
                 const title = $('<div/>').addClass("portfolio-title");
                 const h4 = $('<h4/>').text(name);
+                let img;
+                if (image.includes("http")) {
+                    img = $('<img/>');
+                    img
+                        .css({
+                        maxWidth: imageSize,
+                        padding: '10px'
+                    })
+                        .attr('src', image)
+                        .attr('alt', name);
+                }
+                else {
+                    img = $('<i/>').addClass("fa fa-4x " + image).css({ color: '#FFFFFF' });
+                }
                 portfolio
                     .css({
                     display: 'inline-block',
@@ -1664,13 +1976,6 @@ var SeriesfeedImporter;
                     height: '100px',
                     background: colour
                 });
-                img
-                    .css({
-                    maxWidth: imageSize,
-                    padding: '10px'
-                })
-                    .attr('src', image)
-                    .attr('alt', name);
                 portfolio.append(wrapper);
                 wrapper.append(hover);
                 hover.append(img);

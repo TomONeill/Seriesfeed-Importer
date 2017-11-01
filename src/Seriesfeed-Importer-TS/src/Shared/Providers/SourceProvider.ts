@@ -6,10 +6,24 @@ module SeriesfeedImporter.Providers {
             const portfolio = $('<div/>').addClass("portfolio mix_all");
             const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
             const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
-            const img = $('<img/>');
             const info = $('<div/>').addClass("portfolio-info");
             const title = $('<div/>').addClass("portfolio-title");
             const h4 = $('<h4/>').text(name);
+
+            let img;
+            if (image.includes("http")) {
+                img = $('<img/>');
+
+                img
+                    .css({
+                        maxWidth: imageSize,
+                        padding: '10px'
+                    })
+                    .attr('src', image)
+                    .attr('alt', name);
+            } else {
+                img = $('<i/>').addClass("fa fa-4x " + image).css({ color: '#FFFFFF' });
+            }
 
             portfolio
                 .css({
@@ -37,14 +51,6 @@ module SeriesfeedImporter.Providers {
                     height: '100px',
                     background: colour
                 });
-
-            img
-                .css({
-                    maxWidth: imageSize,
-                    padding: '10px'
-                })
-                .attr('src', image)
-                .attr('alt', name);
 
             portfolio.append(wrapper);
             wrapper.append(hover);

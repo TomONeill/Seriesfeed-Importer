@@ -28,7 +28,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addFavourites(cardContent: JQuery<HTMLElement>): void {
-            const favourites = new ViewModels.Button(Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => Services.RouterService.navigate(Enums.ShortUrl.ImportSourceSelection), "100%");
+            const favourites = new ViewModels.Button(Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => Services.RouterService.navigate(Enums.ShortUrl.ExportSourceSelection), "100%");
             favourites.instance.css({ marginTop: '0px' });
 
             cardContent.append(favourites.instance);

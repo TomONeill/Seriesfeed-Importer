@@ -84,12 +84,12 @@ module SeriesfeedImporter.Controllers {
             this.stepTitle.after(this.stepContent);
             this.stepContent.after(userProfile.instance);
 
-            Services.ImdbService.getUser()
+            Services.ImdbImportService.getUser()
                 .then((user) => {
                     this._userId = user.id;
                     this._username = user.username;
 
-                    Services.ImdbService.getAvatarUrlByUserId(this._userId)
+                    Services.ImdbImportService.getAvatarUrlByUserId(this._userId)
                         .then((avatarUrl) => {
                             const login = '<a href="http://www.imdb.com/" target="_blank">Inloggen</a>';
                             if (!avatarUrl) {
@@ -142,7 +142,7 @@ module SeriesfeedImporter.Controllers {
             this.stepContent.after(loadingData);
             listsTable.append(tableHeader);
 
-            Services.ImdbService.getListsByUserId(this._userId)
+            Services.ImdbImportService.getListsByUserId(this._userId)
                 .then((lists) => {
                     lists.forEach((list, index) => {
                         const listId = $(list).attr("id");
@@ -227,7 +227,7 @@ module SeriesfeedImporter.Controllers {
             loadingData.append(outerProgress);
 
             $(this._selectedLists).each((i, list: any) => {
-                Services.ImdbService.getSeriesByListUrl(list.url)
+                Services.ImdbImportService.getSeriesByListUrl(list.url)
                     .then((series) => {
                         $(series).each((index, seriesItem: any) => {
                             const seriesName = seriesItem.name;

@@ -46,7 +46,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private loadUser(): void {
-            Services.ImdbService.getUser()
+            Services.ImdbImportService.getUser()
                 .then((user) => {
                     if (user == null) {
                         this._user.onClick = null;
@@ -55,7 +55,7 @@ module SeriesfeedImporter.Controllers {
                     } else {
                         this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb + user.id + "/" + user.username);
                         this._user.setUsername(user.username);
-                        Services.ImdbService.getAvatarUrlByUserId(user.id)
+                        Services.ImdbImportService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
                     }
                 });

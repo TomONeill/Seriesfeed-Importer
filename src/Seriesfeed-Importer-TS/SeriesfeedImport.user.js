@@ -751,14 +751,8 @@ var SeriesfeedImporter;
                     .append(this._collectingData.instance)
                     .append(this._nextButton.instance);
                 SeriesfeedImporter.Services.ImdbService.getListsByUserId(this._userId)
-                    .then((lists) => {
-                    lists.each((index, list) => {
-                        const imdbList = new SeriesfeedImporter.Models.ImdbList();
-                        imdbList.name = $(list).find('.name a').text();
-                        imdbList.slug = $(list).find('.name a').attr('href');
-                        imdbList.seriesCount = $(list).find('.name span').text();
-                        imdbList.createdOn = $(list).find('.created').text();
-                        imdbList.modifiedOn = $(list).find('.modified').text();
+                    .then((imdbLists) => {
+                    imdbLists.forEach((imdbList, index) => {
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
@@ -945,7 +939,7 @@ var SeriesfeedImporter;
                 listsTable.append(tableHeader);
                 SeriesfeedImporter.Services.ImdbService.getListsByUserId(this._userId)
                     .then((lists) => {
-                    lists.each((index, list) => {
+                    lists.forEach((list, index) => {
                         const listId = $(list).attr("id");
                         const listName = $(list).find(".name a").html();
                         const listUrl = "http://www.imdb.com" + $(list).find(".name a").attr("href");
@@ -1231,7 +1225,18 @@ var SeriesfeedImporter;
                 return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
-                    return data.find('table.lists tr.row');
+                    const dataRows = data.find('table.lists tr.row');
+                    var imdbLists = new Array();
+                    dataRows.each((index, dataRow) => {
+                        const imdbList = new SeriesfeedImporter.Models.ImdbList();
+                        imdbList.name = $(dataRow).find('.name a').text();
+                        imdbList.slug = $(dataRow).find('.name a').attr('href');
+                        imdbList.seriesCount = $(dataRow).find('.name span').text();
+                        imdbList.createdOn = $(dataRow).find('.created').text();
+                        imdbList.modifiedOn = $(dataRow).find('.modified').text();
+                        imdbLists.push(imdbList);
+                    });
+                    return imdbLists;
                 })
                     .catch((error) => {
                     throw `Could not get lists for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;

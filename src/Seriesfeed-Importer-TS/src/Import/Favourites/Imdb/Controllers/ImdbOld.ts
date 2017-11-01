@@ -144,7 +144,7 @@ module SeriesfeedImporter.Controllers {
 
             Services.ImdbService.getListsByUserId(this._userId)
                 .then((lists) => {
-                    lists.each((index, list) => {
+                    lists.forEach((list, index) => {
                         const listId = $(list).attr("id");
                         const listName = $(list).find(".name a").html();
                         const listUrl = "http://www.imdb.com" + $(list).find(".name a").attr("href");

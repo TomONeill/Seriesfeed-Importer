@@ -27,12 +27,26 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        // TODO: return type to models.
-        public static getListsByUserId(userId: string): Promise<JQuery> {
+        public static getListsByUserId(userId: string): Promise<Models.ImdbList[]> {
             return Services.AjaxService.get(Config.ImdbBaseUrl + "/user/" + userId + "/lists")
                 .then((pageData) => {
                     const data = $(pageData.responseText);
-                    return data.find('table.lists tr.row');
+                    const dataRows = data.find('table.lists tr.row');
+                    var imdbLists = new Array<Models.ImdbList>();
+
+                    dataRows.each((index, dataRow) => {
+                        const imdbList = new Models.ImdbList();
+                        
+                        imdbList.name = $(dataRow).find('.name a').text();
+                        imdbList.slug = $(dataRow).find('.name a').attr('href');
+                        imdbList.seriesCount = $(dataRow).find('.name span').text();
+                        imdbList.createdOn = $(dataRow).find('.created').text();
+                        imdbList.modifiedOn = $(dataRow).find('.modified').text();
+
+                        imdbLists.push(imdbList);
+                    });
+
+                    return imdbLists;
                 })
                 .catch((error) => {
                     throw `Could not get lists for user id ${userId} from ${Config.ImdbBaseUrl}: ${error}`;

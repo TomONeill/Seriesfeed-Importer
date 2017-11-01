@@ -76,15 +76,8 @@ module SeriesfeedImporter.Controllers {
                 .append(this._nextButton.instance);
 
             Services.ImdbService.getListsByUserId(this._userId)
-                .then((lists) => {
-                    lists.each((index, list) => {
-                        const imdbList = new Models.ImdbList();
-                        imdbList.name = $(list).find('.name a').text();
-                        imdbList.slug = $(list).find('.name a').attr('href');
-                        imdbList.seriesCount = $(list).find('.name span').text();
-                        imdbList.createdOn = $(list).find('.created').text();
-                        imdbList.modifiedOn = $(list).find('.modified').text();
-
+                .then((imdbLists) => {
+                    imdbLists.forEach((imdbList, index) => {
                         const checkbox = new ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {

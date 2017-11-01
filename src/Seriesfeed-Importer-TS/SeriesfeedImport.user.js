@@ -38,11 +38,32 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class ExportController {
             constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const contentWrapper = $('<div/>');
+                const exportIconWrapper = $('<div/>').css({ textAlign: 'center' });
+                const exportIcon = $('<i/>').addClass('fa fa-5x fa-cloud-upload').css({ color: '#5a77ad' });
+                exportIconWrapper.append(exportIcon);
+                contentWrapper.append(exportIconWrapper);
+                const text = $('<p/>').append('Wat wil je exporteren?');
+                contentWrapper.append(text);
+                cardContent.append(contentWrapper);
+                this.addFavourites(cardContent);
+                this.addTimeWasted(cardContent);
+            }
+            initialise() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Series exporteren");
-                const text = $('<p/>').append('Dit onderdeel komt binnenkort.');
-                text.css({ marginBottom: '0' });
-                card.setContent(text);
+                card.setBreadcrumbs(null);
+            }
+            addFavourites(cardContent) {
+                const favourites = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportSourceSelection), "100%");
+                favourites.instance.css({ marginTop: '0px' });
+                cardContent.append(favourites.instance);
+            }
+            addTimeWasted(cardContent) {
+                const timeWasted = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => { }, "100%");
+                cardContent.append(timeWasted.instance);
             }
         }
         Controllers.ExportController = ExportController;
@@ -56,8 +77,14 @@ var SeriesfeedImporter;
             constructor() {
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const contentWrapper = $('<div/>');
+                const exportIconWrapper = $('<div/>').css({ textAlign: 'center' });
+                const exportIcon = $('<i/>').addClass('fa fa-5x fa-cloud-download').css({ color: '#2f8e85' });
+                exportIconWrapper.append(exportIcon);
+                contentWrapper.append(exportIconWrapper);
                 const text = $('<p/>').append('Wat wil je importeren?');
-                cardContent.append(text);
+                contentWrapper.append(text);
+                cardContent.append(contentWrapper);
                 this.addFavourites(cardContent);
                 this.addTimeWasted(cardContent);
             }
@@ -75,7 +102,7 @@ var SeriesfeedImporter;
                 cardContent.append(favourites.instance);
             }
             addTimeWasted(cardContent) {
-                const timeWasted = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje), "100%");
+                const timeWasted = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => { }, "100%");
                 cardContent.append(timeWasted.instance);
             }
         }
@@ -1240,7 +1267,7 @@ var SeriesfeedImporter;
                         imdbList.seriesCount = $(dataRow).find('.name span').text();
                         imdbList.createdOn = $(dataRow).find('.created').text();
                         imdbList.modifiedOn = $(dataRow).find('.modified').text();
-                        this.fixTranslations(imdbList);
+                        this.fixListTranslations(imdbList);
                         imdbLists.push(imdbList);
                     });
                     return imdbLists;
@@ -1249,7 +1276,7 @@ var SeriesfeedImporter;
                     throw `Could not get lists for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
                 });
             }
-            static fixTranslations(imdbList) {
+            static fixListTranslations(imdbList) {
                 imdbList.seriesCount = imdbList.seriesCount
                     .replace(" Titles", "")
                     .replace('(', "")

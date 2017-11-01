@@ -43,7 +43,7 @@ module SeriesfeedImporter.Services {
                         imdbList.createdOn = $(dataRow).find('.created').text();
                         imdbList.modifiedOn = $(dataRow).find('.modified').text();
 
-                        this.fixTranslations(imdbList);
+                        this.fixListTranslations(imdbList);
 
                         imdbLists.push(imdbList);
                     });
@@ -55,7 +55,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        private static fixTranslations(imdbList: Models.ImdbList): void {
+        private static fixListTranslations(imdbList: Models.ImdbList): void {
             imdbList.seriesCount = imdbList.seriesCount
                 .replace(" Titles", "")
                 .replace('(', "")

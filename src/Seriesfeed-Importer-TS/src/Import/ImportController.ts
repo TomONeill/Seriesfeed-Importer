@@ -6,8 +6,16 @@ module SeriesfeedImporter.Controllers {
             this.initialise();
             const cardContent = $('#' + Config.Id.CardContent);
 
+            const contentWrapper = $('<div/>');
+            const exportIconWrapper = $('<div/>').css({ textAlign: 'center' });
+            const exportIcon = $('<i/>').addClass('fa fa-5x fa-cloud-download').css({ color: '#2f8e85' });
+            exportIconWrapper.append(exportIcon);
+            contentWrapper.append(exportIconWrapper);
+
             const text = $('<p/>').append('Wat wil je importeren?');
-            cardContent.append(text);
+            contentWrapper.append(text);
+            
+            cardContent.append(contentWrapper);
 
             this.addFavourites(cardContent);
             this.addTimeWasted(cardContent);
@@ -30,7 +38,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addTimeWasted(cardContent: JQuery<HTMLElement>): void {
-            const timeWasted = new ViewModels.Button(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje), "100%");
+            const timeWasted = new ViewModels.Button(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => {}, "100%");
             cardContent.append(timeWasted.instance);
         }
     }

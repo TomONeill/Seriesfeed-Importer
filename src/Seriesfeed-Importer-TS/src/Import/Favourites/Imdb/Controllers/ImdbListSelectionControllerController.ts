@@ -57,7 +57,7 @@ module SeriesfeedImporter.Controllers {
             checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
             const selectAllColumn = $('<th/>').append(checkboxAll.instance);
             const listHeaderColumn = $('<th/>').text('Lijst');
-            const seriesCountHeaderColumn = $('<th/>').text('Titels');
+            const seriesCountHeaderColumn = $('<th/>').text('Aantal items');
             const createdOnHeaderColumn = $('<th/>').text('Aangemaakt op');
             const modifiedOnHeaderColumn = $('<th/>').text('Laatst bewerkt');
             table.addTheadItems([selectAllColumn, listHeaderColumn, seriesCountHeaderColumn, createdOnHeaderColumn, modifiedOnHeaderColumn]);

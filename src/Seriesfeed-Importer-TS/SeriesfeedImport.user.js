@@ -740,7 +740,7 @@ var SeriesfeedImporter;
                 checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
                 const selectAllColumn = $('<th/>').append(checkboxAll.instance);
                 const listHeaderColumn = $('<th/>').text('Lijst');
-                const seriesCountHeaderColumn = $('<th/>').text('Titels');
+                const seriesCountHeaderColumn = $('<th/>').text('Aantal items');
                 const createdOnHeaderColumn = $('<th/>').text('Aangemaakt op');
                 const modifiedOnHeaderColumn = $('<th/>').text('Laatst bewerkt');
                 table.addTheadItems([selectAllColumn, listHeaderColumn, seriesCountHeaderColumn, createdOnHeaderColumn, modifiedOnHeaderColumn]);
@@ -1240,6 +1240,7 @@ var SeriesfeedImporter;
                         imdbList.seriesCount = $(dataRow).find('.name span').text();
                         imdbList.createdOn = $(dataRow).find('.created').text();
                         imdbList.modifiedOn = $(dataRow).find('.modified').text();
+                        this.fixTranslations(imdbList);
                         imdbLists.push(imdbList);
                     });
                     return imdbLists;
@@ -1247,6 +1248,18 @@ var SeriesfeedImporter;
                     .catch((error) => {
                     throw `Could not get lists for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
                 });
+            }
+            static fixTranslations(imdbList) {
+                imdbList.seriesCount = imdbList.seriesCount
+                    .replace(" Titles", "")
+                    .replace('(', "")
+                    .replace(')', "");
+                const createdOnParts = imdbList.createdOn.split(' ');
+                const createdOnMonth = Services.TimeAgoTranslatorService.getFullDutchTranslationOfMonthAbbreviation(createdOnParts[1]);
+                imdbList.createdOn = imdbList.createdOn.replace(createdOnParts[1], createdOnMonth);
+                const modifiedOnParts = imdbList.modifiedOn.split(' ');
+                const modifiedOnTime = Services.TimeAgoTranslatorService.getDutchTranslationOfTime(modifiedOnParts[1]);
+                imdbList.modifiedOn = imdbList.modifiedOn.replace(modifiedOnParts[1], modifiedOnTime).replace("ago", "geleden");
             }
             static getSeriesByListUrl(listUrl) {
                 const url = listUrl + "?view=compact";
@@ -1733,6 +1746,73 @@ var SeriesfeedImporter;
             }
         }
         Services.StorageService = StorageService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class TimeAgoTranslatorService {
+            static getDutchTranslationOfTime(original) {
+                switch (original) {
+                    case "years":
+                    case "year":
+                        return "jaar";
+                    case "months":
+                        return "maanden";
+                    case "month":
+                        return "maand";
+                    case "weeks":
+                        return "weken";
+                    case "week":
+                        return "week";
+                    case "days":
+                        return "dagen";
+                    case "day":
+                        return "dag";
+                    case "hours":
+                    case "hour":
+                        return "uur";
+                    case "minutes":
+                        return "minuten";
+                    case "minute":
+                        return "minuut";
+                    case "seconds":
+                        return "seconden";
+                    case "second":
+                        return "seconde";
+                }
+            }
+            static getFullDutchTranslationOfMonthAbbreviation(month) {
+                switch (month) {
+                    case "Jan":
+                        return "januari";
+                    case "Feb":
+                        return "februari";
+                    case "Mar":
+                        return "maart";
+                    case "Apr":
+                        return "april";
+                    case "May":
+                        return "mei";
+                    case "Jun":
+                        return "juni";
+                    case "Jul":
+                        return "juli";
+                    case "Aug":
+                        return "augustus";
+                    case "Sep":
+                        return "september";
+                    case "Oct":
+                        return "oktober";
+                    case "Nov":
+                        return "november";
+                    case "Dec":
+                        return "december";
+                }
+            }
+        }
+        Services.TimeAgoTranslatorService = TimeAgoTranslatorService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

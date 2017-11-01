@@ -36,12 +36,14 @@ module SeriesfeedImporter.Services {
 
                     dataRows.each((index, dataRow) => {
                         const imdbList = new Models.ImdbList();
-                        
+
                         imdbList.name = $(dataRow).find('.name a').text();
                         imdbList.slug = $(dataRow).find('.name a').attr('href');
                         imdbList.seriesCount = $(dataRow).find('.name span').text();
                         imdbList.createdOn = $(dataRow).find('.created').text();
                         imdbList.modifiedOn = $(dataRow).find('.modified').text();
+
+                        this.fixTranslations(imdbList);
 
                         imdbLists.push(imdbList);
                     });
@@ -51,6 +53,21 @@ module SeriesfeedImporter.Services {
                 .catch((error) => {
                     throw `Could not get lists for user id ${userId} from ${Config.ImdbBaseUrl}: ${error}`;
                 });
+        }
+
+        private static fixTranslations(imdbList: Models.ImdbList): void {
+            imdbList.seriesCount = imdbList.seriesCount
+                .replace(" Titles", "")
+                .replace('(', "")
+                .replace(')', "");
+
+            const createdOnParts = imdbList.createdOn.split(' ');
+            const createdOnMonth = Services.TimeAgoTranslatorService.getFullDutchTranslationOfMonthAbbreviation(createdOnParts[1]);
+            imdbList.createdOn = imdbList.createdOn.replace(createdOnParts[1], createdOnMonth);
+
+            const modifiedOnParts = imdbList.modifiedOn.split(' ');
+            const modifiedOnTime = Services.TimeAgoTranslatorService.getDutchTranslationOfTime(modifiedOnParts[1]);
+            imdbList.modifiedOn = imdbList.modifiedOn.replace(modifiedOnParts[1], modifiedOnTime).replace("ago", "geleden");
         }
 
         public static getSeriesByListUrl(listUrl: string): Promise<any[]> {

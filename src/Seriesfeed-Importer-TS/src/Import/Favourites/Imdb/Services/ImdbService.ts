@@ -32,7 +32,7 @@ module SeriesfeedImporter.Services {
                 .then((pageData) => {
                     const data = $(pageData.responseText);
                     const dataRows = data.find('table.lists tr.row');
-                    var imdbLists = new Array<Models.ImdbList>();
+                    const imdbLists = new Array<Models.ImdbList>();
 
                     dataRows.each((index, dataRow) => {
                         const imdbList = new Models.ImdbList();

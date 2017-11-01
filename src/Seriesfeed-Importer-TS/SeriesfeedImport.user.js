@@ -173,11 +173,9 @@ var SeriesfeedImporter;
                     .append(loadingData)
                     .append(this._collectingData.instance)
                     .append(this._nextButton.instance);
-                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
-                    favourites.each((index, favourite) => {
-                        const show = new SeriesfeedImporter.Models.Show();
-                        show.name = $(favourite).text();
-                        show.slug = $(favourite).attr('href');
+                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(this._username)
+                    .then((favourites) => {
+                    favourites.forEach((show, index) => {
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>');
                         const showColumn = $('<td/>');
@@ -636,7 +634,15 @@ var SeriesfeedImporter;
                 return Services.AjaxService.get(url)
                     .then((pageData) => {
                     const data = $(pageData.responseText);
-                    return data.find(".content").find("ul").find("li").find("a");
+                    const dataRow = data.find(".content").find("ul").find("li").find("a");
+                    const favourites = new Array();
+                    dataRow.each((index, favourite) => {
+                        const show = new SeriesfeedImporter.Models.Show();
+                        show.name = $(favourite).text();
+                        show.slug = $(favourite).attr('href');
+                        favourites.push(show);
+                    });
+                    return favourites;
                 })
                     .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
@@ -1226,7 +1232,7 @@ var SeriesfeedImporter;
                     .then((pageData) => {
                     const data = $(pageData.responseText);
                     const dataRows = data.find('table.lists tr.row');
-                    var imdbLists = new Array();
+                    const imdbLists = new Array();
                     dataRows.each((index, dataRow) => {
                         const imdbList = new SeriesfeedImporter.Models.ImdbList();
                         imdbList.name = $(dataRow).find('.name a').text();

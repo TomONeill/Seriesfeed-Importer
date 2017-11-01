@@ -70,49 +70,46 @@ module SeriesfeedImporter.Controllers {
                 .append(this._collectingData.instance)
                 .append(this._nextButton.instance);
 
-            Services.BierdopjeService.getFavouritesByUsername(this._username).then((favourites) => {
-                favourites.each((index, favourite) => {
-                    const show = new Models.Show();
-                    show.name = $(favourite).text();
-                    show.slug = $(favourite).attr('href');
+            Services.BierdopjeService.getFavouritesByUsername(this._username)
+                .then((favourites) => {
+                    favourites.forEach((show, index) => {
+                        const row = $('<tr/>');
+                        const selectColumn = $('<td/>');
+                        const showColumn = $('<td/>');
 
-                    const row = $('<tr/>');
-                    const selectColumn = $('<td/>');
-                    const showColumn = $('<td/>');
-
-                    const checkbox = new ViewModels.Checkbox(`show_${index}`);
-                    checkbox.subscribe((isEnabled) => {
-                        if (isEnabled) {
-                            this._currentCalls.push(index);
-                            this.setCollectingData();
-                            Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
-                                show.theTvdbId = theTvdbId;
-                                const position = this._currentCalls.indexOf(index);
-                                this._currentCalls.splice(position, 1);
+                        const checkbox = new ViewModels.Checkbox(`show_${index}`);
+                        checkbox.subscribe((isEnabled) => {
+                            if (isEnabled) {
+                                this._currentCalls.push(index);
                                 this.setCollectingData();
-                            });
-                            this._selectedShows.push(show);
-                        } else {
-                            const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
-                            this._selectedShows.splice(position, 1);
-                        }
+                                Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
+                                    show.theTvdbId = theTvdbId;
+                                    const position = this._currentCalls.indexOf(index);
+                                    this._currentCalls.splice(position, 1);
+                                    this.setCollectingData();
+                                });
+                                this._selectedShows.push(show);
+                            } else {
+                                const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                this._selectedShows.splice(position, 1);
+                            }
 
-                        this.setNextButton();
+                            this.setNextButton();
+                        });
+
+                        selectColumn.append(checkbox.instance);
+                        this._checkboxes.push(checkbox);
+
+                        const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                        showColumn.append(showLink);
+
+                        row.append(selectColumn);
+                        row.append(showColumn);
+
+                        table.addRow(row);
                     });
-
-                    selectColumn.append(checkbox.instance);
-                    this._checkboxes.push(checkbox);
-
-                    const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
-                    showColumn.append(showLink);
-
-                    row.append(selectColumn);
-                    row.append(showColumn);
-
-                    table.addRow(row);
+                    loadingData.replaceWith(table.instance);
                 });
-                loadingData.replaceWith(table.instance);
-            });
         }
 
         private toggleAllCheckboxes(isEnabled: boolean): void {

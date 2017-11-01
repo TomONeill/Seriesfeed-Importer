@@ -35,14 +35,25 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        // TODO: return type to models.
-        public static getFavouritesByUsername(username: string): Promise<JQuery<HTMLElement>> {
+        public static getFavouritesByUsername(username: string): Promise<Models.Show[]> {
             const url = Config.BierdopjeBaseUrl + "/users/" + username + "/shows";
 
             return Services.AjaxService.get(url)
                 .then((pageData) => {
                     const data = $(pageData.responseText);
-                    return data.find(".content").find("ul").find("li").find("a");
+                    const dataRow = data.find(".content").find("ul").find("li").find("a");
+                    const favourites = new Array<Models.Show>();
+
+                    dataRow.each((index, favourite) => {
+                        const show = new Models.Show();
+
+                        show.name = $(favourite).text();
+                        show.slug = $(favourite).attr('href');
+
+                        favourites.push(show);
+                    });
+                    
+                    return favourites;
                 })
                 .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);

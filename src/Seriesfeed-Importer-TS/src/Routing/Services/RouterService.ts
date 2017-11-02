@@ -32,14 +32,6 @@ module SeriesfeedImporter.Services {
                     this.exportSourceSelection();
                     break;
 
-                case Enums.ShortUrl.ExportCsv:
-                    this.exportCsv();
-                    break;
-
-                case Enums.ShortUrl.ExportJson:
-                    this.exportJson();
-                    break;
-
                 default:
                     this.navigateOther(url);
                     break;
@@ -105,25 +97,11 @@ module SeriesfeedImporter.Services {
             new Controllers.ExportFavouritesController();
         }
 
-        private static exportCsv(): void {
-            document.title = "Favorieten exporteren als CSV | Seriesfeed";
+        private static exportFavouriteSelection(exportType: Enums.ExportType): void {
+            document.title = `Favorieten selecteren | Exporteren als ${exportType} | Seriesfeed`;
             CardService.getCard().clear();
 
-            new Controllers.CsvFavouriteSelectionController();
-        }
-
-        private static exportJson(): void {
-            document.title = "Favorieten exporteren als JSON | Seriesfeed";
-            CardService.getCard().clear();
-
-            new Controllers.JsonFavouriteSelectionController();
-        }
-
-        private static exportXml(): void {
-            document.title = "Favorieten exporteren als XML | Seriesfeed";
-            CardService.getCard().clear();
-
-            new Controllers.XmlFavouriteSelectionController();
+            new Controllers.ExportFavouriteSelectionController(exportType);
         }
 
         private static navigateOther(url: Enums.ShortUrl): void {
@@ -139,6 +117,13 @@ module SeriesfeedImporter.Services {
                 const userId = parts[parts.length - 2];
                 const username = parts[parts.length - 1];
                 this.importImdbUser(userId, decodeURI(username));
+                return;
+            }
+
+            if (url.startsWith(Enums.ShortUrl.ExportSourceSelection)) {
+                const parts = url.split('/');
+                const exportType = parts[parts.length - 1] as Enums.ExportType;
+                this.exportFavouriteSelection(exportType);
                 return;
             }
         }

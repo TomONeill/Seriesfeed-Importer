@@ -1,12 +1,14 @@
-/// <reference path="../../../../typings/index.d.ts" />
+/// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class CsvFavouriteSelectionController {
+    export class ExportFavouriteSelectionController {
+        private _exportType: Enums.ExportType;
         private _selectedShows: Array<Models.SeriesfeedShow>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
 
-        constructor() {
+        constructor(exportType: Enums.ExportType) {
+            this._exportType = exportType;
             this._checkboxes = [];
             this._selectedShows = [];
 
@@ -16,7 +18,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => { });
+            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => { console.log("exporting as", this._exportType) });
             this._nextButton.instance.hide();
         }
 
@@ -26,8 +28,8 @@ module SeriesfeedImporter.Controllers {
             card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten exporteren", Enums.ShortUrl.Export),
-                new Models.Breadcrumb("CSV", Enums.ShortUrl.ExportSourceSelection),
-                new Models.Breadcrumb("Exporteren", Enums.ShortUrl.ExportCsv)
+                new Models.Breadcrumb(this._exportType, Enums.ShortUrl.ExportSourceSelection),
+                new Models.Breadcrumb("Favorieten selecteren", Enums.ShortUrl.ExportSourceSelection + this._exportType)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();

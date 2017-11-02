@@ -23,17 +23,17 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addCsv(cardContent: JQuery<HTMLElement>): void {
-            const csv = Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", Enums.ShortUrl.ExportCsv, "#209045");
+            const csv = Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", Enums.ShortUrl.ExportSourceSelection + Enums.ExportType.CSV, "#209045");
             cardContent.append(csv);
         }
 
         private addJson(cardContent: JQuery<HTMLElement>): void {
-            const json = Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", Enums.ShortUrl.ExportJson, "#FFFFFF");
+            const json = Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", Enums.ShortUrl.ExportSourceSelection + Enums.ExportType.JSON, "#FFFFFF");
             cardContent.append(json);
         }
 
         private addXml(cardContent: JQuery<HTMLElement>): void {
-            const xml = Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", Enums.ShortUrl.ExportXml, "#FF6600");
+            const xml = Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", Enums.ShortUrl.ExportSourceSelection + Enums.ExportType.XML, "#FF6600");
             cardContent.append(xml);
         }
     }

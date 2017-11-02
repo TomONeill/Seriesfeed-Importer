@@ -108,7 +108,7 @@ module SeriesfeedImporter.Services {
             if (url.startsWith(Enums.ShortUrl.ImportBierdopje)) {
                 const parts = url.split('/');
                 const username = parts[parts.length - 1];
-                this.importBierdopjeUser(decodeURI(username));
+                this.importBierdopjeUser(decodeURIComponent(username));
                 return;
             }
 
@@ -116,7 +116,7 @@ module SeriesfeedImporter.Services {
                 const parts = url.split('/');
                 const userId = parts[parts.length - 2];
                 const username = parts[parts.length - 1];
-                this.importImdbUser(userId, decodeURI(username));
+                this.importImdbUser(userId, decodeURIComponent(username));
                 return;
             }
 

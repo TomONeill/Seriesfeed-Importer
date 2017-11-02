@@ -9,17 +9,12 @@ module SeriesfeedImporter.Controllers {
 
         constructor(exportType: Enums.ExportType) {
             this._exportType = exportType;
-            this._checkboxes = [];
             this._selectedShows = [];
+            this._checkboxes = [];
 
-            this.initialiseNextButton();
             this.initialiseCard();
+            this.initialiseNextButton();
             this.initialise();
-        }
-
-        private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => { console.log("exporting as", this._exportType) });
-            this._nextButton.instance.hide();
         }
 
         private initialiseCard(): void {
@@ -34,6 +29,11 @@ module SeriesfeedImporter.Controllers {
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
             card.setContent();
+        }
+
+        private initialiseNextButton(): void {
+            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => new ExportDetailsController(this._exportType, this._selectedShows));
+            this._nextButton.instance.hide();
         }
 
         private initialise(): void {

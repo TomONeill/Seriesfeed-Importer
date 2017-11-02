@@ -82,6 +82,131 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
+    var Enums;
+    (function (Enums) {
+        Enums.SeriesfeedShowDetails = {
+            Name: "Naam",
+            Url: "Seriesfeed URL",
+            PosterUrl: "Poster URL",
+            Status: "Status",
+            Future: "Toekomst",
+            EpisodeCount: "Aantal afleveringen"
+        };
+    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ExportDetailsController {
+            constructor(exportType, selectedShows) {
+                this._exportType = exportType;
+                this._selectedShows = selectedShows;
+                this._selectedDetails = [];
+                this._checkboxes = [];
+                this.initialiseCard();
+                this.initialiseNextButton();
+                this.initialise();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._exportType, SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Serie details", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection + this._exportType)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth('700px');
+                card.setContent();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => console.log(`${this._exportType} is not supported yet (${this._selectedDetails.length}).`));
+                this._nextButton.instance.hide();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie detail');
+                const exampleColumn = $('<th/>').text('Voorbeeld');
+                table.addTheadItems([selectAllColumn, seriesColumn, exampleColumn]);
+                let index = 0;
+                for (let showDetail in SeriesfeedImporter.Enums.SeriesfeedShowDetails) {
+                    const row = $('<tr/>');
+                    const selectColumn = $('<td/>');
+                    const showColumn = $('<td/>');
+                    const exampleColumn = $('<td/>');
+                    const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`exportType_${index}`);
+                    checkbox.subscribe((isEnabled) => {
+                        if (isEnabled) {
+                            this._selectedDetails.push(showDetail);
+                        }
+                        else {
+                            const position = this._selectedDetails.indexOf(showDetail);
+                            this._selectedDetails.splice(position, 1);
+                        }
+                        this.setNextButton();
+                    });
+                    selectColumn.append(checkbox.instance);
+                    this._checkboxes.push(checkbox);
+                    const currentDetail = SeriesfeedImporter.Enums.SeriesfeedShowDetails[showDetail];
+                    const showLink = $('<span/>').text(currentDetail);
+                    showColumn.append(showLink);
+                    const firstShow = this._selectedShows[0];
+                    const key = Object.keys(firstShow)[index];
+                    const exampleRowContent = $('<span/>').text(firstShow[key]);
+                    exampleColumn.append(exampleRowContent);
+                    row.append(selectColumn);
+                    row.append(showColumn);
+                    row.append(exampleColumn);
+                    table.addRow(row);
+                    index++;
+                }
+                cardContent
+                    .append(table.instance)
+                    .append(this._nextButton.instance);
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setNextButton() {
+                if (this._selectedShows.length === 1 && this._selectedDetails.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie met ${this._selectedDetails.length} detail exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1 && this._selectedDetails.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series met ${this._selectedDetails.length} detail exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length === 1 && this._selectedDetails.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie met ${this._selectedDetails.length} details exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1 && this._selectedDetails.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series met ${this._selectedDetails.length} details exporteren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.ExportDetailsController = ExportDetailsController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
         class ExportFavouritesController {
@@ -125,15 +250,11 @@ var SeriesfeedImporter;
         class ExportFavouriteSelectionController {
             constructor(exportType) {
                 this._exportType = exportType;
-                this._checkboxes = [];
                 this._selectedShows = [];
-                this.initialiseNextButton();
+                this._checkboxes = [];
                 this.initialiseCard();
+                this.initialiseNextButton();
                 this.initialise();
-            }
-            initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => { console.log("exporting as", this._exportType); });
-                this._nextButton.instance.hide();
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -147,6 +268,10 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
                 card.setContent();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => new Controllers.ExportDetailsController(this._exportType, this._selectedShows));
+                this._nextButton.instance.hide();
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
@@ -1716,14 +1841,14 @@ var SeriesfeedImporter;
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)) {
                     const parts = url.split('/');
                     const username = parts[parts.length - 1];
-                    this.importBierdopjeUser(decodeURI(username));
+                    this.importBierdopjeUser(decodeURIComponent(username));
                     return;
                 }
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportImdb)) {
                     const parts = url.split('/');
                     const userId = parts[parts.length - 2];
                     const username = parts[parts.length - 1];
-                    this.importImdbUser(userId, decodeURI(username));
+                    this.importImdbUser(userId, decodeURIComponent(username));
                     return;
                 }
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection)) {

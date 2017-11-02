@@ -11,25 +11,14 @@ module SeriesfeedImporter.Controllers {
 
         constructor(username: string) {
             this._username = username;
-            this._checkboxes = [];
             this._selectedShows = [];
+            this._checkboxes = [];
             this._currentCalls = [];
 
-            this.initialiseNextButton();
-            this.initialiseCollectingData();
             this.initialiseCard();
+            this.initialiseCollectingData();
+            this.initialiseNextButton();
             this.initialise();
-        }
-
-        private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => new ImportBierdopjeFavouritesController(this._username, this._selectedShows));
-            this._nextButton.instance.hide();
-        }
-
-        private initialiseCollectingData(): void {
-            this._collectingData = new ViewModels.ReadMoreButton("Gegevens verzamelen...");
-            this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' })
-            this._collectingData.instance.hide();
         }
 
         private initialiseCard(): void {
@@ -45,6 +34,17 @@ module SeriesfeedImporter.Controllers {
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
             card.setContent();
+        }
+
+        private initialiseCollectingData(): void {
+            this._collectingData = new ViewModels.ReadMoreButton("Gegevens verzamelen...");
+            this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' })
+            this._collectingData.instance.hide();
+        }
+
+        private initialiseNextButton(): void {
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => new ImportBierdopjeFavouritesController(this._username, this._selectedShows));
+            this._nextButton.instance.hide();
         }
 
         private initialise(): void {

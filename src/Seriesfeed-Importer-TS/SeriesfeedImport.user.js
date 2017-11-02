@@ -484,22 +484,13 @@ var SeriesfeedImporter;
         class BierdopjeFavouriteSelectionController {
             constructor(username) {
                 this._username = username;
-                this._checkboxes = [];
                 this._selectedShows = [];
+                this._checkboxes = [];
                 this._currentCalls = [];
-                this.initialiseNextButton();
-                this.initialiseCollectingData();
                 this.initialiseCard();
+                this.initialiseCollectingData();
+                this.initialiseNextButton();
                 this.initialise();
-            }
-            initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
-                this._nextButton.instance.hide();
-            }
-            initialiseCollectingData() {
-                this._collectingData = new SeriesfeedImporter.ViewModels.ReadMoreButton("Gegevens verzamelen...");
-                this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' });
-                this._collectingData.instance.hide();
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -514,6 +505,15 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
                 card.setContent();
+            }
+            initialiseCollectingData() {
+                this._collectingData = new SeriesfeedImporter.ViewModels.ReadMoreButton("Gegevens verzamelen...");
+                this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' });
+                this._collectingData.instance.hide();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedShows));
+                this._nextButton.instance.hide();
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
@@ -700,7 +700,7 @@ var SeriesfeedImporter;
                                 break;
                             case SeriesfeedImporter.Enums.SeriesfeedError.NotFound:
                                 errorIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1px" });
-                                errorMessage = $('<a/>').attr('href', SeriesfeedImporter.Config.BaseUrl + "/voorstellen/").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
+                                errorMessage = $('<a/>').attr('href', SeriesfeedImporter.Config.BaseUrl + "/series/suggest").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
                                 break;
                             default:
                                 errorIcon = $("<i/>").addClass("fa fa-exclamation-circle").css({ color: "#8e2f2f", fontSize: "16px" });

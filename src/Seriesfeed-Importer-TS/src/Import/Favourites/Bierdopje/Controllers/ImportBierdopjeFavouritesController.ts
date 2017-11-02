@@ -97,7 +97,7 @@ module SeriesfeedImporter.Controllers {
 
                             case Enums.SeriesfeedError.NotFound:
                                 errorIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1px" });
-                                errorMessage = $('<a/>').attr('href', Config.BaseUrl + "/voorstellen/").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
+                                errorMessage = $('<a/>').attr('href', Config.BaseUrl + "/series/suggest").attr('target', "_blank").text("Deze serie staat nog niet op Seriesfeed.");
                                 break;
 
                             default:

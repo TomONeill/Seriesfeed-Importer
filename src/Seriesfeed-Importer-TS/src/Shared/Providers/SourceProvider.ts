@@ -12,9 +12,7 @@ module SeriesfeedImporter.Providers {
 
             let img;
             if (image.includes("http")) {
-                img = $('<img/>');
-
-                img
+                img = $('<img/>')
                     .css({
                         maxWidth: imageSize,
                         padding: '10px'

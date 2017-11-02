@@ -76,8 +76,8 @@ module SeriesfeedImporter.Controllers {
             this._selectedShows.forEach((show, index) => {
                 const currentRow = this._table.getRow(index);
 
-                Services.SeriesfeedService.getShowIdByTvdbId(show.theTvdbId)
-                    .then((seriesfeedShow) => Services.SeriesfeedService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
+                Services.SeriesfeedImportService.getShowIdByTvdbId(show.theTvdbId)
+                    .then((seriesfeedShow) => Services.SeriesfeedImportService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
                     .then(() => {
                         const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
                         currentRow.children().first().find("i").replaceWith(checkmarkIcon);
@@ -136,7 +136,7 @@ module SeriesfeedImporter.Controllers {
 
                 Services.BierdopjeService.getTvdbIdByShowSlug("bdShowSlug")
                     .then((tvdbId) => {
-                        Services.SeriesfeedService.getShowIdByTvdbId(tvdbId)
+                        Services.SeriesfeedImportService.getShowIdByTvdbId(tvdbId)
                             .then((sfShowData) => {
                                 //let sfSeriesId = sfShowData.id;
                                 let sfSeriesName = sfShowData.name;
@@ -147,7 +147,7 @@ module SeriesfeedImporter.Controllers {
                                 let current_retries = 0;
 
                                 function addFavouriteByShowId(sfSeriesId: any) {
-                                    Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
+                                    Services.SeriesfeedImportService.addFavouriteByShowId(sfSeriesId)
                                         .then((result) => {
                                             //const resultStatus = result.status;
                                             let item = "<tr></tr>";

@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Controllers {
     export class CsvFavouriteSelectionController {
-        private _selectedShows: Array<Models.Show>;
+        private _selectedShows: Array<Models.SeriesfeedShow>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
 
@@ -16,7 +16,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => {});
+            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => { });
             this._nextButton.instance.hide();
         }
 
@@ -56,46 +56,41 @@ module SeriesfeedImporter.Controllers {
                 .append(loadingData)
                 .append(this._nextButton.instance);
 
-            // Services.SeriesfeedService.getFavourites()
-            //     .then((favourites) => {
-            //         favourites.forEach((show, index) => {
-            //             const row = $('<tr/>');
-            //             const selectColumn = $('<td/>');
-            //             const showColumn = $('<td/>');
+            Services.SeriesfeedExportService.getCurrentUsername()
+                .then((username) => {
+                    Services.SeriesfeedExportService.getFavouritesByUsername(username)
+                        .then((favourites) => {
+                            favourites.forEach((show, index) => {
+                                const row = $('<tr/>');
+                                const selectColumn = $('<td/>');
+                                const showColumn = $('<td/>');
 
-            //             const checkbox = new ViewModels.Checkbox(`show_${index}`);
-            //             checkbox.subscribe((isEnabled) => {
-            //                 if (isEnabled) {
-            //                     this._currentCalls.push(index);
-            //                     this.setCollectingData();
-            //                     Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
-            //                         show.theTvdbId = theTvdbId;
-            //                         const position = this._currentCalls.indexOf(index);
-            //                         this._currentCalls.splice(position, 1);
-            //                         this.setCollectingData();
-            //                     });
-            //                     this._selectedShows.push(show);
-            //                 } else {
-            //                     const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
-            //                     this._selectedShows.splice(position, 1);
-            //                 }
+                                const checkbox = new ViewModels.Checkbox(`show_${index}`);
+                                checkbox.subscribe((isEnabled) => {
+                                    if (isEnabled) {
+                                        this._selectedShows.push(show);
+                                    } else {
+                                        const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                        this._selectedShows.splice(position, 1);
+                                    }
 
-            //                 this.setNextButton();
-            //             });
+                                    this.setNextButton();
+                                });
 
-            //             selectColumn.append(checkbox.instance);
-            //             this._checkboxes.push(checkbox);
+                                selectColumn.append(checkbox.instance);
+                                this._checkboxes.push(checkbox);
 
-            //             const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
-            //             showColumn.append(showLink);
+                                const showLink = $('<a/>').attr('href', show.url).attr('target', '_blank').text(show.name);
+                                showColumn.append(showLink);
 
-            //             row.append(selectColumn);
-            //             row.append(showColumn);
+                                row.append(selectColumn);
+                                row.append(showColumn);
 
-            //             table.addRow(row);
-            //         });
-            //         loadingData.replaceWith(table.instance);
-            //     });
+                                table.addRow(row);
+                            });
+                            loadingData.replaceWith(table.instance);
+                        });
+                });
         }
 
         private toggleAllCheckboxes(isEnabled: boolean): void {

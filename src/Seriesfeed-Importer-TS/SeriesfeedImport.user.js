@@ -155,6 +155,36 @@ var SeriesfeedImporter;
                 cardContent
                     .append(loadingData)
                     .append(this._nextButton.instance);
+                SeriesfeedImporter.Services.SeriesfeedExportService.getCurrentUsername()
+                    .then((username) => {
+                    SeriesfeedImporter.Services.SeriesfeedExportService.getFavouritesByUsername(username)
+                        .then((favourites) => {
+                        favourites.forEach((show, index) => {
+                            const row = $('<tr/>');
+                            const selectColumn = $('<td/>');
+                            const showColumn = $('<td/>');
+                            const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
+                            checkbox.subscribe((isEnabled) => {
+                                if (isEnabled) {
+                                    this._selectedShows.push(show);
+                                }
+                                else {
+                                    const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                    this._selectedShows.splice(position, 1);
+                                }
+                                this.setNextButton();
+                            });
+                            selectColumn.append(checkbox.instance);
+                            this._checkboxes.push(checkbox);
+                            const showLink = $('<a/>').attr('href', show.url).attr('target', '_blank').text(show.name);
+                            showColumn.append(showLink);
+                            row.append(selectColumn);
+                            row.append(showColumn);
+                            table.addRow(row);
+                        });
+                        loadingData.replaceWith(table.instance);
+                    });
+                });
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {
@@ -231,6 +261,36 @@ var SeriesfeedImporter;
                 cardContent
                     .append(loadingData)
                     .append(this._nextButton.instance);
+                SeriesfeedImporter.Services.SeriesfeedExportService.getCurrentUsername()
+                    .then((username) => {
+                    SeriesfeedImporter.Services.SeriesfeedExportService.getFavouritesByUsername(username)
+                        .then((favourites) => {
+                        favourites.forEach((show, index) => {
+                            const row = $('<tr/>');
+                            const selectColumn = $('<td/>');
+                            const showColumn = $('<td/>');
+                            const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
+                            checkbox.subscribe((isEnabled) => {
+                                if (isEnabled) {
+                                    this._selectedShows.push(show);
+                                }
+                                else {
+                                    const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                    this._selectedShows.splice(position, 1);
+                                }
+                                this.setNextButton();
+                            });
+                            selectColumn.append(checkbox.instance);
+                            this._checkboxes.push(checkbox);
+                            const showLink = $('<a/>').attr('href', show.url).attr('target', '_blank').text(show.name);
+                            showColumn.append(showLink);
+                            row.append(selectColumn);
+                            row.append(showColumn);
+                            table.addRow(row);
+                        });
+                        loadingData.replaceWith(table.instance);
+                    });
+                });
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {
@@ -307,6 +367,36 @@ var SeriesfeedImporter;
                 cardContent
                     .append(loadingData)
                     .append(this._nextButton.instance);
+                SeriesfeedImporter.Services.SeriesfeedExportService.getCurrentUsername()
+                    .then((username) => {
+                    SeriesfeedImporter.Services.SeriesfeedExportService.getFavouritesByUsername(username)
+                        .then((favourites) => {
+                        favourites.forEach((show, index) => {
+                            const row = $('<tr/>');
+                            const selectColumn = $('<td/>');
+                            const showColumn = $('<td/>');
+                            const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
+                            checkbox.subscribe((isEnabled) => {
+                                if (isEnabled) {
+                                    this._selectedShows.push(show);
+                                }
+                                else {
+                                    const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                    this._selectedShows.splice(position, 1);
+                                }
+                                this.setNextButton();
+                            });
+                            selectColumn.append(checkbox.instance);
+                            this._checkboxes.push(checkbox);
+                            const showLink = $('<a/>').attr('href', show.url).attr('target', '_blank').text(show.name);
+                            showColumn.append(showLink);
+                            row.append(selectColumn);
+                            row.append(showColumn);
+                            table.addRow(row);
+                        });
+                        loadingData.replaceWith(table.instance);
+                    });
+                });
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {
@@ -334,6 +424,60 @@ var SeriesfeedImporter;
         }
         Controllers.XmlFavouriteSelectionController = XmlFavouriteSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class SeriesfeedShow {
+        }
+        Models.SeriesfeedShow = SeriesfeedShow;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class SeriesfeedExportService {
+            static getCurrentUsername() {
+                return Services.AjaxService.get(SeriesfeedImporter.Config.BaseUrl + "/about/")
+                    .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    const userLink = data.find('.main-menu .profile-li .main-menu-dropdown li:first-child a').attr('href');
+                    const userLinkParts = userLink.split('/');
+                    return userLinkParts[2];
+                })
+                    .catch((error) => {
+                    throw `Could not get username from ${SeriesfeedImporter.Config.BaseUrl}: ${error}`;
+                });
+            }
+            static getFavouritesByUsername(username) {
+                const url = SeriesfeedImporter.Config.BaseUrl + "/users/" + username + "/favourites";
+                return Services.AjaxService.get(url)
+                    .then((pageData) => {
+                    const data = $(pageData.responseText);
+                    const dataRow = data.find("#favourites").find("tbody tr");
+                    const favourites = new Array();
+                    dataRow.each((index, favourite) => {
+                        const show = new SeriesfeedImporter.Models.SeriesfeedShow();
+                        show.posterUrl = $($(favourite).find('td')[0]).find('img').attr('src');
+                        show.name = $($(favourite).find('td')[1]).text();
+                        show.url = SeriesfeedImporter.Config.BaseUrl + $($(favourite).find('td')[1]).find('a').attr('href');
+                        show.status = $($(favourite).find('td')[2]).text();
+                        show.future = $($(favourite).find('td')[3]).text();
+                        show.episodeCount = $($(favourite).find('td')[4]).text();
+                        favourites.push(show);
+                    });
+                    return favourites;
+                })
+                    .catch((error) => {
+                    window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat je niet meer ingelogd bent, geen favorieten hebt of er is iets mis met je verbinding.`);
+                    throw `Could not get favourites from ${SeriesfeedImporter.Config.BaseUrl}: ${error}`;
+                });
+            }
+        }
+        Services.SeriesfeedExportService = SeriesfeedExportService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -612,8 +756,8 @@ var SeriesfeedImporter;
             startImport() {
                 this._selectedShows.forEach((show, index) => {
                     const currentRow = this._table.getRow(index);
-                    SeriesfeedImporter.Services.SeriesfeedService.getShowIdByTvdbId(show.theTvdbId)
-                        .then((seriesfeedShow) => SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
+                    SeriesfeedImporter.Services.SeriesfeedImportService.getShowIdByTvdbId(show.theTvdbId)
+                        .then((seriesfeedShow) => SeriesfeedImporter.Services.SeriesfeedImportService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
                         .then(() => {
                         const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
                         currentRow.children().first().find("i").replaceWith(checkmarkIcon);
@@ -661,7 +805,7 @@ var SeriesfeedImporter;
                     const bdShowUrl = 'http://www.bierdopje.com';
                     SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug("bdShowSlug")
                         .then((tvdbId) => {
-                        SeriesfeedImporter.Services.SeriesfeedService.getShowIdByTvdbId(tvdbId)
+                        SeriesfeedImporter.Services.SeriesfeedImportService.getShowIdByTvdbId(tvdbId)
                             .then((sfShowData) => {
                             let sfSeriesName = sfShowData.name;
                             const sfSeriesSlug = sfShowData.slug;
@@ -669,7 +813,7 @@ var SeriesfeedImporter;
                             const MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
                             let current_retries = 0;
                             function addFavouriteByShowId(sfSeriesId) {
-                                SeriesfeedImporter.Services.SeriesfeedService.addFavouriteByShowId(sfSeriesId)
+                                SeriesfeedImporter.Services.SeriesfeedImportService.addFavouriteByShowId(sfSeriesId)
                                     .then((result) => {
                                     let item = "<tr></tr>";
                                     let status = "-";
@@ -1585,7 +1729,7 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
-        class SeriesfeedService {
+        class SeriesfeedImportService {
             static getShowIdByTvdbId(tvdbId) {
                 const postData = {
                     type: 'tvdb_id',
@@ -1617,7 +1761,7 @@ var SeriesfeedImporter;
                 });
             }
         }
-        Services.SeriesfeedService = SeriesfeedService;
+        Services.SeriesfeedImportService = SeriesfeedImportService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1942,8 +2086,7 @@ var SeriesfeedImporter;
                 const h4 = $('<h4/>').text(name);
                 let img;
                 if (image.includes("http")) {
-                    img = $('<img/>');
-                    img
+                    img = $('<img/>')
                         .css({
                         maxWidth: imageSize,
                         padding: '10px'

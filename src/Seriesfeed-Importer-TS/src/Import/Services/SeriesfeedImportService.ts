@@ -1,7 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Services {
-    export class SeriesfeedService {
+    export class SeriesfeedImportService {
         public static getShowIdByTvdbId(tvdbId: string): Promise<Models.Show> {
             const postData = {
                 type: 'tvdb_id',

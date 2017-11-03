@@ -11,11 +11,13 @@ module SeriesfeedImporter.Controllers {
 
             this.initialise();
             const cardContent = $('#' + Config.Id.CardContent);
-            cardContent.css({ textAlign: 'center' })
 
-            this.addCsv(cardContent);
-            this.addXml(cardContent);
-            this.addJson(cardContent);
+            const wrapper = $('<div/>').css({ textAlign: 'center' })
+            cardContent.append(wrapper);
+
+            this.addCsv(wrapper);
+            this.addXml(wrapper);
+            this.addJson(wrapper);
         }
 
         private initialise(): void {

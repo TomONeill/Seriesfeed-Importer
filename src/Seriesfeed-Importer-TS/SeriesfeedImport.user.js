@@ -308,10 +308,11 @@ var SeriesfeedImporter;
                 this._selectedDetails = selectedDetails;
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                cardContent.css({ textAlign: 'center' });
-                this.addCsv(cardContent);
-                this.addXml(cardContent);
-                this.addJson(cardContent);
+                const wrapper = $('<div/>').css({ textAlign: 'center' });
+                cardContent.append(wrapper);
+                this.addCsv(wrapper);
+                this.addXml(wrapper);
+                this.addJson(wrapper);
             }
             initialise() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();

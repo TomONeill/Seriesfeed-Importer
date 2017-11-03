@@ -7,8 +7,8 @@ module SeriesfeedImporter.Controllers {
             const cardContent = $('#' + Config.Id.CardContent);
 
             this.addCsv(cardContent);
-            this.addXml(cardContent);
             this.addJson(cardContent);
+            this.addXml(cardContent);
         }
 
         private initialise(): void {

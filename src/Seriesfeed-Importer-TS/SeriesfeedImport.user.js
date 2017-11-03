@@ -214,8 +214,8 @@ var SeriesfeedImporter;
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 this.addCsv(cardContent);
-                this.addXml(cardContent);
                 this.addJson(cardContent);
+                this.addXml(cardContent);
             }
             initialise() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();

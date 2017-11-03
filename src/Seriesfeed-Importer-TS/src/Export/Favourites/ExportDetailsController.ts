@@ -75,9 +75,8 @@ module SeriesfeedImporter.Controllers {
                 const showLink = $('<span/>').text(currentDetail);
                 showColumn.append(showLink);
 
-                // TODO: order isn't right
                 const firstShow = this._selectedShows[0];
-                const key = Object.keys(firstShow)[index];
+                const key = Object.keys(firstShow).find((property) => property.toLowerCase() === showDetail.toLowerCase());
                 const exampleRowContent = $('<span/>').text((<any>firstShow)[key]);
                 exampleColumn.append(exampleRowContent);
 

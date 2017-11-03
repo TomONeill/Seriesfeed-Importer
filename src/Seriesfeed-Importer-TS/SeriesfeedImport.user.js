@@ -157,7 +157,7 @@ var SeriesfeedImporter;
                     const showLink = $('<span/>').text(currentDetail);
                     showColumn.append(showLink);
                     const firstShow = this._selectedShows[0];
-                    const key = Object.keys(firstShow)[index];
+                    const key = Object.keys(firstShow).find((property) => property.toLowerCase() === showDetail.toLowerCase());
                     const exampleRowContent = $('<span/>').text(firstShow[key]);
                     exampleColumn.append(exampleRowContent);
                     row.append(selectColumn);
@@ -214,8 +214,8 @@ var SeriesfeedImporter;
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 this.addCsv(cardContent);
-                this.addJson(cardContent);
                 this.addXml(cardContent);
+                this.addJson(cardContent);
             }
             initialise() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();

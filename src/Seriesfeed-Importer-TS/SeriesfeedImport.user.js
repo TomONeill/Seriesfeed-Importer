@@ -431,7 +431,7 @@ var SeriesfeedImporter;
                 const card = SeriesfeedImporter.Services.CardService.getCard();
                 card.setTitle("Series importeren");
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Soort import", SeriesfeedImporter.Enums.ShortUrl.Import)
+                    new SeriesfeedImporter.Models.Breadcrumb("Type import", SeriesfeedImporter.Enums.ShortUrl.Import)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
             }

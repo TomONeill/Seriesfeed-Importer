@@ -25,7 +25,7 @@ module SeriesfeedImporter.Controllers {
             const card = Services.CardService.getCard();
             card.setTitle("Series importeren");
             const breadcrumbs = [
-                new Models.Breadcrumb("Soort import", Enums.ShortUrl.Import)
+                new Models.Breadcrumb("Type import", Enums.ShortUrl.Import)
             ];
             card.setBreadcrumbs(breadcrumbs);
         }

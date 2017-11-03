@@ -28,8 +28,8 @@ module SeriesfeedImporter.Services {
                     this.export();
                     break;
 
-                case Enums.ShortUrl.ExportSourceSelection:
-                    this.exportSourceSelection();
+                case Enums.ShortUrl.ExportFavouriteSelection:
+                    this.exportFavouriteSelection();
                     break;
 
                 default:
@@ -90,18 +90,11 @@ module SeriesfeedImporter.Services {
             new Controllers.ExportController();
         }
 
-        private static exportSourceSelection(): void {
-            document.title = "Bronkeuze | Favoriete series exporteren | Seriesfeed";
+        private static exportFavouriteSelection(): void {
+            document.title = `Favorieten selecteren | Exporteren | Seriesfeed`;
             CardService.getCard().clear();
 
-            new Controllers.ExportFavouritesController();
-        }
-
-        private static exportFavouriteSelection(exportType: Enums.ExportType): void {
-            document.title = `Favorieten selecteren | Exporteren als ${exportType} | Seriesfeed`;
-            CardService.getCard().clear();
-
-            new Controllers.ExportFavouriteSelectionController(exportType);
+            new Controllers.ExportFavouriteSelectionController();
         }
 
         private static navigateOther(url: Enums.ShortUrl): void {
@@ -117,13 +110,6 @@ module SeriesfeedImporter.Services {
                 const userId = parts[parts.length - 2];
                 const username = parts[parts.length - 1];
                 this.importImdbUser(userId, decodeURIComponent(username));
-                return;
-            }
-
-            if (url.startsWith(Enums.ShortUrl.ExportSourceSelection)) {
-                const parts = url.split('/');
-                const exportType = parts[parts.length - 1] as Enums.ExportType;
-                this.exportFavouriteSelection(exportType);
                 return;
             }
         }

@@ -2,13 +2,11 @@
 
 module SeriesfeedImporter.Controllers {
     export class ExportFavouriteSelectionController {
-        private _exportType: Enums.ExportType;
         private _selectedShows: Array<Models.SeriesfeedShow>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
 
-        constructor(exportType: Enums.ExportType) {
-            this._exportType = exportType;
+        constructor() {
             this._selectedShows = [];
             this._checkboxes = [];
 
@@ -22,9 +20,8 @@ module SeriesfeedImporter.Controllers {
             card.setTitle("Bierdopje favorieten selecteren");
             card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
             const breadcrumbs = [
-                new Models.Breadcrumb("Favorieten exporteren", Enums.ShortUrl.Export),
-                new Models.Breadcrumb(this._exportType, Enums.ShortUrl.ExportSourceSelection),
-                new Models.Breadcrumb("Favorieten selecteren", Enums.ShortUrl.ExportSourceSelection + this._exportType)
+                new Models.Breadcrumb("Type export", Enums.ShortUrl.Export),
+                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavouriteSelection)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
@@ -32,7 +29,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => new ExportDetailsController(this._exportType, this._selectedShows));
+            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => new ExportDetailsController(this._selectedShows));
             this._nextButton.instance.hide();
         }
 

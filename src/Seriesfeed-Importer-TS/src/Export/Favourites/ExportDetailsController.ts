@@ -2,14 +2,12 @@
 
 module SeriesfeedImporter.Controllers {
     export class ExportDetailsController {
-        private _exportType: Enums.ExportType;
         private _selectedShows: Array<Models.SeriesfeedShow>;
         private _selectedDetails: Array<string>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
 
-        constructor(exportType: Enums.ExportType, selectedShows: Array<Models.SeriesfeedShow>) {
-            this._exportType = exportType;
+        constructor(selectedShows: Array<Models.SeriesfeedShow>) {
             this._selectedShows = selectedShows;
             this._selectedDetails = [];
             this._checkboxes = [];
@@ -24,9 +22,9 @@ module SeriesfeedImporter.Controllers {
             card.setTitle("Bierdopje favorieten selecteren");
             card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
             const breadcrumbs = [
-                new Models.Breadcrumb("Favorieten exporteren", Enums.ShortUrl.Export),
-                new Models.Breadcrumb(this._exportType, Enums.ShortUrl.ExportSourceSelection),
-                new Models.Breadcrumb("Serie details", Enums.ShortUrl.ExportSourceSelection + this._exportType)
+                new Models.Breadcrumb("Type export", Enums.ShortUrl.Export),
+                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavouriteSelection),
+                new Models.Breadcrumb("Serie details", null)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth('700px');
@@ -34,7 +32,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => console.log(`${this._exportType} is not supported yet (${this._selectedDetails.length}).`));
+            this._nextButton = new ViewModels.ReadMoreButton("Exporteren", () => new ExportFileController(this._selectedShows, this._selectedDetails));
             this._nextButton.instance.hide();
         }
 

@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Providers {
     export class SourceProvider {
         public static provide(name: string, image: string, imageSize: string, url: Enums.ShortUrl, colour: string): JQuery {
-            const portfolio = $('<div/>').addClass("portfolio mix_all");
+            const portfolio = $('<a/>').addClass("portfolio mix_all");
             const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
             const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
             const info = $('<div/>').addClass("portfolio-info");
@@ -25,6 +25,7 @@ module SeriesfeedImporter.Providers {
 
             portfolio
                 .css({
+                    textDecoration: 'none',
                     display: 'inline-block',
                     width: '100%',
                     transition: 'all .24s ease-in-out'

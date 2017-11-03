@@ -70,6 +70,10 @@ module SeriesfeedImporter.Services {
                 + '        0% { transform: rotateX(0); }'
                 + '        50% { transform: rotateX(180deg); }'
                 + '    }'
+                + ''
+                + '    .table thead {'
+                + '        border-bottom: 2px solid #d9d9d9;'
+                + '    }'
                 + '</style>';
             $('body').append(css);
         }

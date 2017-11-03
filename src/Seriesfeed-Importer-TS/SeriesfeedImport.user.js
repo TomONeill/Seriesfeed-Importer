@@ -57,7 +57,7 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(null);
             }
             addFavourites(cardContent) {
-                const favourites = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection), "100%");
+                const favourites = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-star-o", "Favorieten", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ExportFavouriteSelection), "100%");
                 favourites.instance.css({ marginTop: '0px' });
                 cardContent.append(favourites.instance);
             }
@@ -68,17 +68,6 @@ var SeriesfeedImporter;
         }
         Controllers.ExportController = ExportController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Enums;
-    (function (Enums) {
-        Enums.ExportType = {
-            CSV: "CSV",
-            JSON: "JSON",
-            XML: "XML"
-        };
-    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
@@ -99,8 +88,7 @@ var SeriesfeedImporter;
     var Controllers;
     (function (Controllers) {
         class ExportDetailsController {
-            constructor(exportType, selectedShows) {
-                this._exportType = exportType;
+            constructor(selectedShows) {
                 this._selectedShows = selectedShows;
                 this._selectedDetails = [];
                 this._checkboxes = [];
@@ -113,16 +101,16 @@ var SeriesfeedImporter;
                 card.setTitle("Bierdopje favorieten selecteren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
-                    new SeriesfeedImporter.Models.Breadcrumb(this._exportType, SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Serie details", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection + this._exportType)
+                    new SeriesfeedImporter.Models.Breadcrumb("Type export", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorietenselectie", SeriesfeedImporter.Enums.ShortUrl.ExportFavouriteSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Serie details", null)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth('700px');
                 card.setContent();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => console.log(`${this._exportType} is not supported yet (${this._selectedDetails.length}).`));
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => new Controllers.ExportFileController(this._selectedShows, this._selectedDetails));
                 this._nextButton.instance.hide();
             }
             initialise() {
@@ -209,47 +197,8 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class ExportFavouritesController {
-            constructor() {
-                this.initialise();
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this.addCsv(cardContent);
-                this.addJson(cardContent);
-                this.addXml(cardContent);
-            }
-            initialise() {
-                const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Favorieten exporteren");
-                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
-                const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection)
-                ];
-                card.setBreadcrumbs(breadcrumbs);
-            }
-            addCsv(cardContent) {
-                const csv = SeriesfeedImporter.Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection + SeriesfeedImporter.Enums.ExportType.CSV, "#209045");
-                cardContent.append(csv);
-            }
-            addJson(cardContent) {
-                const json = SeriesfeedImporter.Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection + SeriesfeedImporter.Enums.ExportType.JSON, "#FFFFFF");
-                cardContent.append(json);
-            }
-            addXml(cardContent) {
-                const xml = SeriesfeedImporter.Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection + SeriesfeedImporter.Enums.ExportType.XML, "#FF6600");
-                cardContent.append(xml);
-            }
-        }
-        Controllers.ExportFavouritesController = ExportFavouritesController;
-    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Controllers;
-    (function (Controllers) {
         class ExportFavouriteSelectionController {
-            constructor(exportType) {
-                this._exportType = exportType;
+            constructor() {
                 this._selectedShows = [];
                 this._checkboxes = [];
                 this.initialiseCard();
@@ -261,16 +210,15 @@ var SeriesfeedImporter;
                 card.setTitle("Bierdopje favorieten selecteren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje);
                 const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten exporteren", SeriesfeedImporter.Enums.ShortUrl.Export),
-                    new SeriesfeedImporter.Models.Breadcrumb(this._exportType, SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection),
-                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten selecteren", SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection + this._exportType)
+                    new SeriesfeedImporter.Models.Breadcrumb("Type export", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorietenselectie", SeriesfeedImporter.Enums.ShortUrl.ExportFavouriteSelection)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
                 card.setContent();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => new Controllers.ExportDetailsController(this._exportType, this._selectedShows));
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Exporteren", () => new Controllers.ExportDetailsController(this._selectedShows));
                 this._nextButton.instance.hide();
             }
             initialise() {
@@ -348,6 +296,61 @@ var SeriesfeedImporter;
             }
         }
         Controllers.ExportFavouriteSelectionController = ExportFavouriteSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ExportFileController {
+            constructor(selectedShows, selectedDetails) {
+                this._selectedShows = selectedShows;
+                this._selectedDetails = selectedDetails;
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                cardContent.css({ textAlign: 'center' });
+                this.addCsv(cardContent);
+                this.addXml(cardContent);
+                this.addJson(cardContent);
+            }
+            initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Favorieten exporteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Type export", SeriesfeedImporter.Enums.ShortUrl.Export),
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorietenselectie", SeriesfeedImporter.Enums.ShortUrl.ExportFavouriteSelection),
+                    new SeriesfeedImporter.Models.Breadcrumb("Serie details", ""),
+                    new SeriesfeedImporter.Models.Breadcrumb("Exporteren", null)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth('550px');
+                card.setContent();
+            }
+            addCsv(cardContent) {
+                const csv = SeriesfeedImporter.Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", null, "#209045");
+                csv.css({ width: '150px', textAlign: 'center', margin: '5px' });
+                csv.click(() => console.log("download csv"));
+                cardContent.append(csv);
+            }
+            addXml(cardContent) {
+                const xml = SeriesfeedImporter.Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", null, "#FF6600");
+                xml.css({ width: '150px', textAlign: 'center', margin: '5px' });
+                xml.click(() => console.log("download xml"));
+                cardContent.append(xml);
+            }
+            addJson(cardContent) {
+                const json = SeriesfeedImporter.Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
+                json.css({ width: '150px', textAlign: 'center', margin: '5px' });
+                const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
+                const filename = "seriesfeed_" + currentDateTime + ".json";
+                const jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this._selectedShows));
+                json.attr('download', filename);
+                json.attr('href', jsonDataString);
+                cardContent.append(json);
+            }
+        }
+        Controllers.ExportFileController = ExportFileController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1782,8 +1785,8 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.Export:
                         this.export();
                         break;
-                    case SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection:
-                        this.exportSourceSelection();
+                    case SeriesfeedImporter.Enums.ShortUrl.ExportFavouriteSelection:
+                        this.exportFavouriteSelection();
                         break;
                     default:
                         this.navigateOther(url);
@@ -1827,15 +1830,10 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ExportController();
             }
-            static exportSourceSelection() {
-                document.title = "Bronkeuze | Favoriete series exporteren | Seriesfeed";
+            static exportFavouriteSelection() {
+                document.title = `Favorieten selecteren | Exporteren | Seriesfeed`;
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ExportFavouritesController();
-            }
-            static exportFavouriteSelection(exportType) {
-                document.title = `Favorieten selecteren | Exporteren als ${exportType} | Seriesfeed`;
-                Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ExportFavouriteSelectionController(exportType);
+                new SeriesfeedImporter.Controllers.ExportFavouriteSelectionController();
             }
             static navigateOther(url) {
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje)) {
@@ -1849,12 +1847,6 @@ var SeriesfeedImporter;
                     const userId = parts[parts.length - 2];
                     const username = parts[parts.length - 1];
                     this.importImdbUser(userId, decodeURIComponent(username));
-                    return;
-                }
-                if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ExportSourceSelection)) {
-                    const parts = url.split('/');
-                    const exportType = parts[parts.length - 1];
-                    this.exportFavouriteSelection(exportType);
                     return;
                 }
             }
@@ -1958,7 +1950,7 @@ var SeriesfeedImporter;
             ImportBierdopje: "/series/import/source/bierdopje/",
             ImportImdb: "/series/import/source/imdb/",
             Export: "/series/export/",
-            ExportSourceSelection: "/series/export/source/"
+            ExportFavouriteSelection: "/series/export/favourites/"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -1990,7 +1982,7 @@ var SeriesfeedImporter;
     (function (Providers) {
         class SourceProvider {
             static provide(name, image, imageSize, url, colour) {
-                const portfolio = $('<div/>').addClass("portfolio mix_all");
+                const portfolio = $('<a/>').addClass("portfolio mix_all");
                 const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
                 const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
                 const info = $('<div/>').addClass("portfolio-info");
@@ -2011,6 +2003,7 @@ var SeriesfeedImporter;
                 }
                 portfolio
                     .css({
+                    textDecoration: 'none',
                     display: 'inline-block',
                     width: '100%',
                     transition: 'all .24s ease-in-out'
@@ -2111,6 +2104,36 @@ var SeriesfeedImporter;
             }
         }
         Services.CardService = CardService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class DateTimeService {
+            static getCurrentDateTime() {
+                let now = new Date();
+                let dd = now.getDate().toString();
+                let mm = (now.getMonth() + 1).toString();
+                let hh = now.getHours().toString();
+                let mi = now.getMinutes().toString();
+                const yyyy = now.getFullYear();
+                if (+dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (+mm < 10) {
+                    mm = '0' + mm;
+                }
+                if (+hh < 10) {
+                    hh = '0' + hh;
+                }
+                if (+mi < 10) {
+                    mi = '0' + mi;
+                }
+                return dd + '-' + mm + '-' + yyyy + '_' + hh + ':' + mi;
+            }
+        }
+        Services.DateTimeService = DateTimeService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -2643,6 +2666,10 @@ var SeriesfeedImporter;
                     + '    @keyframes flip {'
                     + '        0% { transform: rotateX(0); }'
                     + '        50% { transform: rotateX(180deg); }'
+                    + '    }'
+                    + ''
+                    + '    .table thead {'
+                    + '        border-bottom: 2px solid #d9d9d9;'
                     + '    }'
                     + '</style>';
                 $('body').append(css);

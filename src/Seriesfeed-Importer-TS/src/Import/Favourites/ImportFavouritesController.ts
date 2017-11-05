@@ -22,13 +22,35 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addBierdopje(cardContent: JQuery<HTMLElement>): void {
-            const bierdopje = Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", Enums.ShortUrl.ImportBierdopje, "#3399FE");
-            cardContent.append(bierdopje);
+            const name = "Bierdopje.com";
+            const bierdopje = new ViewModels.CardButton(name, "#3399FE");
+            const img = $('<img/>')
+                .css({
+                    maxWidth: "100%",
+                    padding: '10px'
+                })
+                .attr('src', "http://cdn.bierdopje.eu/g/layout/bierdopje.png")
+                .attr('alt', name);
+
+            bierdopje.topArea.append(img);
+            bierdopje.instance.click(() => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje));
+            cardContent.append(bierdopje.instance);
         }
 
         private addImdb(cardContent: JQuery<HTMLElement>): void {
-            const imdb = Providers.SourceProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", Enums.ShortUrl.ImportImdb, "#313131");
-            cardContent.append(imdb);
+            const name = "IMDb.com";
+            const imdb = new ViewModels.CardButton(name, "#313131");
+            const img = $('<img/>')
+                .css({
+                    maxWidth: "40%",
+                    padding: '10px'
+                })
+                .attr('src', "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png")
+                .attr('alt', name);
+
+            imdb.topArea.append(img);
+            imdb.instance.click(() => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb));
+            cardContent.append(imdb.instance);
         }
     }
 }

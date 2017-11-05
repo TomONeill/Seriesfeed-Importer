@@ -337,42 +337,51 @@ var SeriesfeedImporter;
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".tsv";
                 const downloadLink = SeriesfeedImporter.Services.ConverterService.toTsv(this._selectedShows);
-                const tsv = SeriesfeedImporter.Providers.SourceProvider.provide("Excel (TSV)", "fa-file-excel-o", "100%", null, "#209045");
-                tsv.css({ width: '150px', textAlign: 'center', margin: '5px' });
-                tsv
+                const tsv = new SeriesfeedImporter.ViewModels.CardButton("Excel (TSV)", "#209045");
+                const icon = $('<i/>').addClass("fa fa-4x fa-file-excel-o").css({ color: '#FFFFFF' });
+                tsv.topArea.append(icon);
+                tsv.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
                     .attr('href', downloadLink);
-                cardContent.append(tsv);
+                cardContent.append(tsv.instance);
             }
             addCsv(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".csv";
                 const downloadLink = SeriesfeedImporter.Services.ConverterService.toCsv(this._selectedShows);
-                const csv = SeriesfeedImporter.Providers.SourceProvider.provide("Excel (CSV)", "fa-file-text-o", "100%", null, "#47a265");
-                csv.css({ width: '150px', textAlign: 'center', margin: '5px' });
-                csv
+                const csv = new SeriesfeedImporter.ViewModels.CardButton("Excel (CSV)", "#47a265");
+                const icon = $('<i/>').addClass("fa fa-4x fa-file-text-o").css({ color: '#FFFFFF' });
+                csv.topArea.append(icon);
+                csv.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
                     .attr('href', downloadLink);
-                cardContent.append(csv);
+                cardContent.append(csv.instance);
             }
             addXml(cardContent) {
-                const xml = SeriesfeedImporter.Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", null, "#FF6600");
-                xml.css({ width: '150px', textAlign: 'center', margin: '5px' });
-                xml.click(() => console.log("download xml"));
-                cardContent.append(xml);
+                const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
+                const filename = "seriesfeed_" + currentDateTime + ".xml";
+                const xml = new SeriesfeedImporter.ViewModels.CardButton("XML", "#FF6600");
+                const icon = $('<i/>').addClass("fa fa-4x fa-file-code-o").css({ color: '#FFFFFF' });
+                xml.topArea.append(icon);
+                xml.instance
+                    .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                    .attr('download', filename);
+                cardContent.append(xml.instance);
             }
             addJson(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".json";
                 const downloadLink = SeriesfeedImporter.Services.ConverterService.toJson(this._selectedShows);
-                const json = SeriesfeedImporter.Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
-                json
+                const json = new SeriesfeedImporter.ViewModels.CardButton("JSON", "#e6e6e6");
+                const icon = $('<i/>').addClass("fa fa-4x fa-file-o").css({ color: '#FFFFFF' });
+                json.topArea.append(icon);
+                json.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
                     .attr('href', downloadLink);
-                cardContent.append(json);
+                cardContent.append(json.instance);
             }
         }
         Controllers.ExportFileController = ExportFileController;
@@ -564,12 +573,32 @@ var SeriesfeedImporter;
                 card.setBreadcrumbs(breadcrumbs);
             }
             addBierdopje(cardContent) {
-                const bierdopje = SeriesfeedImporter.Providers.SourceProvider.provide("Bierdopje.com", "http://cdn.bierdopje.eu/g/layout/bierdopje.png", "100%", SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje, "#3399FE");
-                cardContent.append(bierdopje);
+                const name = "Bierdopje.com";
+                const bierdopje = new SeriesfeedImporter.ViewModels.CardButton(name, "#3399FE");
+                const img = $('<img/>')
+                    .css({
+                    maxWidth: "100%",
+                    padding: '10px'
+                })
+                    .attr('src', "http://cdn.bierdopje.eu/g/layout/bierdopje.png")
+                    .attr('alt', name);
+                bierdopje.topArea.append(img);
+                bierdopje.instance.click(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportBierdopje));
+                cardContent.append(bierdopje.instance);
             }
             addImdb(cardContent) {
-                const imdb = SeriesfeedImporter.Providers.SourceProvider.provide("IMDb.com", "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png", "40%", SeriesfeedImporter.Enums.ShortUrl.ImportImdb, "#313131");
-                cardContent.append(imdb);
+                const name = "IMDb.com";
+                const imdb = new SeriesfeedImporter.ViewModels.CardButton(name, "#313131");
+                const img = $('<img/>')
+                    .css({
+                    maxWidth: "40%",
+                    padding: '10px'
+                })
+                    .attr('src', "http://i1221.photobucket.com/albums/dd472/5xt/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE._V1__zpsrwfm9zf4.png")
+                    .attr('alt', name);
+                imdb.topArea.append(img);
+                imdb.instance.click(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportImdb));
+                cardContent.append(imdb.instance);
             }
         }
         Controllers.ImportFavouritesController = ImportFavouritesController;
@@ -2075,66 +2104,6 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Providers;
     (function (Providers) {
-        class SourceProvider {
-            static provide(name, image, imageSize, url, colour) {
-                const portfolio = $('<a/>').addClass("portfolio mix_all");
-                const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
-                const hover = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
-                const info = $('<div/>').addClass("portfolio-info");
-                const title = $('<div/>').addClass("portfolio-title");
-                const h4 = $('<h4/>').text(name);
-                let img;
-                if (image.includes("http")) {
-                    img = $('<img/>')
-                        .css({
-                        maxWidth: imageSize,
-                        padding: '10px'
-                    })
-                        .attr('src', image)
-                        .attr('alt', name);
-                }
-                else {
-                    img = $('<i/>').addClass("fa fa-4x " + image).css({ color: '#FFFFFF' });
-                }
-                portfolio
-                    .css({
-                    textDecoration: 'none',
-                    display: 'inline-block',
-                    width: '100%',
-                    transition: 'all .24s ease-in-out'
-                })
-                    .hover(() => portfolio.css({
-                    webkitBoxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)',
-                    boxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)'
-                }), () => portfolio.css({
-                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
-                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
-                }))
-                    .click(() => SeriesfeedImporter.Services.RouterService.navigate(url));
-                hover
-                    .css({
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100px',
-                    background: colour
-                });
-                portfolio.append(wrapper);
-                wrapper.append(hover);
-                hover.append(img);
-                wrapper.append(info);
-                info.append(title);
-                title.append(h4);
-                return portfolio;
-            }
-        }
-        Providers.SourceProvider = SourceProvider;
-    })(Providers = SeriesfeedImporter.Providers || (SeriesfeedImporter.Providers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Providers;
-    (function (Providers) {
         class TextInputProvider {
             static provide(width, placeholder, value) {
                 return $('<input/>')
@@ -2484,6 +2453,50 @@ var SeriesfeedImporter;
             }
         }
         ViewModels.Card = Card;
+    })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var ViewModels;
+    (function (ViewModels) {
+        class CardButton {
+            constructor(text, topAreaColour) {
+                this.instance = $('<a/>').addClass("portfolio mix_all");
+                const wrapper = $('<div/>').addClass("portfolio-wrapper cardStyle");
+                this.topArea = $('<div/>').addClass("portfolio-hover").css({ height: '100px' });
+                const info = $('<div/>').addClass("portfolio-info");
+                const title = $('<div/>').addClass("portfolio-title");
+                const h4 = $('<h4/>').text(text);
+                this.instance
+                    .css({
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                    width: '100%',
+                    transition: 'all .24s ease-in-out'
+                })
+                    .hover(() => this.instance.css({
+                    webkitBoxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0px 4px 3px 0px rgba(0, 0, 0, 0.15)'
+                }), () => this.instance.css({
+                    webkitBoxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)',
+                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.0)'
+                }));
+                this.topArea
+                    .css({
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100px',
+                    background: topAreaColour
+                });
+                this.instance.append(wrapper);
+                wrapper.append(this.topArea);
+                wrapper.append(info);
+                info.append(title);
+                title.append(h4);
+            }
+        }
+        ViewModels.CardButton = CardButton;
     })(ViewModels = SeriesfeedImporter.ViewModels || (SeriesfeedImporter.ViewModels = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

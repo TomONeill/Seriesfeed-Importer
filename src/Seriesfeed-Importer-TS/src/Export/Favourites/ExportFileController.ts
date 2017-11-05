@@ -43,14 +43,16 @@ module SeriesfeedImporter.Controllers {
             const filename = "seriesfeed_" + currentDateTime + ".tsv";
             const downloadLink = Services.ConverterService.toTsv(this._selectedShows);
 
-            const tsv = Providers.SourceProvider.provide("Excel (TSV)", "fa-file-excel-o", "100%", null, "#209045");
-            tsv.css({ width: '150px', textAlign: 'center', margin: '5px' });
-            tsv
+            const tsv = new ViewModels.CardButton("Excel (TSV)", "#209045");
+            const icon = $('<i/>').addClass("fa fa-4x fa-file-excel-o").css({ color: '#FFFFFF' });
+            tsv.topArea.append(icon);
+
+            tsv.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
                 .attr('href', downloadLink);
 
-            cardContent.append(tsv);
+            cardContent.append(tsv.instance);
         }
 
         private addCsv(cardContent: JQuery<HTMLElement>): void {
@@ -58,22 +60,33 @@ module SeriesfeedImporter.Controllers {
             const filename = "seriesfeed_" + currentDateTime + ".csv";
             const downloadLink = Services.ConverterService.toCsv(this._selectedShows);
 
-            const csv = Providers.SourceProvider.provide("Excel (CSV)", "fa-file-text-o", "100%", null, "#47a265");
-            csv.css({ width: '150px', textAlign: 'center', margin: '5px' });
-            csv
+            const csv = new ViewModels.CardButton("Excel (CSV)", "#47a265");
+            const icon = $('<i/>').addClass("fa fa-4x fa-file-text-o").css({ color: '#FFFFFF' });
+            csv.topArea.append(icon);
+
+            csv.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
                 .attr('href', downloadLink);
 
-            cardContent.append(csv);
+            cardContent.append(csv.instance);
         }
 
         private addXml(cardContent: JQuery<HTMLElement>): void {
-            const xml = Providers.SourceProvider.provide("XML", "fa-file-code-o", "100%", null, "#FF6600");
-            xml.css({ width: '150px', textAlign: 'center', margin: '5px' });
-            xml.click(() => console.log("download xml"));
+            const currentDateTime = Services.DateTimeService.getCurrentDateTime();
+            const filename = "seriesfeed_" + currentDateTime + ".xml";
+            //const downloadLink = Services.ConverterService.toXml(this._selectedShows);
 
-            cardContent.append(xml);
+            const xml = new ViewModels.CardButton("XML", "#FF6600");
+            const icon = $('<i/>').addClass("fa fa-4x fa-file-code-o").css({ color: '#FFFFFF' });
+            xml.topArea.append(icon);
+
+            xml.instance
+                .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                .attr('download', filename);
+                //.attr('href', downloadLink);
+
+            cardContent.append(xml.instance);
         }
 
         private addJson(cardContent: JQuery<HTMLElement>): void {
@@ -81,13 +94,16 @@ module SeriesfeedImporter.Controllers {
             const filename = "seriesfeed_" + currentDateTime + ".json";
             const downloadLink = Services.ConverterService.toJson(this._selectedShows);
 
-            const json = Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
-            json
+            const json = new ViewModels.CardButton("JSON", "#e6e6e6");
+            const icon = $('<i/>').addClass("fa fa-4x fa-file-o").css({ color: '#FFFFFF' });
+            json.topArea.append(icon);
+
+            json.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
                 .attr('href', downloadLink);
 
-            cardContent.append(json);
+            cardContent.append(json.instance);
         }
     }
 }

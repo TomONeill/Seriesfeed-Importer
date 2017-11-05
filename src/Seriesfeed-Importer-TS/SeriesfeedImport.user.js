@@ -314,6 +314,7 @@ var SeriesfeedImporter;
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const wrapper = $('<div/>').css({ textAlign: 'center' });
                 cardContent.append(wrapper);
+                this.addTsv(wrapper);
                 this.addCsv(wrapper);
                 this.addXml(wrapper);
                 this.addJson(wrapper);
@@ -332,10 +333,28 @@ var SeriesfeedImporter;
                 card.setWidth('550px');
                 card.setContent();
             }
+            addTsv(cardContent) {
+                const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
+                const filename = "seriesfeed_" + currentDateTime + ".tsv";
+                const downloadLink = SeriesfeedImporter.Services.ConverterService.toTsv(this._selectedShows);
+                const tsv = SeriesfeedImporter.Providers.SourceProvider.provide("Excel (TSV)", "fa-file-excel-o", "100%", null, "#209045");
+                tsv.css({ width: '150px', textAlign: 'center', margin: '5px' });
+                tsv
+                    .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                    .attr('download', filename)
+                    .attr('href', downloadLink);
+                cardContent.append(tsv);
+            }
             addCsv(cardContent) {
-                const csv = SeriesfeedImporter.Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", null, "#209045");
+                const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
+                const filename = "seriesfeed_" + currentDateTime + ".csv";
+                const downloadLink = SeriesfeedImporter.Services.ConverterService.toCsv(this._selectedShows);
+                const csv = SeriesfeedImporter.Providers.SourceProvider.provide("Excel (CSV)", "fa-file-text-o", "100%", null, "#47a265");
                 csv.css({ width: '150px', textAlign: 'center', margin: '5px' });
-                csv.click(() => console.log("download csv"));
+                csv
+                    .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                    .attr('download', filename)
+                    .attr('href', downloadLink);
                 cardContent.append(csv);
             }
             addXml(cardContent) {
@@ -373,8 +392,66 @@ var SeriesfeedImporter;
     var Services;
     (function (Services) {
         class ConverterService {
-            static toJson(object) {
-                return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(object));
+            static toJson(objects) {
+                return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(objects));
+            }
+            static toXml(objects) {
+                return "data:text/xml;charset=utf-8," + encodeURIComponent(this.getXml(objects));
+            }
+            static getXml(objects) {
+                return "";
+            }
+            static toCsv(objects) {
+                return "data:text/csv;charset=utf-8," + encodeURIComponent(this.getCsv(objects));
+            }
+            static getCsv(objects) {
+                let csv = "";
+                csv += this.getXsvKeyString(objects[0], ",");
+                csv += this.getXsvValueString(objects, ",");
+                return csv;
+            }
+            static toTsv(objects) {
+                return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(objects));
+            }
+            static getTsv(objects) {
+                let tsv = "";
+                tsv += this.getXsvKeyString(objects[0], "\t");
+                tsv += this.getXsvValueString(objects, "\t");
+                return tsv;
+            }
+            static getXsvKeyString(object, separator) {
+                const keys = Object.keys(object);
+                let keyString = "";
+                let index = 0;
+                keys.map((key) => {
+                    keyString += `"${key}"`;
+                    if (index < keys.length - 1) {
+                        keyString += separator;
+                    }
+                    else {
+                        keyString += "\n";
+                    }
+                    index++;
+                });
+                return keyString;
+            }
+            static getXsvValueString(objects, separator) {
+                let keyString = "";
+                objects.forEach((object) => {
+                    const keys = Object.keys(object);
+                    let index = 0;
+                    keys.map((key) => {
+                        keyString += `"${object[key]}"`;
+                        if (index < keys.length - 1) {
+                            keyString += separator;
+                        }
+                        else {
+                            keyString += "\n";
+                        }
+                        index++;
+                    });
+                });
+                return keyString;
             }
         }
         Services.ConverterService = ConverterService;

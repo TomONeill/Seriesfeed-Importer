@@ -17,6 +17,7 @@ module SeriesfeedImporter.Controllers {
             const wrapper = $('<div/>').css({ textAlign: 'center' })
             cardContent.append(wrapper);
 
+            this.addTsv(wrapper);
             this.addCsv(wrapper);
             this.addXml(wrapper);
             this.addJson(wrapper);
@@ -37,10 +38,32 @@ module SeriesfeedImporter.Controllers {
             card.setContent();
         }
 
+        private addTsv(cardContent: JQuery<HTMLElement>): void {
+            const currentDateTime = Services.DateTimeService.getCurrentDateTime();
+            const filename = "seriesfeed_" + currentDateTime + ".tsv";
+            const downloadLink = Services.ConverterService.toTsv(this._selectedShows);
+
+            const tsv = Providers.SourceProvider.provide("Excel (TSV)", "fa-file-excel-o", "100%", null, "#209045");
+            tsv.css({ width: '150px', textAlign: 'center', margin: '5px' });
+            tsv
+                .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                .attr('download', filename)
+                .attr('href', downloadLink);
+
+            cardContent.append(tsv);
+        }
+
         private addCsv(cardContent: JQuery<HTMLElement>): void {
-            const csv = Providers.SourceProvider.provide("CSV", "fa-file-text-o", "100%", null, "#209045");
+            const currentDateTime = Services.DateTimeService.getCurrentDateTime();
+            const filename = "seriesfeed_" + currentDateTime + ".csv";
+            const downloadLink = Services.ConverterService.toCsv(this._selectedShows);
+
+            const csv = Providers.SourceProvider.provide("Excel (CSV)", "fa-file-text-o", "100%", null, "#47a265");
             csv.css({ width: '150px', textAlign: 'center', margin: '5px' });
-            csv.click(() => console.log("download csv"));
+            csv
+                .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                .attr('download', filename)
+                .attr('href', downloadLink);
 
             cardContent.append(csv);
         }

@@ -12,6 +12,8 @@ module SeriesfeedImporter.Controllers {
             this._selectedDetails = [];
             this._checkboxes = [];
 
+            window.scrollTo(0, 0);
+            document.title = "Details kiezen | Favorieten exporteren | Seriesfeed";
             this.initialiseCard();
             this.initialiseNextButton();
             this.initialise();

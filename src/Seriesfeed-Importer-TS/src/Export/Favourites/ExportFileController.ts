@@ -9,6 +9,8 @@ module SeriesfeedImporter.Controllers {
             this._selectedShows = selectedShows;
             this._selectedDetails = selectedDetails;
 
+            window.scrollTo(0, 0);
+            document.title = "Favorieten exporteren | Seriesfeed";
             this.initialise();
             const cardContent = $('#' + Config.Id.CardContent);
 
@@ -52,15 +54,15 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addJson(cardContent: JQuery<HTMLElement>): void {
-            const json = Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
-            json.css({ width: '150px', textAlign: 'center', margin: '5px' });
-            
             const currentDateTime = Services.DateTimeService.getCurrentDateTime();
             const filename = "seriesfeed_" + currentDateTime + ".json";
-            const jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this._selectedShows));
+            const downloadLink = Services.ConverterService.toJson(this._selectedShows);
 
-            json.attr('download', filename);
-            json.attr('href', jsonDataString);
+            const json = Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
+            json
+                .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                .attr('download', filename)
+                .attr('href', downloadLink);
 
             cardContent.append(json);
         }

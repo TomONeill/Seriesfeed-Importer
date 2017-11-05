@@ -92,6 +92,8 @@ var SeriesfeedImporter;
                 this._selectedShows = selectedShows;
                 this._selectedDetails = [];
                 this._checkboxes = [];
+                window.scrollTo(0, 0);
+                document.title = "Details kiezen | Favorieten exporteren | Seriesfeed";
                 this.initialiseCard();
                 this.initialiseNextButton();
                 this.initialise();
@@ -306,6 +308,8 @@ var SeriesfeedImporter;
             constructor(selectedShows, selectedDetails) {
                 this._selectedShows = selectedShows;
                 this._selectedDetails = selectedDetails;
+                window.scrollTo(0, 0);
+                document.title = "Favorieten exporteren | Seriesfeed";
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 const wrapper = $('<div/>').css({ textAlign: 'center' });
@@ -341,13 +345,14 @@ var SeriesfeedImporter;
                 cardContent.append(xml);
             }
             addJson(cardContent) {
-                const json = SeriesfeedImporter.Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
-                json.css({ width: '150px', textAlign: 'center', margin: '5px' });
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".json";
-                const jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this._selectedShows));
-                json.attr('download', filename);
-                json.attr('href', jsonDataString);
+                const downloadLink = SeriesfeedImporter.Services.ConverterService.toJson(this._selectedShows);
+                const json = SeriesfeedImporter.Providers.SourceProvider.provide("JSON", "http://www.json.org/img/json160.gif", "100%", null, "#e6e6e6");
+                json
+                    .css({ width: '150px', textAlign: 'center', margin: '5px' })
+                    .attr('download', filename)
+                    .attr('href', downloadLink);
                 cardContent.append(json);
             }
         }
@@ -362,6 +367,18 @@ var SeriesfeedImporter;
         }
         Models.SeriesfeedShow = SeriesfeedShow;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class ConverterService {
+            static toJson(object) {
+                return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(object));
+            }
+        }
+        Services.ConverterService = ConverterService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {

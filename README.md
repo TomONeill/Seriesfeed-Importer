@@ -28,10 +28,34 @@ Check out other userscripts for Seriesfeed by me:<BR/>
 
 # Development
 If you want to help with the development, you can. From now on I'll be working in the `src/Seriesfeed-Importer-TS` directory, in which a TypeScript project is located. You can use this for development. To setup the dev in combination with Tampermonkey/other, do the following:
-- Open the `src/Seriesfeed-Importer-TS` folder in Visual Studio Code.
-- Open the terminal using CTRL + `
-- Type: `tsc --watch` to run the TypeScript compiler. The `tsconfig.json` file will determine the location of the output.
-- Add a userscript and add `// @require   YOUR_CLONE_LOCATION/src/Seriesfeed-Importer-TS/SeriesfeedImport.user.js`
+1. Open the `src/Seriesfeed-Importer-TS` folder in your favourite IDE.
+2. Open CMD, PowerShell or the terminal (VS Code tip: use CTRL + `).
+2.5: If not already, `cd` to this repository.
+3. Type: `tsc --watch` to run the TypeScript compiler. The `tsconfig.json` file will determine the location of the output.
+4. Add a userscript with the following:
+```
+	// ==UserScript==
+	// @name         Seriesfeed Importer
+	// @namespace    https://www.seriesfeed.com
+	// @version      3.0-dev
+	// @description  Import your favourites and Time Wasted from Bierdopje.com.
+	// @match        https://*.seriesfeed.com/*
+	// @grant        unsafeWindow
+	// @grant        GM_xmlhttpRequest
+	// @connect      www.bierdopje.com
+	// @connect      www.imdb.com
+	// @domain       www.bierdopje.com
+	// @domain       www.imdb.com
+	// @require      https://code.jquery.com/jquery-3.2.1.min.js
+	// @require      file://{YOUR_CLONE}\Seriesfeed-Importer\src\Seriesfeed-Importer-TS\SeriesfeedImport.user.js
+	// @author       Tom
+	// @copyright    2016 - 2017, Tom
+	// ==/UserScript==
+	/* jshint -W097 */
+	/* global $, GM_xmlhttpRequest, Promise, console */
+	'use strict';
+```
+5. Make sure you have ticked the box `Allow access to file URLs` for the Tampermonkey extension.
 
 Any change will compile (some would say transpile) and a browser refresh will do the rest.
 

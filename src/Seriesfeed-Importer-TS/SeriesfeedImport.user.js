@@ -336,46 +336,46 @@ var SeriesfeedImporter;
             addTsv(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".tsv";
-                const downloadLink = SeriesfeedImporter.Services.ConverterService.toTsv(this._selectedShows);
+                const dataLink = SeriesfeedImporter.Services.ConverterService.toTsv(this._selectedShows, this._selectedDetails);
                 const tsv = new SeriesfeedImporter.ViewModels.CardButton("Excel (TSV)", "#209045");
                 const icon = $('<i/>').addClass("fa fa-4x fa-file-excel-o").css({ color: '#FFFFFF' });
                 tsv.topArea.append(icon);
                 tsv.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
-                    .attr('href', downloadLink);
+                    .attr('href', dataLink);
                 cardContent.append(tsv.instance);
             }
             addCsv(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".csv";
-                const downloadLink = SeriesfeedImporter.Services.ConverterService.toCsv(this._selectedShows);
+                const dataLink = SeriesfeedImporter.Services.ConverterService.toCsv(this._selectedShows, this._selectedDetails);
                 const csv = new SeriesfeedImporter.ViewModels.CardButton("Excel (CSV)", "#47a265");
                 const icon = $('<i/>').addClass("fa fa-4x fa-file-text-o").css({ color: '#FFFFFF' });
                 csv.topArea.append(icon);
                 csv.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
-                    .attr('href', downloadLink);
+                    .attr('href', dataLink);
                 cardContent.append(csv.instance);
             }
             addXml(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".xml";
-                const downloadLink = SeriesfeedImporter.Services.ConverterService.toXml(this._selectedShows);
+                const dataLink = SeriesfeedImporter.Services.ConverterService.toXml(this._selectedShows, this._selectedDetails);
                 const xml = new SeriesfeedImporter.ViewModels.CardButton("XML", "#FF6600");
                 const icon = $('<i/>').addClass("fa fa-4x fa-file-code-o").css({ color: '#FFFFFF' });
                 xml.topArea.append(icon);
                 xml.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
-                    .attr('href', downloadLink);
+                    .attr('href', dataLink);
                 cardContent.append(xml.instance);
             }
             addJson(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".json";
-                const downloadLink = SeriesfeedImporter.Services.ConverterService.toJson(this._selectedShows);
+                const dataLink = SeriesfeedImporter.Services.ConverterService.toJson(this._selectedShows, this._selectedDetails);
                 const json = new SeriesfeedImporter.ViewModels.CardButton("JSON", "#000000");
                 const iconWrapper = $('<span/>').css({ position: 'relative' });
                 const iconFile = $('<i/>').addClass("fa fa-4x fa-file-o").css({ color: '#FFFFFF' });
@@ -393,7 +393,7 @@ var SeriesfeedImporter;
                 json.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
                     .attr('download', filename)
-                    .attr('href', downloadLink);
+                    .attr('href', dataLink);
                 cardContent.append(json.instance);
             }
         }
@@ -414,11 +414,30 @@ var SeriesfeedImporter;
     var Services;
     (function (Services) {
         class ConverterService {
-            static toJson(objects) {
-                return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(objects));
+            static toJson(objects, filterKeys) {
+                const filteredArray = this.filter(objects, filterKeys);
+                return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredArray));
             }
-            static toXml(objects) {
-                return "data:text/xml;charset=utf-8," + encodeURIComponent(this.getXml(objects));
+            static filter(objects, filterKeys) {
+                if (filterKeys == null || filterKeys.length === 0) {
+                    return objects;
+                }
+                const filteredArray = new Array();
+                objects.forEach((object) => {
+                    const filteredObject = {};
+                    filterKeys.forEach((key) => {
+                        key = key.toLowerCase();
+                        if (object.hasOwnProperty(key)) {
+                            filteredObject[key] = object[key];
+                        }
+                    });
+                    filteredArray.push(filteredObject);
+                });
+                return filteredArray;
+            }
+            static toXml(objects, filterKeys) {
+                const filteredArray = this.filter(objects, filterKeys);
+                return "data:text/xml;charset=utf-8," + encodeURIComponent(this.getXml(filteredArray));
             }
             static getXml(objects) {
                 let xml = `<?xml version="1.0" encoding="utf-8"?>\n`;
@@ -437,8 +456,9 @@ var SeriesfeedImporter;
                 });
                 return xml;
             }
-            static toCsv(objects) {
-                return "data:text/csv;charset=utf-8," + encodeURIComponent(this.getCsv(objects));
+            static toCsv(objects, filterKeys) {
+                const filteredArray = this.filter(objects, filterKeys);
+                return "data:text/csv;charset=utf-8," + encodeURIComponent(this.getCsv(filteredArray));
             }
             static getCsv(objects) {
                 let csv = "";
@@ -446,8 +466,9 @@ var SeriesfeedImporter;
                 csv += this.getXsvValueString(objects, ",");
                 return csv;
             }
-            static toTsv(objects) {
-                return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(objects));
+            static toTsv(objects, filterKeys) {
+                const filteredArray = this.filter(objects, filterKeys);
+                return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(filterKeys));
             }
             static getTsv(objects) {
                 let tsv = "";

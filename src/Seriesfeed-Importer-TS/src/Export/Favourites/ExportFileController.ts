@@ -41,7 +41,7 @@ module SeriesfeedImporter.Controllers {
         private addTsv(cardContent: JQuery<HTMLElement>): void {
             const currentDateTime = Services.DateTimeService.getCurrentDateTime();
             const filename = "seriesfeed_" + currentDateTime + ".tsv";
-            const downloadLink = Services.ConverterService.toTsv(this._selectedShows);
+            const dataLink = Services.ConverterService.toTsv(this._selectedShows, this._selectedDetails);
 
             const tsv = new ViewModels.CardButton("Excel (TSV)", "#209045");
             const icon = $('<i/>').addClass("fa fa-4x fa-file-excel-o").css({ color: '#FFFFFF' });
@@ -50,7 +50,7 @@ module SeriesfeedImporter.Controllers {
             tsv.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
-                .attr('href', downloadLink);
+                .attr('href', dataLink);
 
             cardContent.append(tsv.instance);
         }
@@ -58,7 +58,7 @@ module SeriesfeedImporter.Controllers {
         private addCsv(cardContent: JQuery<HTMLElement>): void {
             const currentDateTime = Services.DateTimeService.getCurrentDateTime();
             const filename = "seriesfeed_" + currentDateTime + ".csv";
-            const downloadLink = Services.ConverterService.toCsv(this._selectedShows);
+            const dataLink = Services.ConverterService.toCsv(this._selectedShows, this._selectedDetails);
 
             const csv = new ViewModels.CardButton("Excel (CSV)", "#47a265");
             const icon = $('<i/>').addClass("fa fa-4x fa-file-text-o").css({ color: '#FFFFFF' });
@@ -67,7 +67,7 @@ module SeriesfeedImporter.Controllers {
             csv.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
-                .attr('href', downloadLink);
+                .attr('href', dataLink);
 
             cardContent.append(csv.instance);
         }
@@ -75,7 +75,7 @@ module SeriesfeedImporter.Controllers {
         private addXml(cardContent: JQuery<HTMLElement>): void {
             const currentDateTime = Services.DateTimeService.getCurrentDateTime();
             const filename = "seriesfeed_" + currentDateTime + ".xml";
-            const downloadLink = Services.ConverterService.toXml(this._selectedShows);
+            const dataLink = Services.ConverterService.toXml(this._selectedShows, this._selectedDetails);
 
             const xml = new ViewModels.CardButton("XML", "#FF6600");
             const icon = $('<i/>').addClass("fa fa-4x fa-file-code-o").css({ color: '#FFFFFF' });
@@ -84,7 +84,7 @@ module SeriesfeedImporter.Controllers {
             xml.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
-                .attr('href', downloadLink);
+                .attr('href', dataLink);
 
             cardContent.append(xml.instance);
         }
@@ -92,7 +92,7 @@ module SeriesfeedImporter.Controllers {
         private addJson(cardContent: JQuery<HTMLElement>): void {
             const currentDateTime = Services.DateTimeService.getCurrentDateTime();
             const filename = "seriesfeed_" + currentDateTime + ".json";
-            const downloadLink = Services.ConverterService.toJson(this._selectedShows);
+            const dataLink = Services.ConverterService.toJson(this._selectedShows, this._selectedDetails);
 
             const json = new ViewModels.CardButton("JSON", "#000000");
             const iconWrapper = $('<span/>').css({ position: 'relative' });
@@ -114,7 +114,7 @@ module SeriesfeedImporter.Controllers {
             json.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename)
-                .attr('href', downloadLink);
+                .attr('href', dataLink);
 
             cardContent.append(json.instance);
         }

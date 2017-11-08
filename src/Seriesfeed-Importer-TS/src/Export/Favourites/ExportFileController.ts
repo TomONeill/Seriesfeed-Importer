@@ -75,7 +75,7 @@ module SeriesfeedImporter.Controllers {
         private addXml(cardContent: JQuery<HTMLElement>): void {
             const currentDateTime = Services.DateTimeService.getCurrentDateTime();
             const filename = "seriesfeed_" + currentDateTime + ".xml";
-            //const downloadLink = Services.ConverterService.toXml(this._selectedShows);
+            const downloadLink = Services.ConverterService.toXml(this._selectedShows);
 
             const xml = new ViewModels.CardButton("XML", "#FF6600");
             const icon = $('<i/>').addClass("fa fa-4x fa-file-code-o").css({ color: '#FFFFFF' });
@@ -83,8 +83,8 @@ module SeriesfeedImporter.Controllers {
 
             xml.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
-                .attr('download', filename);
-            //.attr('href', downloadLink);
+                .attr('download', filename)
+                .attr('href', downloadLink);
 
             cardContent.append(xml.instance);
         }

@@ -362,12 +362,14 @@ var SeriesfeedImporter;
             addXml(cardContent) {
                 const currentDateTime = SeriesfeedImporter.Services.DateTimeService.getCurrentDateTime();
                 const filename = "seriesfeed_" + currentDateTime + ".xml";
+                const downloadLink = SeriesfeedImporter.Services.ConverterService.toXml(this._selectedShows);
                 const xml = new SeriesfeedImporter.ViewModels.CardButton("XML", "#FF6600");
                 const icon = $('<i/>').addClass("fa fa-4x fa-file-code-o").css({ color: '#FFFFFF' });
                 xml.topArea.append(icon);
                 xml.instance
                     .css({ width: '150px', textAlign: 'center', margin: '5px' })
-                    .attr('download', filename);
+                    .attr('download', filename)
+                    .attr('href', downloadLink);
                 cardContent.append(xml.instance);
             }
             addJson(cardContent) {
@@ -419,7 +421,21 @@ var SeriesfeedImporter;
                 return "data:text/xml;charset=utf-8," + encodeURIComponent(this.getXml(objects));
             }
             static getXml(objects) {
-                return "";
+                let xml = `<?xml version="1.0" encoding="utf-8"?>\n`;
+                objects.forEach((object, index) => {
+                    xml += "<show>\n";
+                    var keys = Object.keys(object);
+                    keys.map((key) => {
+                        xml += `\t<${key}>\n\t\t${object[key]}\n\t</${key}>\n`;
+                    });
+                    if (index < objects.length - 1) {
+                        xml += "</show>\n";
+                    }
+                    else {
+                        xml += "</show>";
+                    }
+                });
+                return xml;
             }
             static toCsv(objects) {
                 return "data:text/csv;charset=utf-8," + encodeURIComponent(this.getCsv(objects));

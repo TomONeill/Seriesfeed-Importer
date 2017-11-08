@@ -11,7 +11,24 @@ module SeriesfeedImporter.Services {
         }
 
         private static getXml(objects: Array<any>): string {
-            return "";
+            let xml = `<?xml version="1.0" encoding="utf-8"?>\n`;
+
+            objects.forEach((object, index) => {
+                xml += "<show>\n";
+
+                var keys = Object.keys(object);
+                keys.map((key) => {
+                    xml += `\t<${key}>\n\t\t${object[key]}\n\t</${key}>\n`;
+                });
+
+                if (index < objects.length - 1) {
+                    xml += "</show>\n";
+                } else {
+                    xml += "</show>";
+                }
+            });
+
+            return xml;
         }
 
         public static toCsv(objects: Array<any>): string {

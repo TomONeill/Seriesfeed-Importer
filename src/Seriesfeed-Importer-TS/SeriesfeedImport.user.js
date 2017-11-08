@@ -426,9 +426,8 @@ var SeriesfeedImporter;
                 objects.forEach((object) => {
                     const filteredObject = {};
                     filterKeys.forEach((key) => {
-                        key = key.toLowerCase();
                         Object.getOwnPropertyNames(object).map((property) => {
-                            if (key === property.toLowerCase()) {
+                            if (key.toLowerCase() === property.toLowerCase()) {
                                 filteredObject[property] = object[property];
                             }
                         });

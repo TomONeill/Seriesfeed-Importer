@@ -19,10 +19,8 @@ module SeriesfeedImporter.Services {
                 const filteredObject = {};
             
                 filterKeys.forEach((key) => {
-                    key = key.toLowerCase();
-
                     Object.getOwnPropertyNames(object).map((property) => {
-                        if (key === property.toLowerCase()) {
+                        if (key.toLowerCase() === property.toLowerCase()) {
                             (<any>filteredObject)[property] = (<any>object)[property];
                         }
                     });

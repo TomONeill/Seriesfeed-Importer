@@ -84,7 +84,7 @@ module SeriesfeedImporter.Controllers {
             xml.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })
                 .attr('download', filename);
-                //.attr('href', downloadLink);
+            //.attr('href', downloadLink);
 
             cardContent.append(xml.instance);
         }
@@ -94,9 +94,22 @@ module SeriesfeedImporter.Controllers {
             const filename = "seriesfeed_" + currentDateTime + ".json";
             const downloadLink = Services.ConverterService.toJson(this._selectedShows);
 
-            const json = new ViewModels.CardButton("JSON", "#e6e6e6");
-            const icon = $('<i/>').addClass("fa fa-4x fa-file-o").css({ color: '#FFFFFF' });
-            json.topArea.append(icon);
+            const json = new ViewModels.CardButton("JSON", "#000000");
+            const iconWrapper = $('<span/>').css({ position: 'relative' });
+            const iconFile = $('<i/>').addClass("fa fa-4x fa-file-o").css({ color: '#FFFFFF' });
+            const iconBrackets = $('<span/>').addClass("brackets").css({
+                color: '#FFFFFF',
+                position: 'absolute',
+                top: '19px',
+                left: '14.5px',
+                fontSize: '1.7em',
+                fontWeight: '900'
+            }).text("{ }");
+
+
+            iconWrapper.append(iconFile);
+            iconWrapper.append(iconBrackets);
+            json.topArea.append(iconWrapper);
 
             json.instance
                 .css({ width: '150px', textAlign: 'center', margin: '5px' })

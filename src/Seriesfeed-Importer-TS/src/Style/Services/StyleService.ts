@@ -74,8 +74,15 @@ module SeriesfeedImporter.Services {
                 + '    .table thead {'
                 + '        border-bottom: 2px solid #d9d9d9;'
                 + '    }'
+                + ''
+                + '    .brackets {'
+                + '        text-rendering: auto;'
+                + '        -webkit-font-smoothing: antialiased;'
+                + '        -moz-osx-font-smoothing: grayscale;'
+                + '    }'
                 + '</style>';
             $('body').append(css);
         }
     }
 }
+

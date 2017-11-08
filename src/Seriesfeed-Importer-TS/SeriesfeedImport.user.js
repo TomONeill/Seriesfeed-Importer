@@ -427,9 +427,11 @@ var SeriesfeedImporter;
                     const filteredObject = {};
                     filterKeys.forEach((key) => {
                         key = key.toLowerCase();
-                        if (object.hasOwnProperty(key)) {
-                            filteredObject[key] = object[key];
-                        }
+                        Object.getOwnPropertyNames(object).map((property) => {
+                            if (key === property.toLowerCase()) {
+                                filteredObject[property] = object[property];
+                            }
+                        });
                     });
                     filteredArray.push(filteredObject);
                 });

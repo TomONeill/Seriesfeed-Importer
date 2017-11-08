@@ -2033,7 +2033,7 @@ var SeriesfeedImporter;
     (function (Controllers) {
         class SettingsController {
             initialise() {
-                if (!window.location.href.includes("users") && !window.location.href.includes("edit")) {
+                if (!window.location.href.includes("users") || !window.location.href.includes("edit")) {
                     return;
                 }
                 const settingBlocks = $('.container.content .row');

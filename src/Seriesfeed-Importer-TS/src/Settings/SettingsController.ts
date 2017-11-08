@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Controllers {
     export class SettingsController {
         public initialise() {
-            if (!window.location.href.includes("users") && !window.location.href.includes("edit")) {
+            if (!window.location.href.includes("users") || !window.location.href.includes("edit")) {
                 return;
             }
 

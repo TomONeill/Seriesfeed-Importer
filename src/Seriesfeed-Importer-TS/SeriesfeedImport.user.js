@@ -469,7 +469,7 @@ var SeriesfeedImporter;
             }
             static toTsv(objects, filterKeys) {
                 const filteredArray = this.filter(objects, filterKeys);
-                return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(filterKeys));
+                return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(filteredArray));
             }
             static getTsv(objects) {
                 let tsv = "";

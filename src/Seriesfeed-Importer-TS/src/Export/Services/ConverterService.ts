@@ -2,18 +2,18 @@
 
 module SeriesfeedImporter.Services {
     export class ConverterService {
-        public static toJson(objects: Array<any>, filterKeys?: Array<string>): string {
+        public static toJson(objects: Array<Object>, filterKeys?: Array<string>): string {
             const filteredArray = this.filter(objects, filterKeys);
 
             return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredArray));
         }
 
-        private static filter(objects: Array<any>, filterKeys?: Array<string>): Array<any> {
+        private static filter(objects: Array<Object>, filterKeys?: Array<string>): Array<Object> {
             if (filterKeys == null || filterKeys.length === 0) {
                 return objects;
             }
 
-            const filteredArray = new Array<any>();
+            const filteredArray = new Array<Object>();
             
             objects.forEach((object) => {
                 const filteredObject = {};
@@ -32,7 +32,7 @@ module SeriesfeedImporter.Services {
             return filteredArray;
         }
 
-        public static toXml(objects: Array<any>, filterKeys?: Array<any>): string {
+        public static toXml(objects: Array<Object>, filterKeys?: Array<any>): string {
             const filteredArray = this.filter(objects, filterKeys);
 
             return "data:text/xml;charset=utf-8," + encodeURIComponent(this.getXml(filteredArray));
@@ -59,13 +59,13 @@ module SeriesfeedImporter.Services {
             return xml;
         }
 
-        public static toCsv(objects: Array<any>, filterKeys?: Array<string>): string {
+        public static toCsv(objects: Array<Object>, filterKeys?: Array<string>): string {
             const filteredArray = this.filter(objects, filterKeys);
 
             return "data:text/csv;charset=utf-8," + encodeURIComponent(this.getCsv(filteredArray));
         }
 
-        private static getCsv(objects: Array<any>): string {
+        private static getCsv(objects: Array<Object>): string {
             let csv = "";
 
             csv += this.getXsvKeyString(objects[0], ",");
@@ -74,13 +74,13 @@ module SeriesfeedImporter.Services {
             return csv;
         }
 
-        public static toTsv(objects: Array<any>, filterKeys?: Array<string>): string {
+        public static toTsv(objects: Array<Object>, filterKeys?: Array<string>): string {
             const filteredArray = this.filter(objects, filterKeys);
 
-            return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(filterKeys));
+            return "data:text/tsv;charset=utf-8," + encodeURIComponent(this.getTsv(filteredArray));
         }
 
-        private static getTsv(objects: Array<any>): string {
+        private static getTsv(objects: Array<Object>): string {
             let tsv = "";
 
             tsv += this.getXsvKeyString(objects[0], "\t");
@@ -89,7 +89,7 @@ module SeriesfeedImporter.Services {
             return tsv;
         }
 
-        private static getXsvKeyString(object: any, separator: "," | "\t"): string {
+        private static getXsvKeyString(object: Object, separator: "," | "\t"): string {
             const keys = Object.keys(object);
             let keyString = "";
             let index = 0;

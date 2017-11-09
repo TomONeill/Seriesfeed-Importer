@@ -123,7 +123,7 @@ module SeriesfeedImporter.Services {
                     const entries = csv.split('\n') as Array<string>;
 
                     const entryKeys = entries[0].split(',');
-                    const imdbIdIndex = entryKeys.indexOf("\"const\"");
+                    const imdbSlugIndex = entryKeys.indexOf("\"const\"");
                     const titleIndex = entryKeys.indexOf("\"Title\"");
                     const titleTypeIndex = entryKeys.indexOf("\"Title type\"");
 
@@ -137,22 +137,23 @@ module SeriesfeedImporter.Services {
 
                         const entryValues = entry.split(',');
                         const titleType = entryValues[titleTypeIndex];
-                        const id = entryValues[imdbIdIndex];
+                        const slug = entryValues[imdbSlugIndex];
                         const title = entryValues[titleIndex];
 
-                        if (titleType == null || id == null || title == null) {
+                        if (titleType == null || slug == null || title == null) {
                             return;
                         }
 
                         if (titleType.replace(quoteRegex, '') !== "Feature Film") {
                             const show = new Models.Show();
-                            show.imdbId = id.replace(quoteRegex, '');
+                            show.imdbType = titleType.replace(quoteRegex, '');
+                            show.slug = slug.replace(quoteRegex, '');
                             show.name = title.replace(quoteRegex, '');
                             shows.push(show);
                         }
                     });
 
-                    return shows;
+                    return Services.ShowSorterService.sort(shows, "name");
                 })
                 .catch((error) => {
                     throw `Could not get list id ${listId} for user ${userId} from ${Config.ImdbBaseUrl}. ${error}`;

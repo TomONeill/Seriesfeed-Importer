@@ -22,7 +22,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => { console.log(this._selectedLists) });
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImdbFavouriteSelectionController(this._user, this._selectedLists));
             this._nextButton.instance.hide();
         }
 
@@ -76,7 +76,7 @@ module SeriesfeedImporter.Controllers {
             Services.ImdbImportService.getListsByUserId(this._user.id)
                 .then((imdbLists) => {
                     imdbLists.forEach((imdbList, index) => {
-                        const checkbox = new ViewModels.Checkbox(`show_${index}`);
+                        const checkbox = new ViewModels.Checkbox(`list_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
                                 this._currentCalls.push(index);
@@ -98,7 +98,7 @@ module SeriesfeedImporter.Controllers {
                         });
 
                         this._checkboxes.push(checkbox);
-                        const showLink = $('<a/>').attr('href', Config.ImdbBaseUrl + imdbList.id).attr('target', '_blank').text(imdbList.name);
+                        const showLink = $('<a/>').attr('href', Config.ImdbBaseUrl + "/list/" + imdbList.id).attr('target', '_blank').text(imdbList.name);
 
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>').append(checkbox.instance);

@@ -798,24 +798,13 @@ var SeriesfeedImporter;
     var Controllers;
     (function (Controllers) {
         class ImportBierdopjeFavouritesController {
-            constructor(username, selectedSeries) {
+            constructor(username, selectedShows) {
                 this._username = username;
-                this._selectedShows = selectedSeries.sort(this.sortSelectedSeriesByName);
+                this._selectedShows = SeriesfeedImporter.Services.ShowSorterService.sort(selectedShows, "name");
                 window.scrollTo(0, 0);
                 this.initialiseCard();
                 this.initialise();
                 this.startImport();
-            }
-            sortSelectedSeriesByName(showA, showB) {
-                if (showA.name < showB.name) {
-                    return -1;
-                }
-                else if (showA.name === showB.name) {
-                    return 0;
-                }
-                else {
-                    return 1;
-                }
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -1236,6 +1225,104 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
+        class ImdbFavouriteSelectionController {
+            constructor(user, selectedLists) {
+                this._user = user;
+                this._selectedLists = selectedLists;
+                this._checkboxes = [];
+                this._selectedShows = [];
+                this.initialiseNextButton();
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { });
+                this._nextButton.instance.hide();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("IMDb lijsten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("IMDb", SeriesfeedImporter.Enums.ShortUrl.ImportFavourites),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._user.username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb),
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb}${this._user.username}`)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const listHeaderColumn = $('<th/>').text('Item');
+                const seriesTypeHeaderColumn = $('<th/>').text('Type');
+                table.addTheadItems([selectAllColumn, listHeaderColumn, seriesTypeHeaderColumn]);
+                cardContent
+                    .append(table.instance)
+                    .append(this._nextButton.instance);
+                this._selectedLists.forEach((imdbList, listIndex) => {
+                    imdbList.shows.forEach((show, showsIndex) => {
+                        const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`list_${listIndex}_show_${showsIndex}`);
+                        checkbox.subscribe((isEnabled) => {
+                            if (isEnabled) {
+                                this.setNextButton();
+                                this._selectedShows.push(show);
+                            }
+                            else {
+                                const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                this._selectedShows.splice(position, 1);
+                            }
+                            this.setNextButton();
+                        });
+                        this._checkboxes.push(checkbox);
+                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.ImdbBaseUrl + "/title/" + show.slug).attr('target', '_blank').text(show.name);
+                        const row = $('<tr/>');
+                        const selectColumn = $('<td/>').append(checkbox.instance);
+                        const showColumn = $('<td/>').append(showLink);
+                        const showTypeColumn = $('<td/>').text(show.imdbType);
+                        row.append(selectColumn);
+                        row.append(showColumn);
+                        row.append(showTypeColumn);
+                        table.addRow(row);
+                    });
+                });
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setNextButton() {
+                if (this._selectedLists.length === 1) {
+                    this._nextButton.text = `${this._selectedLists.length} serie selecteren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedLists.length > 1) {
+                    this._nextButton.text = `${this._selectedLists.length} series selecteren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.ImdbFavouriteSelectionController = ImdbFavouriteSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
         class ImdbListSelectionControllerController {
             constructor(user) {
                 this._user = user;
@@ -1248,7 +1335,7 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { console.log(this._selectedLists); });
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImdbFavouriteSelectionController(this._user, this._selectedLists));
                 this._nextButton.instance.hide();
             }
             initialiseCollectingData() {
@@ -1296,7 +1383,7 @@ var SeriesfeedImporter;
                 SeriesfeedImporter.Services.ImdbImportService.getListsByUserId(this._user.id)
                     .then((imdbLists) => {
                     imdbLists.forEach((imdbList, index) => {
-                        const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
+                        const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`list_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
                                 this._currentCalls.push(index);
@@ -1317,7 +1404,7 @@ var SeriesfeedImporter;
                             this.setNextButton();
                         });
                         this._checkboxes.push(checkbox);
-                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.ImdbBaseUrl + imdbList.id).attr('target', '_blank').text(imdbList.name);
+                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.ImdbBaseUrl + "/list/" + imdbList.id).attr('target', '_blank').text(imdbList.name);
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>').append(checkbox.instance);
                         const listColumn = $('<td/>').append(showLink);
@@ -1851,7 +1938,7 @@ var SeriesfeedImporter;
                     const csv = result.responseText;
                     const entries = csv.split('\n');
                     const entryKeys = entries[0].split(',');
-                    const imdbIdIndex = entryKeys.indexOf("\"const\"");
+                    const imdbSlugIndex = entryKeys.indexOf("\"const\"");
                     const titleIndex = entryKeys.indexOf("\"Title\"");
                     const titleTypeIndex = entryKeys.indexOf("\"Title type\"");
                     const shows = new Array();
@@ -1862,19 +1949,20 @@ var SeriesfeedImporter;
                         }
                         const entryValues = entry.split(',');
                         const titleType = entryValues[titleTypeIndex];
-                        const id = entryValues[imdbIdIndex];
+                        const slug = entryValues[imdbSlugIndex];
                         const title = entryValues[titleIndex];
-                        if (titleType == null || id == null || title == null) {
+                        if (titleType == null || slug == null || title == null) {
                             return;
                         }
                         if (titleType.replace(quoteRegex, '') !== "Feature Film") {
                             const show = new SeriesfeedImporter.Models.Show();
-                            show.imdbId = id.replace(quoteRegex, '');
+                            show.imdbType = titleType.replace(quoteRegex, '');
+                            show.slug = slug.replace(quoteRegex, '');
                             show.name = title.replace(quoteRegex, '');
                             shows.push(show);
                         }
                     });
-                    return shows;
+                    return Services.ShowSorterService.sort(shows, "name");
                 })
                     .catch((error) => {
                     throw `Could not get list id ${listId} for user ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}. ${error}`;
@@ -2338,6 +2426,28 @@ var SeriesfeedImporter;
             }
         }
         Services.DateTimeService = DateTimeService;
+    })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Services;
+    (function (Services) {
+        class ShowSorterService {
+            static sort(shows, property) {
+                return shows.sort((showA, showB) => {
+                    if (showA[property] < showB[property]) {
+                        return -1;
+                    }
+                    else if (showA[property] === showB[property]) {
+                        return 0;
+                    }
+                    else {
+                        return 1;
+                    }
+                });
+            }
+        }
+        Services.ShowSorterService = ShowSorterService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

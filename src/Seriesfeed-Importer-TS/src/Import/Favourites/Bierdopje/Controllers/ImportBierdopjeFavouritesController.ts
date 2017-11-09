@@ -6,24 +6,14 @@ module SeriesfeedImporter.Controllers {
         private _selectedShows: Array<Models.Show>;
         private _table: ViewModels.Table;
 
-        constructor(username: string, selectedSeries: Array<Models.Show>) {
+        constructor(username: string, selectedShows: Array<Models.Show>) {
             this._username = username;
-            this._selectedShows = selectedSeries.sort(this.sortSelectedSeriesByName);
+            this._selectedShows = Services.ShowSorterService.sort(selectedShows, "name");
             window.scrollTo(0, 0);
 
             this.initialiseCard();
             this.initialise();
             this.startImport();
-        }
-
-        private sortSelectedSeriesByName(showA: Models.Show, showB: Models.Show): number {
-            if (showA.name < showB.name) {
-                return -1;
-            } else if (showA.name === showB.name) {
-                return 0;
-            } else {
-                return 1;
-            }
         }
 
         private initialiseCard(): void {

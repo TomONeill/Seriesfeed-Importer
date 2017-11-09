@@ -12,16 +12,16 @@ module SeriesfeedImporter.Services {
                     this.import();
                     break;
 
-                case Enums.ShortUrl.ImportSourceSelection:
-                    this.importSourceSelection();
+                case Enums.ShortUrl.ImportFavourites:
+                    this.importFavourites();
                     break;
 
-                case Enums.ShortUrl.ImportBierdopje:
-                    this.importBierdopje();
+                case Enums.ShortUrl.ImportFavouritesBierdopje:
+                    this.importFavouritesBierdopje();
                     break;
 
-                case Enums.ShortUrl.ImportImdb:
-                    this.importImdb();
+                case Enums.ShortUrl.ImportFavouritesImdb:
+                    this.importFavouritesImdb();
                     break;
 
                 case Enums.ShortUrl.ImportTimeWasted:
@@ -32,8 +32,8 @@ module SeriesfeedImporter.Services {
                     this.export();
                     break;
 
-                case Enums.ShortUrl.ExportFavouriteSelection:
-                    this.exportFavouriteSelection();
+                case Enums.ShortUrl.ExportFavourites:
+                    this.exportFavourites();
                     break;
 
                 default:
@@ -46,20 +46,20 @@ module SeriesfeedImporter.Services {
         }
 
         private static import(): void {
-            document.title = "Series importeren | Seriesfeed";
+            document.title = "Importeren | Seriesfeed";
             CardService.getCard().clear();
 
             new Controllers.ImportController();
         }
 
-        private static importSourceSelection(): void {
-            document.title = "Bronkeuze | Favoriete series importeren | Seriesfeed";
+        private static importFavourites(): void {
+            document.title = "Favorieten importeren | Seriesfeed";
             CardService.getCard().clear();
 
             new Controllers.ImportFavouritesController();
         }
 
-        private static importBierdopje(): void {
+        private static importFavouritesBierdopje(): void {
             document.title = "Bierdopje favorieten importeren | Seriesfeed";
             CardService.getCard().clear();
 
@@ -73,7 +73,7 @@ module SeriesfeedImporter.Services {
             new Controllers.BierdopjeFavouriteSelectionController(username);
         }
 
-        private static importImdb(): void {
+        private static importFavouritesImdb(): void {
             document.title = "IMDb series importeren | Seriesfeed";
             CardService.getCard().clear();
 
@@ -95,28 +95,28 @@ module SeriesfeedImporter.Services {
         }
 
         private static export(): void {
-            document.title = "Series exporteren | Seriesfeed";
+            document.title = "Exporteren | Seriesfeed";
             CardService.getCard().clear();
 
             new Controllers.ExportController();
         }
 
-        private static exportFavouriteSelection(): void {
-            document.title = `Favorieten selecteren | Exporteren | Seriesfeed`;
+        private static exportFavourites(): void {
+            document.title = `Favorieten exporteren | Seriesfeed`;
             CardService.getCard().clear();
 
-            new Controllers.ExportFavouriteSelectionController();
+            new Controllers.ExportFavouritesController();
         }
 
         private static navigateOther(url: Enums.ShortUrl): void {
-            if (url.startsWith(Enums.ShortUrl.ImportBierdopje)) {
+            if (url.startsWith(Enums.ShortUrl.ImportFavouritesBierdopje)) {
                 const parts = url.split('/');
                 const username = parts[parts.length - 1];
                 this.importBierdopjeUser(decodeURIComponent(username));
                 return;
             }
 
-            if (url.startsWith(Enums.ShortUrl.ImportImdb)) {
+            if (url.startsWith(Enums.ShortUrl.ImportFavouritesImdb)) {
                 const parts = url.split('/');
                 const userId = parts[parts.length - 2];
                 const username = parts[parts.length - 1];

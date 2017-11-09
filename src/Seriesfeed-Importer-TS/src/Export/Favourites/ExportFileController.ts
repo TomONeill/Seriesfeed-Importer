@@ -29,7 +29,7 @@ module SeriesfeedImporter.Controllers {
             card.setBackButtonUrl(Enums.ShortUrl.Import);
             const breadcrumbs = [
                 new Models.Breadcrumb("Type export", Enums.ShortUrl.Export),
-                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavouriteSelection),
+                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavourites),
                 new Models.Breadcrumb("Serie details", ""),
                 new Models.Breadcrumb("Exporteren", null)
             ];

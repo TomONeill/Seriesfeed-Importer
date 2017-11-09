@@ -14,11 +14,11 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("Bierdopje favorieten importeren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportSourceSelection);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportFavourites);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportBierdopje)
+                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportFavourites),
+                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportFavouritesBierdopje)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth('700px');
@@ -57,7 +57,7 @@ module SeriesfeedImporter.Controllers {
                         this._user.setAvatarUrl();
                         this._user.setUsername("Niet ingelogd");
                     } else {
-                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
+                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportFavouritesBierdopje + username);
                         this._user.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
@@ -125,7 +125,7 @@ module SeriesfeedImporter.Controllers {
                         this._customUser.onClick = null;
                         this._customUser.setAvatarUrl();
                     } else {
-                        this._customUser.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje + username);
+                        this._customUser.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportFavouritesBierdopje + username);
                         this._customUser.setUsername(username);
                         Services.BierdopjeService.getAvatarUrlByUsername(username)
                             .then((avatarUrl) => {

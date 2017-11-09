@@ -1,7 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class ExportFavouriteSelectionController {
+    export class ExportFavouritesController {
         private _selectedShows: Array<Models.SeriesfeedShow>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
@@ -18,10 +18,10 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("Bierdopje favorieten selecteren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportFavouritesBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Type export", Enums.ShortUrl.Export),
-                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavouriteSelection)
+                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavourites)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();

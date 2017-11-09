@@ -37,12 +37,12 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("IMDb lijsten selecteren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportFavouritesBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportImdb),
-                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportImdb}${this._username}`)
+                new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportFavourites),
+                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportFavouritesImdb),
+                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportFavouritesImdb}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth('650px');

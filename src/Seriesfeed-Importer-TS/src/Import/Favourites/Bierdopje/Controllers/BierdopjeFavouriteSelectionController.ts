@@ -24,12 +24,12 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("Bierdopje favorieten selecteren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportFavouritesBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportBierdopje),
-                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportBierdopje}${this._username}`)
+                new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportFavourites),
+                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportFavouritesBierdopje),
+                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportFavouritesBierdopje}${this._username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();

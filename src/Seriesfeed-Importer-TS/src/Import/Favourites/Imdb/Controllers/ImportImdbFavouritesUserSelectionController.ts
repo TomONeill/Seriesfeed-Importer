@@ -12,11 +12,11 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("IMDb favorieten importeren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportSourceSelection);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportFavourites);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportSourceSelection),
-                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportImdb)
+                new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportFavourites),
+                new Models.Breadcrumb("Gebruiker", Enums.ShortUrl.ImportFavouritesImdb)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth();
@@ -53,7 +53,7 @@ module SeriesfeedImporter.Controllers {
                         this._user.setAvatarUrl();
                         this._user.setUsername("Niet ingelogd");
                     } else {
-                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb + user.id + "/" + user.username);
+                        this._user.onClick = () => Services.RouterService.navigate(Enums.ShortUrl.ImportFavouritesImdb + user.id + "/" + user.username);
                         this._user.setUsername(user.username);
                         Services.ImdbImportService.getAvatarUrlByUserId(user.id)
                             .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));

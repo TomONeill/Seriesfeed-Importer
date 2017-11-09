@@ -22,10 +22,10 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("Bierdopje favorieten selecteren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportBierdopje);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportFavouritesBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Type export", Enums.ShortUrl.Export),
-                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavouriteSelection),
+                new Models.Breadcrumb("Favorietenselectie", Enums.ShortUrl.ExportFavourites),
                 new Models.Breadcrumb("Serie details", null)
             ];
             card.setBreadcrumbs(breadcrumbs);

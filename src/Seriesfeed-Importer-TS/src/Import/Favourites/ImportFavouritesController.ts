@@ -16,7 +16,7 @@ module SeriesfeedImporter.Controllers {
             card.setBackButtonUrl(Enums.ShortUrl.Import);
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
-                new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportSourceSelection)
+                new Models.Breadcrumb("Bronkeuze", Enums.ShortUrl.ImportFavourites)
             ];
             card.setBreadcrumbs(breadcrumbs);
         }
@@ -33,7 +33,7 @@ module SeriesfeedImporter.Controllers {
                 .attr('alt', name);
 
             bierdopje.topArea.append(img);
-            bierdopje.instance.click(() => Services.RouterService.navigate(Enums.ShortUrl.ImportBierdopje));
+            bierdopje.instance.click(() => Services.RouterService.navigate(Enums.ShortUrl.ImportFavouritesBierdopje));
             cardContent.append(bierdopje.instance);
         }
 
@@ -49,7 +49,7 @@ module SeriesfeedImporter.Controllers {
                 .attr('alt', name);
 
             imdb.topArea.append(img);
-            imdb.instance.click(() => Services.RouterService.navigate(Enums.ShortUrl.ImportImdb));
+            imdb.instance.click(() => Services.RouterService.navigate(Enums.ShortUrl.ImportFavouritesImdb));
             cardContent.append(imdb.instance);
         }
     }

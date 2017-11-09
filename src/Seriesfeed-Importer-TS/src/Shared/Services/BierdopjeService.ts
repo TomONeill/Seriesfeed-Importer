@@ -68,14 +68,16 @@ module SeriesfeedImporter.Services {
                 return Promise.resolve(localTheTvdbId);
             }
 
-            return this.getTvdbIdByShowSlugFromBierdopje(showSlug).then((theTvdbId) => {
-                this.addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug);
-                return theTvdbId;
-            });
+            return this.getTvdbIdByShowSlugFromApi(showSlug)
+                .then((theTvdbId) => {
+                    this.addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug);
+                    return theTvdbId;
+                });
         }
 
         private static getTvdbIdByShowSlugFromStorage(showSlug: string): string | null {
-            const localShow = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId) as Array<Models.Show>;
+            const localShow = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShows) as Array<Models.Show>;
+            
             if (localShow != null) {
                 for (let i = 0; i < localShow.length; i++) {
                     if (localShow[i].slug === showSlug) {
@@ -87,7 +89,7 @@ module SeriesfeedImporter.Services {
             return null;
         }
 
-        private static getTvdbIdByShowSlugFromBierdopje(showSlug: string): Promise<string> {
+        private static getTvdbIdByShowSlugFromApi(showSlug: string): Promise<string> {
             const url = Config.BierdopjeBaseUrl + showSlug;
 
             return Services.AjaxService.get(url)
@@ -103,12 +105,14 @@ module SeriesfeedImporter.Services {
         }
 
         private static addTvdbIdWithShowSlugToStorage(theTvdbId: string, showSlug: string): void {
-            let localIds = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId) as Array<Models.Show> | null;
+            let localIds = Services.StorageService.get(Enums.LocalStorageKey.BierdopjeShows) as Array<Models.Show> | null;
+
             if (localIds == null) {
                 localIds = new Array<Models.Show>();
             }
+
             localIds.push({ theTvdbId: theTvdbId, slug: showSlug } as Models.Show);
-            Services.StorageService.set(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId, localIds);
+            Services.StorageService.set(Enums.LocalStorageKey.BierdopjeShows, localIds);
         }
 
         public static getTimeWastedByUsername(username: string): Promise<Models.Show[]> {

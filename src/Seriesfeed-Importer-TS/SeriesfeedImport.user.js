@@ -1590,6 +1590,29 @@ var SeriesfeedImporter;
     (function (Services) {
         class SeriesfeedImportService {
             static findShowByTheTvdbId(theTvdbId) {
+                const localShow = this.findShowByTheTvdbIdFromStorage(theTvdbId);
+                if (localShow != null) {
+                    return Promise.resolve(localShow);
+                }
+                return this.findShowByTheTvdbIdFromApi(theTvdbId)
+                    .then((show) => {
+                    show.theTvdbId = theTvdbId;
+                    this.addShowToStorage(show);
+                    return show;
+                });
+            }
+            static findShowByTheTvdbIdFromStorage(theTvdbId) {
+                const localShows = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedShows);
+                if (localShows != null) {
+                    for (let i = 0; i < localShows.length; i++) {
+                        if (localShows[i].theTvdbId === theTvdbId) {
+                            return localShows[i];
+                        }
+                    }
+                }
+                return null;
+            }
+            static findShowByTheTvdbIdFromApi(theTvdbId) {
                 const postData = {
                     type: 'tvdb_id',
                     data: theTvdbId
@@ -1606,6 +1629,14 @@ var SeriesfeedImporter;
                     console.error(`Could not convert TVDB id ${theTvdbId} on Seriesfeed.com: ${error.responseText}`);
                     return error;
                 });
+            }
+            static addShowToStorage(show) {
+                let localShows = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedShows);
+                if (localShows == null) {
+                    localShows = new Array();
+                }
+                localShows.push(show);
+                Services.StorageService.set(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedShows, localShows);
             }
             static addFavouriteByShowId(showId) {
                 const postData = {
@@ -2117,7 +2148,8 @@ var SeriesfeedImporter;
     var Enums;
     (function (Enums) {
         Enums.LocalStorageKey = {
-            BierdopjeShowSlugTvdbId: "bierdopje.showSlug_tvdbId"
+            BierdopjeShows: "bierdopje.shows",
+            SeriesfeedShows: "seriesfeed.shows"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -2297,13 +2329,14 @@ var SeriesfeedImporter;
                 if (localTheTvdbId != null) {
                     return Promise.resolve(localTheTvdbId);
                 }
-                return this.getTvdbIdByShowSlugFromBierdopje(showSlug).then((theTvdbId) => {
+                return this.getTvdbIdByShowSlugFromApi(showSlug)
+                    .then((theTvdbId) => {
                     this.addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug);
                     return theTvdbId;
                 });
             }
             static getTvdbIdByShowSlugFromStorage(showSlug) {
-                const localShow = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId);
+                const localShow = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShows);
                 if (localShow != null) {
                     for (let i = 0; i < localShow.length; i++) {
                         if (localShow[i].slug === showSlug) {
@@ -2313,7 +2346,7 @@ var SeriesfeedImporter;
                 }
                 return null;
             }
-            static getTvdbIdByShowSlugFromBierdopje(showSlug) {
+            static getTvdbIdByShowSlugFromApi(showSlug) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + showSlug;
                 return Services.AjaxService.get(url)
                     .then((pageData) => {
@@ -2326,12 +2359,12 @@ var SeriesfeedImporter;
                 });
             }
             static addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug) {
-                let localIds = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId);
+                let localIds = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShows);
                 if (localIds == null) {
                     localIds = new Array();
                 }
                 localIds.push({ theTvdbId: theTvdbId, slug: showSlug });
-                Services.StorageService.set(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShowSlugTvdbId, localIds);
+                Services.StorageService.set(SeriesfeedImporter.Enums.LocalStorageKey.BierdopjeShows, localIds);
             }
             static getTimeWastedByUsername(username) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + "/user/" + username + "/timewasted";

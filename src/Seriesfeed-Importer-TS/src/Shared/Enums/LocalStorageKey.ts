@@ -3,6 +3,7 @@
 module SeriesfeedImporter.Enums {
     export type LocalStorageKey = string;
     export const LocalStorageKey = {
-        BierdopjeShowSlugTvdbId: "bierdopje.showSlug_tvdbId" as LocalStorageKey
+        BierdopjeShows: "bierdopje.shows" as LocalStorageKey,
+        SeriesfeedShows: "seriesfeed.shows" as LocalStorageKey
     };
 }

@@ -12,7 +12,7 @@ module SeriesfeedImporter.Controllers {
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
             card.setTitle("Bierdopje Time Wasted importeren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportFavourites);
+            card.setBackButtonUrl(Enums.ShortUrl.ImportTimeWasted);
             const breadcrumbs = [
                 new Models.Breadcrumb("Time Wasted importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportTimeWasted),

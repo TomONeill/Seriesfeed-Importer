@@ -6,10 +6,10 @@ module SeriesfeedImporter.Services {
             return Services.AjaxService.get(Config.ImdbBaseUrl + "/helpdesk/contact")
                 .then((pageData) => {
                     const data = $(pageData.responseText);
-                    const imdbUser = new Models.ImdbUser();
-                    imdbUser.id = data.find('#navUserMenu p a').attr('href').split('/')[4];
-                    imdbUser.username = data.find('#navUserMenu p a').html().trim();
-                    return imdbUser;
+                    const id = data.find('#navUserMenu p a').attr('href').split('/')[4];
+                    const username = data.find('#navUserMenu p a').html().trim();
+
+                    return new Models.ImdbUser(id, username);
                 })
                 .catch((error) => {
                     throw `Could not get user from ${Config.ImdbBaseUrl}: ${error}`;

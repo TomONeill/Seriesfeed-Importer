@@ -2,17 +2,15 @@
 
 module SeriesfeedImporter.Controllers {
     export class ImdbListSelectionControllerController {
-        private _userId: string;
-        private _username: string;
+        private _user: Models.ImdbUser;
         private _selectedLists: Array<any>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
         private _collectingData: ViewModels.ReadMoreButton;
         private _currentCalls: Array<number>;
 
-        constructor(userId: string, username: string) {
-            this._userId = userId;
-            this._username = username;
+        constructor(user: Models.ImdbUser) {
+            this._user = user;
             this._checkboxes = [];
             this._selectedLists = [];
             this._currentCalls = [];
@@ -24,7 +22,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => new ImportBierdopjeFavouritesController(this._username, this._selectedLists));
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => {});
             this._nextButton.instance.hide();
         }
 
@@ -41,8 +39,8 @@ module SeriesfeedImporter.Controllers {
             const breadcrumbs = [
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportFavourites),
-                new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportFavouritesImdb),
-                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportFavouritesImdb}${this._username}`)
+                new Models.Breadcrumb(this._user.username, Enums.ShortUrl.ImportFavouritesImdb),
+                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportFavouritesImdb}${this._user.username}`)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth('650px');
@@ -75,7 +73,7 @@ module SeriesfeedImporter.Controllers {
                 .append(this._collectingData.instance)
                 .append(this._nextButton.instance);
 
-            Services.ImdbImportService.getListsByUserId(this._userId)
+            Services.ImdbImportService.getListsByUserId(this._user.id)
                 .then((imdbLists) => {
                     imdbLists.forEach((imdbList, index) => {
                         const checkbox = new ViewModels.Checkbox(`show_${index}`);

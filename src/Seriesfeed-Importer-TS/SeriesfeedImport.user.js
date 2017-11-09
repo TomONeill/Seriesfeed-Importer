@@ -1237,9 +1237,8 @@ var SeriesfeedImporter;
     var Controllers;
     (function (Controllers) {
         class ImdbListSelectionControllerController {
-            constructor(userId, username) {
-                this._userId = userId;
-                this._username = username;
+            constructor(user) {
+                this._user = user;
                 this._checkboxes = [];
                 this._selectedLists = [];
                 this._currentCalls = [];
@@ -1249,7 +1248,7 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImportBierdopjeFavouritesController(this._username, this._selectedLists));
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { });
                 this._nextButton.instance.hide();
             }
             initialiseCollectingData() {
@@ -1264,8 +1263,8 @@ var SeriesfeedImporter;
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("IMDb", SeriesfeedImporter.Enums.ShortUrl.ImportFavourites),
-                    new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb),
-                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb}${this._username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb(this._user.username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb),
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb}${this._user.username}`)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth('650px');
@@ -1294,7 +1293,7 @@ var SeriesfeedImporter;
                     .append(loadingData)
                     .append(this._collectingData.instance)
                     .append(this._nextButton.instance);
-                SeriesfeedImporter.Services.ImdbImportService.getListsByUserId(this._userId)
+                SeriesfeedImporter.Services.ImdbImportService.getListsByUserId(this._user.id)
                     .then((imdbLists) => {
                     imdbLists.forEach((imdbList, index) => {
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
@@ -1733,6 +1732,10 @@ var SeriesfeedImporter;
     var Models;
     (function (Models) {
         class ImdbUser {
+            constructor(id, username) {
+                this.id = id;
+                this.username = username;
+            }
         }
         Models.ImdbUser = ImdbUser;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
@@ -1746,10 +1749,9 @@ var SeriesfeedImporter;
                 return Services.AjaxService.get(SeriesfeedImporter.Config.ImdbBaseUrl + "/helpdesk/contact")
                     .then((pageData) => {
                     const data = $(pageData.responseText);
-                    const imdbUser = new SeriesfeedImporter.Models.ImdbUser();
-                    imdbUser.id = data.find('#navUserMenu p a').attr('href').split('/')[4];
-                    imdbUser.username = data.find('#navUserMenu p a').html().trim();
-                    return imdbUser;
+                    const id = data.find('#navUserMenu p a').attr('href').split('/')[4];
+                    const username = data.find('#navUserMenu p a').html().trim();
+                    return new SeriesfeedImporter.Models.ImdbUser(id, username);
                 })
                     .catch((error) => {
                     throw `Could not get user from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
@@ -2019,10 +2021,10 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportImdbFavouritesUserSelectionController();
             }
-            static importImdbUser(userId, username) {
+            static importImdbUser(user) {
                 document.title = "IMDb lijsten selecteren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(userId, username);
+                new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(user);
             }
             static importTimeWasted() {
                 document.title = "Time Wasted importeren | Seriesfeed";
@@ -2050,7 +2052,8 @@ var SeriesfeedImporter;
                     const parts = url.split('/');
                     const userId = parts[parts.length - 2];
                     const username = parts[parts.length - 1];
-                    this.importImdbUser(userId, decodeURIComponent(username));
+                    const user = new SeriesfeedImporter.Models.ImdbUser(userId, decodeURIComponent(username));
+                    this.importImdbUser(user);
                     return;
                 }
             }

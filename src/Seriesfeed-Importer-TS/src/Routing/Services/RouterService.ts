@@ -80,11 +80,11 @@ module SeriesfeedImporter.Services {
             new Controllers.ImportImdbFavouritesUserSelectionController();
         }
 
-        private static importImdbUser(userId: string, username: string): void {
+        private static importImdbUser(user: Models.ImdbUser): void {
             document.title = "IMDb lijsten selecteren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImdbListSelectionControllerController(userId, username);
+            new Controllers.ImdbListSelectionControllerController(user);
         }
 
         private static importTimeWasted(): void {
@@ -120,7 +120,9 @@ module SeriesfeedImporter.Services {
                 const parts = url.split('/');
                 const userId = parts[parts.length - 2];
                 const username = parts[parts.length - 1];
-                this.importImdbUser(userId, decodeURIComponent(username));
+                const user = new Models.ImdbUser(userId, decodeURIComponent(username));
+
+                this.importImdbUser(user);
                 return;
             }
         }

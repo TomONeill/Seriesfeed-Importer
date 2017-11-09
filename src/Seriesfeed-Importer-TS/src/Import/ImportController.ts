@@ -38,7 +38,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private addTimeWasted(cardContent: JQuery<HTMLElement>): void {
-            const timeWasted = new ViewModels.Button(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => {}, "100%");
+            const timeWasted = new ViewModels.Button(Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => Services.RouterService.navigate(Enums.ShortUrl.ImportTimeWasted), "100%");
             cardContent.append(timeWasted.instance);
         }
     }

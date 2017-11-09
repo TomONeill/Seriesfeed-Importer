@@ -593,7 +593,7 @@ var SeriesfeedImporter;
                 cardContent.append(favourites.instance);
             }
             addTimeWasted(cardContent) {
-                const timeWasted = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => { }, "100%");
+                const timeWasted = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Success, "fa-clock-o", "Time Wasted", () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted), "100%");
                 cardContent.append(timeWasted.instance);
             }
         }
@@ -1869,6 +1869,29 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
+        class ImportTimeWastedController {
+            constructor() {
+                this.initialise();
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+            }
+            initialise() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Favorieten importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("X", null)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+            }
+        }
+        Controllers.ImportTimeWastedController = ImportTimeWastedController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
         class NavigationController {
             initialise() {
                 SeriesfeedImporter.Services.NavigationService.add(SeriesfeedImporter.Enums.NavigationType.Series, 5, "Importeren", SeriesfeedImporter.Enums.ShortUrl.Import);
@@ -1955,6 +1978,9 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.ImportImdb:
                         this.importImdb();
                         break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted:
+                        this.importTimeWasted();
+                        break;
                     case SeriesfeedImporter.Enums.ShortUrl.Export:
                         this.export();
                         break;
@@ -1997,6 +2023,11 @@ var SeriesfeedImporter;
                 document.title = "IMDb lijsten selecteren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(userId, username);
+            }
+            static importTimeWasted() {
+                document.title = "Time Wasted importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.ImportTimeWastedController();
             }
             static export() {
                 document.title = "Series exporteren | Seriesfeed";
@@ -2122,6 +2153,7 @@ var SeriesfeedImporter;
             ImportSourceSelection: "/series/import/source/",
             ImportBierdopje: "/series/import/source/bierdopje/",
             ImportImdb: "/series/import/source/imdb/",
+            ImportTimeWasted: "/series/import/timewasted/",
             Export: "/series/export/",
             ExportFavouriteSelection: "/series/export/favourites/"
         };

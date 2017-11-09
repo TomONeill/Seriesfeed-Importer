@@ -24,6 +24,10 @@ module SeriesfeedImporter.Services {
                     this.importImdb();
                     break;
 
+                case Enums.ShortUrl.ImportTimeWasted:
+                    this.importTimeWasted();
+                    break;
+
                 case Enums.ShortUrl.Export:
                     this.export();
                     break;
@@ -81,6 +85,13 @@ module SeriesfeedImporter.Services {
             CardService.getCard().clear();
 
             new Controllers.ImdbListSelectionControllerController(userId, username);
+        }
+
+        private static importTimeWasted(): void {
+            document.title = "Time Wasted importeren | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.ImportTimeWastedController();
         }
 
         private static export(): void {

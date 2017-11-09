@@ -1231,6 +1231,7 @@ var SeriesfeedImporter;
                 this._selectedLists = selectedLists;
                 this._checkboxes = [];
                 this._selectedShows = [];
+                window.scrollTo(0, 0);
                 this.initialiseNextButton();
                 this.initialiseCard();
                 this.initialise();

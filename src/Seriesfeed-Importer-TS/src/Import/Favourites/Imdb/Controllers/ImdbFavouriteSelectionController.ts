@@ -14,6 +14,7 @@ module SeriesfeedImporter.Controllers {
             this._checkboxes = [];
             this._selectedShows = [];
 
+            window.scrollTo(0, 0);
             this.initialiseNextButton();
             this.initialiseCard();
             this.initialise();

@@ -1241,7 +1241,7 @@ var SeriesfeedImporter;
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("IMDb lijsten selecteren");
+                card.setTitle("IMDb series selecteren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),

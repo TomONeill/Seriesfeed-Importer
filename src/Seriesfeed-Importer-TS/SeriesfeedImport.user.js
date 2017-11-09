@@ -1248,7 +1248,7 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { });
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { console.log(this._selectedLists); });
                 this._nextButton.instance.hide();
             }
             initialiseCollectingData() {
@@ -1299,7 +1299,15 @@ var SeriesfeedImporter;
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
+                                this._currentCalls.push(index);
                                 this.setCollectingData();
+                                SeriesfeedImporter.Services.ImdbImportService.getSeriesByListIdAndUserId(imdbList.id, this._user.id)
+                                    .then((shows) => {
+                                    imdbList.shows = shows;
+                                    const position = this._currentCalls.indexOf(index);
+                                    this._currentCalls.splice(position, 1);
+                                    this.setCollectingData();
+                                });
                                 this._selectedLists.push(imdbList);
                             }
                             else {

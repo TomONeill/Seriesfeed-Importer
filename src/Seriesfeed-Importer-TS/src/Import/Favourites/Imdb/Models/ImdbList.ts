@@ -7,5 +7,6 @@ module SeriesfeedImporter.Models {
         public seriesCount: string;
         public createdOn: string;
         public modifiedOn: string;
+        public shows: Models.Show[];
     }
 }

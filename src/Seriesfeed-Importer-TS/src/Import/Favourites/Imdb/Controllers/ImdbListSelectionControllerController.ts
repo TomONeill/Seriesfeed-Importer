@@ -3,7 +3,7 @@
 module SeriesfeedImporter.Controllers {
     export class ImdbListSelectionControllerController {
         private _user: Models.ImdbUser;
-        private _selectedLists: Array<any>;
+        private _selectedLists: Array<Models.ImdbList>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
         private _collectingData: ViewModels.ReadMoreButton;
@@ -22,7 +22,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => {});
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => { console.log(this._selectedLists) });
             this._nextButton.instance.hide();
         }
 
@@ -79,14 +79,15 @@ module SeriesfeedImporter.Controllers {
                         const checkbox = new ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                //this._currentCalls.push(index);
+                                this._currentCalls.push(index);
                                 this.setCollectingData();
-                                // Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
-                                //     show.theTvdbId = theTvdbId;
-                                //     const position = this._currentCalls.indexOf(index);
-                                //     this._currentCalls.splice(position, 1);
-                                //     this.setCollectingData();
-                                // });
+                                Services.ImdbImportService.getSeriesByListIdAndUserId(imdbList.id, this._user.id)
+                                    .then((shows) => {
+                                        imdbList.shows = shows;
+                                        const position = this._currentCalls.indexOf(index);
+                                        this._currentCalls.splice(position, 1);
+                                        this.setCollectingData();
+                                    });
                                 this._selectedLists.push(imdbList);
                             } else {
                                 const position = this._selectedLists.map((list) => list.name).indexOf(imdbList.name);

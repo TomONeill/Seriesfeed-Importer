@@ -97,11 +97,11 @@ module SeriesfeedImporter.Controllers {
         }
 
         private setNextButton(): void {
-            if (this._selectedLists.length === 1) {
-                this._nextButton.text = `${this._selectedLists.length} serie selecteren`;
+            if (this._selectedShows.length === 1) {
+                this._nextButton.text = `${this._selectedShows.length} serie selecteren`;
                 this._nextButton.instance.show();
-            } else if (this._selectedLists.length > 1) {
-                this._nextButton.text = `${this._selectedLists.length} series selecteren`;
+            } else if (this._selectedShows.length > 1) {
+                this._nextButton.text = `${this._selectedShows.length} series selecteren`;
                 this._nextButton.instance.show();
             } else {
                 this._nextButton.instance.hide();

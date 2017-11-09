@@ -29,7 +29,7 @@ Check out other userscripts for Seriesfeed by me:<BR/>
 # Development
 If you want to help with the development, you can. From now on I'll be working in the `src/Seriesfeed-Importer-TS` directory, in which a TypeScript project is located. You can use this for development. To setup the dev in combination with Tampermonkey/other, do the following:
 1. Open the `src/Seriesfeed-Importer-TS` folder in your favourite IDE.
-2. Open CMD, PowerShell or the terminal (VS Code tip: use CTRL + `).
+2. Open CMD, PowerShell or the terminal (VS Code tip: use CTRL + \`).<br/>
 2.5: If not already, `cd` to this repository.
 3. Type: `tsc --watch` to run the TypeScript compiler. The `tsconfig.json` file will determine the location of the output.
 4. Add a userscript with the following:

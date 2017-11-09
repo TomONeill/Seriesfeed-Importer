@@ -1144,7 +1144,7 @@ var SeriesfeedImporter;
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                     .catch((error) => {
-                    throw `Could not get username from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
+                    throw `Could not get username from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
             static isExistingUser(username) {
@@ -1164,7 +1164,7 @@ var SeriesfeedImporter;
                     return data.find('img.avatar').attr('src');
                 })
                     .catch((error) => {
-                    throw `Could not get avatar url from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
+                    throw `Could not get avatar url from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
             static getFavouritesByUsername(username) {
@@ -1184,7 +1184,7 @@ var SeriesfeedImporter;
                 })
                     .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
-                    throw `Could not get favourites from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
+                    throw `Could not get favourites from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
             static getTvdbIdByShowSlug(showSlug) {
@@ -1217,7 +1217,7 @@ var SeriesfeedImporter;
                     return theTvdbId;
                 })
                     .catch((error) => {
-                    throw `Could not get the TVDB of ${showSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}: ${error}`;
+                    throw `Could not get the TVDB of ${showSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
             static addTvdbIdWithShowSlugToStorage(theTvdbId, showSlug) {
@@ -1754,7 +1754,7 @@ var SeriesfeedImporter;
                     return new SeriesfeedImporter.Models.ImdbUser(id, username);
                 })
                     .catch((error) => {
-                    throw `Could not get user from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
+                    throw `Could not get user from ${SeriesfeedImporter.Config.ImdbBaseUrl}. ${error}`;
                 });
             }
             static getAvatarUrlByUserId(userId) {
@@ -1764,7 +1764,7 @@ var SeriesfeedImporter;
                     return data.find('#avatar').attr('src');
                 })
                     .catch((error) => {
-                    throw `Could not get avatar for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
+                    throw `Could not get avatar for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}. ${error}`;
                 });
             }
             static getListsByUserId(userId) {
@@ -1786,7 +1786,7 @@ var SeriesfeedImporter;
                     return imdbLists;
                 })
                     .catch((error) => {
-                    throw `Could not get lists for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}: ${error}`;
+                    throw `Could not get lists for user id ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}. ${error}`;
                 });
             }
             static fixListTranslations(imdbList) {
@@ -1821,7 +1821,43 @@ var SeriesfeedImporter;
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
                 })
                     .catch((error) => {
-                    throw `Could not get series from ${listUrl}: ${error}`;
+                    throw `Could not get series from ${listUrl}. ${error}`;
+                });
+            }
+            static getSeriesByListIdAndUserId(listId, userId) {
+                const url = SeriesfeedImporter.Config.ImdbBaseUrl + "/list/export?list_id=" + listId + "&author_id=" + userId;
+                return Services.AjaxService.get(url)
+                    .then((result) => {
+                    const csv = result.responseText;
+                    const entries = csv.split('\n');
+                    const entryKeys = entries[0].split(',');
+                    const imdbIdIndex = entryKeys.indexOf("\"const\"");
+                    const titleIndex = entryKeys.indexOf("\"Title\"");
+                    const titleTypeIndex = entryKeys.indexOf("\"Title type\"");
+                    const shows = new Array();
+                    const quoteRegex = new RegExp('"', 'g');
+                    entries.forEach((entry, index) => {
+                        if (index === 0) {
+                            return;
+                        }
+                        const entryValues = entry.split(',');
+                        const titleType = entryValues[titleTypeIndex];
+                        const id = entryValues[imdbIdIndex];
+                        const title = entryValues[titleIndex];
+                        if (titleType == null || id == null || title == null) {
+                            return;
+                        }
+                        if (titleType.replace(quoteRegex, '') !== "Feature Film") {
+                            const show = new SeriesfeedImporter.Models.Show();
+                            show.imdbId = id.replace(quoteRegex, '');
+                            show.name = title.replace(quoteRegex, '');
+                            shows.push(show);
+                        }
+                    });
+                    return shows;
+                })
+                    .catch((error) => {
+                    throw `Could not get list id ${listId} for user ${userId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}. ${error}`;
                 });
             }
         }

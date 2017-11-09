@@ -12,7 +12,7 @@ module SeriesfeedImporter.Services {
                     return new Models.ImdbUser(id, username);
                 })
                 .catch((error) => {
-                    throw `Could not get user from ${Config.ImdbBaseUrl}: ${error}`;
+                    throw `Could not get user from ${Config.ImdbBaseUrl}. ${error}`;
                 });
         }
 
@@ -23,7 +23,7 @@ module SeriesfeedImporter.Services {
                     return data.find('#avatar').attr('src');
                 })
                 .catch((error) => {
-                    throw `Could not get avatar for user id ${userId} from ${Config.ImdbBaseUrl}: ${error}`;
+                    throw `Could not get avatar for user id ${userId} from ${Config.ImdbBaseUrl}. ${error}`;
                 });
         }
 
@@ -51,7 +51,7 @@ module SeriesfeedImporter.Services {
                     return imdbLists;
                 })
                 .catch((error) => {
-                    throw `Could not get lists for user id ${userId} from ${Config.ImdbBaseUrl}: ${error}`;
+                    throw `Could not get lists for user id ${userId} from ${Config.ImdbBaseUrl}. ${error}`;
                 });
         }
 
@@ -95,7 +95,52 @@ module SeriesfeedImporter.Services {
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
                 })
                 .catch((error) => {
-                    throw `Could not get series from ${listUrl}: ${error}`;
+                    throw `Could not get series from ${listUrl}. ${error}`;
+                });
+        }
+
+        public static getSeriesByListIdAndUserId(listId: string, userId: string): Promise<Models.Show[]> {
+            const url = Config.ImdbBaseUrl + "/list/export?list_id=" + listId + "&author_id=" + userId;
+
+            return Services.AjaxService.get(url)
+                .then((result) => {
+                    const csv = result.responseText;
+                    const entries = csv.split('\n') as Array<string>;
+
+                    const entryKeys = entries[0].split(',');
+                    const imdbIdIndex = entryKeys.indexOf("\"const\"");
+                    const titleIndex = entryKeys.indexOf("\"Title\"");
+                    const titleTypeIndex = entryKeys.indexOf("\"Title type\"");
+
+                    const shows = new Array<Models.Show>();
+                    const quoteRegex = new RegExp('"', 'g');
+                    
+                    entries.forEach((entry, index) => {
+                        if (index === 0) {
+                            return;
+                        }
+
+                        const entryValues = entry.split(',');
+                        const titleType = entryValues[titleTypeIndex];
+                        const id = entryValues[imdbIdIndex];
+                        const title = entryValues[titleIndex];
+
+                        if (titleType == null || id == null || title == null) {
+                            return;
+                        }
+
+                        if (titleType.replace(quoteRegex, '') !== "Feature Film") {
+                            const show = new Models.Show();
+                            show.imdbId = id.replace(quoteRegex, '');
+                            show.name = title.replace(quoteRegex, '');
+                            shows.push(show);
+                        }
+                    });
+
+                    return shows;
+                })
+                .catch((error) => {
+                    throw `Could not get list id ${listId} for user ${userId} from ${Config.ImdbBaseUrl}. ${error}`;
                 });
         }
     }

@@ -12,21 +12,21 @@ module SeriesfeedImporter.Services {
                     return userLinkParts[2];
                 })
                 .catch((error) => {
-                    throw `Could not get username from ${Config.BaseUrl}: ${error}`;
+                    throw `Could not get username from ${Config.BaseUrl}. ${error}`;
                 });
         }
 
-        public static getFavouritesByUsername(username: string): Promise<Models.SeriesfeedShow[]> {
+        public static getFavouritesByUsername(username: string): Promise<Models.SeriesfeedShowExportModel[]> {
             const url = Config.BaseUrl + "/users/" + username + "/favourites";
 
             return Services.AjaxService.get(url)
                 .then((pageData) => {
                     const data = $(pageData.responseText);
                     const dataRow = data.find("#favourites").find("tbody tr");
-                    const favourites = new Array<Models.SeriesfeedShow>();
+                    const favourites = new Array<Models.SeriesfeedShowExportModel>();
 
                     dataRow.each((index, favourite) => {
-                        const show = new Models.SeriesfeedShow();
+                        const show = new Models.SeriesfeedShowExportModel();
 
                         show.posterUrl = $($(favourite).find('td')[0]).find('img').attr('src');
                         show.name = $($(favourite).find('td')[1]).text();
@@ -42,7 +42,7 @@ module SeriesfeedImporter.Services {
                 })
                 .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat je niet meer ingelogd bent, geen favorieten hebt of er is iets mis met je verbinding.`);
-                    throw `Could not get favourites from ${Config.BaseUrl}: ${error}`;
+                    throw `Could not get favourites from ${Config.BaseUrl}. ${error}`;
                 });
         }
     }

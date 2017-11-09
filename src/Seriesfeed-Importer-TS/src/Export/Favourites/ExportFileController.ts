@@ -2,10 +2,10 @@
 
 module SeriesfeedImporter.Controllers {
     export class ExportFileController {
-        private _selectedShows: Array<Models.SeriesfeedShow>;
+        private _selectedShows: Array<Models.SeriesfeedShowExportModel>;
         private _selectedDetails: Array<string>;
 
-        constructor(selectedShows: Array<Models.SeriesfeedShow>, selectedDetails: Array<string>) {
+        constructor(selectedShows: Array<Models.SeriesfeedShowExportModel>, selectedDetails: Array<string>) {
             this._selectedShows = selectedShows;
             this._selectedDetails = selectedDetails;
 

@@ -42,7 +42,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => {} /* new FakeController(this._username, this._selectedShows) */);
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => { } /* new FakeController(this._username, this._selectedShows) */);
             this._nextButton.instance.hide();
         }
 
@@ -69,46 +69,57 @@ module SeriesfeedImporter.Controllers {
                 .append(this._collectingData.instance)
                 .append(this._nextButton.instance);
 
-            // Services.BierdopjeService.getFavouritesByUsername(this._username)
-            //     .then((favourites) => {
-            //         favourites.forEach((show, index) => {
-            //             const row = $('<tr/>');
-            //             const selectColumn = $('<td/>');
-            //             const showColumn = $('<td/>');
+            Services.BierdopjeService.getTimeWastedByUsername(this._username)
+                .then((shows) => {
+                    shows.forEach((show, index) => {
+                        const row = $('<tr/>');
+                        const selectColumn = $('<td/>');
+                        const showColumn = $('<td/>');
 
-            //             const checkbox = new ViewModels.Checkbox(`show_${index}`);
-            //             checkbox.subscribe((isEnabled) => {
-            //                 if (isEnabled) {
-            //                     this._currentCalls.push(index);
-            //                     this.setCollectingData();
-            //                     Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
-            //                         show.theTvdbId = theTvdbId;
-            //                         const position = this._currentCalls.indexOf(index);
-            //                         this._currentCalls.splice(position, 1);
-            //                         this.setCollectingData();
-            //                     });
-            //                     this._selectedShows.push(show);
-            //                 } else {
-            //                     const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
-            //                     this._selectedShows.splice(position, 1);
-            //                 }
+                        const checkbox = new ViewModels.Checkbox(`show_${index}`);
+                        checkbox.subscribe((isEnabled) => {
+                            if (isEnabled) {
+                                this._currentCalls.push(index);
+                                this.setCollectingData();
+                                Services.BierdopjeService.getTvdbIdByShowSlug(show.slug)
+                                    .then((theTvdbId) => {
+                                        show.theTvdbId = theTvdbId;
 
-            //                 this.setNextButton();
-            //             });
+                                        Services.SeriesfeedImportService.findShowByTheTvdbId(show.theTvdbId)
+                                            .then((result) => {
+                                                show.seriesfeedId = result.id;
+                                                const position = this._currentCalls.indexOf(index);
+                                                this._currentCalls.splice(position, 1);
+                                                this.setCollectingData();
+                                            })
+                                            .catch(() => {
+                                                const position = this._currentCalls.indexOf(index);
+                                                this._currentCalls.splice(position, 1);
+                                                this.setCollectingData();
+                                            });
+                                    });
+                                this._selectedShows.push(show);
+                            } else {
+                                const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
+                                this._selectedShows.splice(position, 1);
+                            }
 
-            //             selectColumn.append(checkbox.instance);
-            //             this._checkboxes.push(checkbox);
+                            this.setNextButton();
+                        });
 
-            //             const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
-            //             showColumn.append(showLink);
+                        selectColumn.append(checkbox.instance);
+                        this._checkboxes.push(checkbox);
 
-            //             row.append(selectColumn);
-            //             row.append(showColumn);
+                        const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                        showColumn.append(showLink);
 
-            //             table.addRow(row);
-            //         });
-            //         loadingData.replaceWith(table.instance);
-            //     });
+                        row.append(selectColumn);
+                        row.append(showColumn);
+
+                        table.addRow(row);
+                    });
+                    loadingData.replaceWith(table.instance);
+                });
         }
 
         private toggleAllCheckboxes(isEnabled: boolean): void {

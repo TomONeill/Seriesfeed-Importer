@@ -66,7 +66,7 @@ module SeriesfeedImporter.Controllers {
             this._selectedShows.forEach((show, index) => {
                 const currentRow = this._table.getRow(index);
 
-                Services.SeriesfeedImportService.getShowIdByTvdbId(show.theTvdbId)
+                Services.SeriesfeedImportService.getShowIdByTheTvdbId(show.theTvdbId)
                     .then((seriesfeedShow) => Services.SeriesfeedImportService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
                     .then(() => {
                         const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
@@ -126,7 +126,7 @@ module SeriesfeedImporter.Controllers {
 
                 Services.BierdopjeService.getTvdbIdByShowSlug("bdShowSlug")
                     .then((tvdbId) => {
-                        Services.SeriesfeedImportService.getShowIdByTvdbId(tvdbId)
+                        Services.SeriesfeedImportService.getShowIdByTheTvdbId(tvdbId)
                             .then((sfShowData) => {
                                 //let sfSeriesId = sfShowData.id;
                                 let sfSeriesName = sfShowData.name;

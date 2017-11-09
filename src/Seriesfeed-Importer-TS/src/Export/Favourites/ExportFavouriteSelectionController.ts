@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Controllers {
     export class ExportFavouritesController {
-        private _selectedShows: Array<Models.SeriesfeedShow>;
+        private _selectedShows: Array<Models.SeriesfeedShowExportModel>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
 

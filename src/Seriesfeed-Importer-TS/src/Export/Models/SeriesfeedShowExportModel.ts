@@ -1,7 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Models {
-    export class SeriesfeedShow {
+    export class SeriesfeedShowExportModel {
         public name: string;
         public url: string;
         public posterUrl: string;

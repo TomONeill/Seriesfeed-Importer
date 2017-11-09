@@ -1,4 +1,4 @@
-/// <reference path="../../../../typings/index.d.ts" />
+/// <reference path="../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Services {
     export class BierdopjeService {
@@ -52,7 +52,7 @@ module SeriesfeedImporter.Services {
 
                         favourites.push(show);
                     });
-                    
+
                     return favourites;
                 })
                 .catch((error) => {
@@ -109,6 +109,34 @@ module SeriesfeedImporter.Services {
             }
             localIds.push({ theTvdbId: theTvdbId, slug: showSlug } as Models.Show);
             Services.StorageService.set(Enums.LocalStorageKey.BierdopjeShowSlugTvdbId, localIds);
+        }
+
+        public static getTimeWastedByUsername(username: string): Promise<Models.Show[]> {
+            const url = Config.BierdopjeBaseUrl + "/user/" + username + "/timewasted";
+
+            return Services.AjaxService.get(url)
+                .then((pageData) => {
+                    const bdTimeWastedData = $(pageData.responseText);
+                    const timeWastedRows = bdTimeWastedData.find('table tr');
+                    const shows = new Array<Models.Show>();
+
+                    timeWastedRows.each((index, timeWastedRow) => {
+                        if (index === 0 || index === timeWastedRows.length - 1) {
+                            return;
+                        }
+
+                        const show = new Models.Show();
+                        show.name = $(timeWastedRow).find('td a').html();
+                        show.slug = $(timeWastedRow).find('td a').attr('href');
+
+                        shows.push(show);
+                    });
+
+                    return Services.ShowSorterService.sort(shows, "name");
+                })
+                .catch((error) => {
+                    throw `Could not get Time Wasted for user ${username} from ${Config.BierdopjeBaseUrl}. ${error}`;
+                });
         }
     }
 }

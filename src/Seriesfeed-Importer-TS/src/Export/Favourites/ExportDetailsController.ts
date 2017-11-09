@@ -2,12 +2,12 @@
 
 module SeriesfeedImporter.Controllers {
     export class ExportDetailsController {
-        private _selectedShows: Array<Models.SeriesfeedShow>;
+        private _selectedShows: Array<Models.SeriesfeedShowExportModel>;
         private _selectedDetails: Array<string>;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
 
-        constructor(selectedShows: Array<Models.SeriesfeedShow>) {
+        constructor(selectedShows: Array<Models.SeriesfeedShowExportModel>) {
             this._selectedShows = selectedShows;
             this._selectedDetails = [];
             this._checkboxes = [];

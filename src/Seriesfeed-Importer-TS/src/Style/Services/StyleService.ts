@@ -71,7 +71,7 @@ module SeriesfeedImporter.Services {
                 + '        50% { transform: rotateX(180deg); }'
                 + '    }'
                 + ''
-                + '    .table.thickenHeader thead {'
+                + '    .table.thicken-header thead {'
                 + '        border-bottom: 2px solid #d9d9d9;'
                 + '    }'
                 + ''

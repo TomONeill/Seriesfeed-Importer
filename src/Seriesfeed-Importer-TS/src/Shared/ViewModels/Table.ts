@@ -7,7 +7,7 @@ module SeriesfeedImporter.ViewModels {
         private tbody: JQuery<HTMLElement>;
 
         constructor() {
-            this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only thickenHeader');
+            this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only thicken-header');
             const thead = $('<thead/>');
             this.headerRow = $('<tr/>');
             this.tbody = $('<tbody/>');

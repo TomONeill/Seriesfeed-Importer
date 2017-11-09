@@ -2647,7 +2647,7 @@ var SeriesfeedImporter;
     (function (ViewModels) {
         class Table {
             constructor() {
-                this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only thickenHeader');
+                this.instance = $('<table/>').addClass('table table-hover responsiveTable stacktable large-only thicken-header');
                 const thead = $('<thead/>');
                 this.headerRow = $('<tr/>');
                 this.tbody = $('<tbody/>');
@@ -2825,7 +2825,7 @@ var SeriesfeedImporter;
                     + '        50% { transform: rotateX(180deg); }'
                     + '    }'
                     + ''
-                    + '    .table.thickenHeader thead {'
+                    + '    .table.thicken-header thead {'
                     + '        border-bottom: 2px solid #d9d9d9;'
                     + '    }'
                     + ''

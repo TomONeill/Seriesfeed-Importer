@@ -36,9 +36,11 @@ module SeriesfeedImporter.Services {
 
                     dataRows.each((index, dataRow) => {
                         const imdbList = new Models.ImdbList();
+                        const imdbListUrl = $(dataRow).find('.name a').attr('href');
+                        const imdbListUrlParts = imdbListUrl.split('/');
 
+                        imdbList.id = imdbListUrlParts[imdbListUrlParts.length - 2];
                         imdbList.name = $(dataRow).find('.name a').text();
-                        imdbList.slug = $(dataRow).find('.name a').attr('href');
                         imdbList.seriesCount = $(dataRow).find('.name span').text();
                         imdbList.createdOn = $(dataRow).find('.created').text();
                         imdbList.modifiedOn = $(dataRow).find('.modified').text();
@@ -47,6 +49,8 @@ module SeriesfeedImporter.Services {
 
                         imdbLists.push(imdbList);
                     });
+
+                    imdbLists.push(this.getWatchlistItem());
 
                     return imdbLists;
                 })
@@ -70,8 +74,19 @@ module SeriesfeedImporter.Services {
             imdbList.modifiedOn = imdbList.modifiedOn.replace(modifiedOnParts[1], modifiedOnTime).replace("ago", "geleden");
         }
 
-        public static getSeriesByListUrl(listUrl: string): Promise<any[]> {
-            const url = listUrl + "?view=compact";
+        private static getWatchlistItem(): Models.ImdbList {
+            const watchlist = new Models.ImdbList();
+            watchlist.name = "Watchlist";
+            watchlist.id = "watchlist";
+            watchlist.seriesCount = "-";
+            watchlist.createdOn = "-";
+            watchlist.modifiedOn = "-";
+
+            return watchlist;
+        }
+
+        public static getSeriesByListId(listId: string): Promise<any[]> {
+            const url = Config.ImdbBaseUrl + "/list/" + listId + "?view=compact";
 
             return Services.AjaxService.get(url)
                 .then((pageData) => {
@@ -95,7 +110,7 @@ module SeriesfeedImporter.Services {
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
                 })
                 .catch((error) => {
-                    throw `Could not get series from ${listUrl}. ${error}`;
+                    throw `Could not get series from ${listId}. ${error}`;
                 });
         }
 
@@ -114,7 +129,7 @@ module SeriesfeedImporter.Services {
 
                     const shows = new Array<Models.Show>();
                     const quoteRegex = new RegExp('"', 'g');
-                    
+
                     entries.forEach((entry, index) => {
                         if (index === 0) {
                             return;

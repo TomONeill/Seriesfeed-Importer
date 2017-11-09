@@ -97,7 +97,7 @@ module SeriesfeedImporter.Controllers {
                         });
 
                         this._checkboxes.push(checkbox);
-                        const showLink = $('<a/>').attr('href', Config.ImdbBaseUrl + imdbList.slug).attr('target', '_blank').text(imdbList.name);
+                        const showLink = $('<a/>').attr('href', Config.ImdbBaseUrl + imdbList.id).attr('target', '_blank').text(imdbList.name);
 
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>').append(checkbox.instance);

@@ -1309,7 +1309,7 @@ var SeriesfeedImporter;
                             this.setNextButton();
                         });
                         this._checkboxes.push(checkbox);
-                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.ImdbBaseUrl + imdbList.slug).attr('target', '_blank').text(imdbList.name);
+                        const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.ImdbBaseUrl + imdbList.id).attr('target', '_blank').text(imdbList.name);
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>').append(checkbox.instance);
                         const listColumn = $('<td/>').append(showLink);
@@ -1548,7 +1548,7 @@ var SeriesfeedImporter;
                 outerProgress.append(progressBar);
                 loadingData.append(outerProgress);
                 $(this._selectedLists).each((i, list) => {
-                    SeriesfeedImporter.Services.ImdbImportService.getSeriesByListUrl(list.url)
+                    SeriesfeedImporter.Services.ImdbImportService.getSeriesByListId(list.url)
                         .then((series) => {
                         $(series).each((index, seriesItem) => {
                             const seriesName = seriesItem.name;
@@ -1775,14 +1775,17 @@ var SeriesfeedImporter;
                     const imdbLists = new Array();
                     dataRows.each((index, dataRow) => {
                         const imdbList = new SeriesfeedImporter.Models.ImdbList();
+                        const imdbListUrl = $(dataRow).find('.name a').attr('href');
+                        const imdbListUrlParts = imdbListUrl.split('/');
+                        imdbList.id = imdbListUrlParts[imdbListUrlParts.length - 2];
                         imdbList.name = $(dataRow).find('.name a').text();
-                        imdbList.slug = $(dataRow).find('.name a').attr('href');
                         imdbList.seriesCount = $(dataRow).find('.name span').text();
                         imdbList.createdOn = $(dataRow).find('.created').text();
                         imdbList.modifiedOn = $(dataRow).find('.modified').text();
                         this.fixListTranslations(imdbList);
                         imdbLists.push(imdbList);
                     });
+                    imdbLists.push(this.getWatchlistItem());
                     return imdbLists;
                 })
                     .catch((error) => {
@@ -1801,8 +1804,17 @@ var SeriesfeedImporter;
                 const modifiedOnTime = Services.TimeAgoTranslatorService.getDutchTranslationOfTime(modifiedOnParts[1]);
                 imdbList.modifiedOn = imdbList.modifiedOn.replace(modifiedOnParts[1], modifiedOnTime).replace("ago", "geleden");
             }
-            static getSeriesByListUrl(listUrl) {
-                const url = listUrl + "?view=compact";
+            static getWatchlistItem() {
+                const watchlist = new SeriesfeedImporter.Models.ImdbList();
+                watchlist.name = "Watchlist";
+                watchlist.id = "watchlist";
+                watchlist.seriesCount = "-";
+                watchlist.createdOn = "-";
+                watchlist.modifiedOn = "-";
+                return watchlist;
+            }
+            static getSeriesByListId(listId) {
+                const url = SeriesfeedImporter.Config.ImdbBaseUrl + "/list/" + listId + "?view=compact";
                 return Services.AjaxService.get(url)
                     .then((pageData) => {
                     const data = $(pageData.responseText);
@@ -1821,7 +1833,7 @@ var SeriesfeedImporter;
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
                 })
                     .catch((error) => {
-                    throw `Could not get series from ${listUrl}. ${error}`;
+                    throw `Could not get series from ${listId}. ${error}`;
                 });
             }
             static getSeriesByListIdAndUserId(listId, userId) {

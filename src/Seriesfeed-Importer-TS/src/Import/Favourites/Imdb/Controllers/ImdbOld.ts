@@ -227,7 +227,7 @@ module SeriesfeedImporter.Controllers {
             loadingData.append(outerProgress);
 
             $(this._selectedLists).each((i, list: any) => {
-                Services.ImdbImportService.getSeriesByListUrl(list.url)
+                Services.ImdbImportService.getSeriesByListId(list.url)
                     .then((series) => {
                         $(series).each((index, seriesItem: any) => {
                             const seriesName = seriesItem.name;

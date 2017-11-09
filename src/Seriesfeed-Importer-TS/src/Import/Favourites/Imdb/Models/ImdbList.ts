@@ -2,8 +2,8 @@
 
 module SeriesfeedImporter.Models {
     export class ImdbList {
+        public id: string;
         public name: string;
-        public slug: string;
         public seriesCount: string;
         public createdOn: string;
         public modifiedOn: string;

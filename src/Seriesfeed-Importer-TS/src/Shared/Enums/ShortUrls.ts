@@ -8,6 +8,7 @@ module SeriesfeedImporter.Enums {
         ImportFavouritesBierdopje: "/series/import/favourites/bierdopje/" as ShortUrl,
         ImportFavouritesImdb: "/series/import/favourites/imdb/" as ShortUrl,
         ImportTimeWasted: "/series/import/timewasted/" as ShortUrl,
+        ImportTimeWastedBierdopje: "/series/import/timewasted/bierdopje/" as ShortUrl,
         Export: "/series/export/" as ShortUrl,
         ExportFavourites: "/series/export/favourites/" as ShortUrl
     };

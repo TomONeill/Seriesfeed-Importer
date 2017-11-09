@@ -63,7 +63,7 @@ module SeriesfeedImporter.Controllers {
             const loadingData = $('<div/>');
             const loadingFavourites = $('<h4/>').css({ padding: '15px' });
             const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Lijsten ophalen...");
-            const starIcon = $('<i/>').addClass('fa fa-list-ul fa-flip');
+            const starIcon = $('<i/>').addClass('fa fa-list-ul fa-flip-x');
             loadingData.append(loadingFavourites);
             loadingFavourites
                 .append(starIcon)

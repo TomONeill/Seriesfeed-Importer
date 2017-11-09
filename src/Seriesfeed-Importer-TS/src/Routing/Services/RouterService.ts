@@ -28,6 +28,10 @@ module SeriesfeedImporter.Services {
                     this.importTimeWasted();
                     break;
 
+                case Enums.ShortUrl.ImportTimeWastedBierdopje:
+                    this.importTimeWastedBierdopje();
+                    break;
+
                 case Enums.ShortUrl.Export:
                     this.export();
                     break;
@@ -66,7 +70,7 @@ module SeriesfeedImporter.Services {
             new Controllers.ImportBierdopjeFavouritesUserSelectionController();
         }
 
-        private static importBierdopjeUser(username: string): void {
+        private static importFavouritesBierdopjeByUsername(username: string): void {
             document.title = "Bierdopje favorieten importeren | Seriesfeed";
             CardService.getCard().clear();
 
@@ -80,7 +84,7 @@ module SeriesfeedImporter.Services {
             new Controllers.ImportImdbFavouritesUserSelectionController();
         }
 
-        private static importImdbUser(user: Models.ImdbUser): void {
+        private static importFavouritesImdbByUser(user: Models.ImdbUser): void {
             document.title = "IMDb lijsten selecteren | Seriesfeed";
             CardService.getCard().clear();
 
@@ -92,6 +96,20 @@ module SeriesfeedImporter.Services {
             CardService.getCard().clear();
 
             new Controllers.ImportTimeWastedController();
+        }
+
+        private static importTimeWastedBierdopje(): void {
+            document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.ImportTimeWastedBierdopjeController();
+        }
+
+        private static importTimeWastedBierdopjeByUsername(username: string): void {
+            document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
+            CardService.getCard().clear();
+
+            new Controllers.ImportTimeWastedBierdopjeShowSelection(username);
         }
 
         private static export(): void {
@@ -112,7 +130,7 @@ module SeriesfeedImporter.Services {
             if (url.startsWith(Enums.ShortUrl.ImportFavouritesBierdopje)) {
                 const parts = url.split('/');
                 const username = parts[parts.length - 1];
-                this.importBierdopjeUser(decodeURIComponent(username));
+                this.importFavouritesBierdopjeByUsername(decodeURIComponent(username));
                 return;
             }
 
@@ -122,7 +140,14 @@ module SeriesfeedImporter.Services {
                 const username = parts[parts.length - 1];
                 const user = new Models.ImdbUser(userId, decodeURIComponent(username));
 
-                this.importImdbUser(user);
+                this.importFavouritesImdbByUser(user);
+                return;
+            }
+
+            if (url.startsWith(Enums.ShortUrl.ImportTimeWastedBierdopje)) {
+                const parts = url.split('/');
+                const username = parts[parts.length - 1];
+                this.importTimeWastedBierdopjeByUsername(decodeURIComponent(username));
                 return;
             }
         }

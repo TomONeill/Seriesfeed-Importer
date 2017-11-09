@@ -1372,7 +1372,7 @@ var SeriesfeedImporter;
                 const loadingData = $('<div/>');
                 const loadingFavourites = $('<h4/>').css({ padding: '15px' });
                 const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Lijsten ophalen...");
-                const starIcon = $('<i/>').addClass('fa fa-list-ul fa-flip');
+                const starIcon = $('<i/>').addClass('fa fa-list-ul fa-flip-x');
                 loadingData.append(loadingFavourites);
                 loadingFavourites
                     .append(starIcon)
@@ -1731,19 +1731,197 @@ var SeriesfeedImporter;
             constructor() {
                 this.initialise();
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this.addBierdopje(cardContent);
             }
             initialise() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Favorieten importeren");
+                card.setTitle("Time Wasted importeren");
                 card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.Import);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("X", null)
+                    new SeriesfeedImporter.Models.Breadcrumb("Bronkeuze", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
             }
+            addBierdopje(cardContent) {
+                const name = "Bierdopje.com";
+                const bierdopje = new SeriesfeedImporter.ViewModels.CardButton(name, "#3399FE");
+                const img = $('<img/>')
+                    .css({
+                    maxWidth: "100%",
+                    padding: '10px'
+                })
+                    .attr('src', "http://cdn.bierdopje.eu/g/layout/bierdopje.png")
+                    .attr('alt', name);
+                bierdopje.topArea.append(img);
+                bierdopje.instance.click(() => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje));
+                cardContent.append(bierdopje.instance);
+            }
         }
         Controllers.ImportTimeWastedController = ImportTimeWastedController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportTimeWastedBierdopjeController {
+            constructor() {
+                this.initialiseCard();
+                this.initialiseCurrentUser();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje Time Wasted importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportFavourites);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+            }
+            initialiseCurrentUser() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this._user = new SeriesfeedImporter.ViewModels.User();
+                this._user.setUsername("Laden...");
+                this._user.instance.css({ marginRight: '1%' });
+                cardContent.append(this._user.instance);
+                const refreshButtonAction = (event) => {
+                    event.stopPropagation();
+                    this.loadUser();
+                };
+                const refreshButton = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+                refreshButton.instance.css({
+                    position: 'absolute',
+                    left: '0',
+                    bottom: '0'
+                });
+                this._user.instance.append(refreshButton.instance);
+                this.loadUser();
+            }
+            loadUser() {
+                SeriesfeedImporter.Services.BierdopjeService.getUsername()
+                    .then((username) => {
+                    if (username == null) {
+                        this._user.onClick = null;
+                        this._user.setAvatarUrl();
+                        this._user.setUsername("Niet ingelogd");
+                    }
+                    else {
+                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje + username);
+                        this._user.setUsername(username);
+                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
+                            .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
+                    }
+                });
+            }
+        }
+        Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportTimeWastedBierdopjeShowSelection {
+            constructor(username) {
+                this._username = username;
+                this._selectedShows = [];
+                this._checkboxes = [];
+                this._currentCalls = [];
+                this.initialiseCard();
+                this.initialiseCollectingData();
+                this.initialiseNextButton();
+                this.initialise();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje}${this._username}`)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth();
+                card.setContent();
+            }
+            initialiseCollectingData() {
+                this._collectingData = new SeriesfeedImporter.ViewModels.ReadMoreButton("Gegevens verzamelen...");
+                this._collectingData.instance.find('a').css({ color: '#848383', textDecoration: 'none' });
+                this._collectingData.instance.hide();
+            }
+            initialiseNextButton() {
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { });
+                this._nextButton.instance.hide();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                const table = new SeriesfeedImporter.ViewModels.Table();
+                const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
+                checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
+                const selectAllColumn = $('<th/>').append(checkboxAll.instance);
+                const seriesColumn = $('<th/>').text('Serie');
+                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const loadingData = $('<div/>');
+                const loadingShows = $('<h4/>').css({ padding: '15px' });
+                const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Shows ophalen...");
+                const starIcon = $('<i/>').addClass('fa fa-television fa-flip-y');
+                loadingData.append(loadingShows);
+                loadingShows
+                    .append(starIcon)
+                    .append(loadingText);
+                cardContent
+                    .append(loadingData)
+                    .append(this._collectingData.instance)
+                    .append(this._nextButton.instance);
+            }
+            toggleAllCheckboxes(isEnabled) {
+                this._checkboxes.forEach((checkbox) => {
+                    if (isEnabled) {
+                        checkbox.check();
+                    }
+                    else {
+                        checkbox.uncheck();
+                    }
+                });
+            }
+            setCollectingData() {
+                if (this._currentCalls.length === 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
+                    this._collectingData.instance.show();
+                    return;
+                }
+                else if (this._currentCalls.length > 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} series)...`;
+                    this._collectingData.instance.show();
+                }
+                else {
+                    this._collectingData.instance.hide();
+                    this.setNextButton();
+                }
+            }
+            setNextButton() {
+                if (this._currentCalls.length > 0) {
+                    this._nextButton.instance.hide();
+                    return;
+                }
+                if (this._selectedShows.length === 1) {
+                    this._nextButton.text = `${this._selectedShows.length} serie importeren`;
+                    this._nextButton.instance.show();
+                }
+                else if (this._selectedShows.length > 1) {
+                    this._nextButton.text = `${this._selectedShows.length} series importeren`;
+                    this._nextButton.instance.show();
+                }
+                else {
+                    this._nextButton.instance.hide();
+                }
+            }
+        }
+        Controllers.ImportTimeWastedBierdopjeShowSelection = ImportTimeWastedBierdopjeShowSelection;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1839,6 +2017,9 @@ var SeriesfeedImporter;
                     case SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted:
                         this.importTimeWasted();
                         break;
+                    case SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje:
+                        this.importTimeWastedBierdopje();
+                        break;
                     case SeriesfeedImporter.Enums.ShortUrl.Export:
                         this.export();
                         break;
@@ -1867,7 +2048,7 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportBierdopjeFavouritesUserSelectionController();
             }
-            static importBierdopjeUser(username) {
+            static importFavouritesBierdopjeByUsername(username) {
                 document.title = "Bierdopje favorieten importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.BierdopjeFavouriteSelectionController(username);
@@ -1877,7 +2058,7 @@ var SeriesfeedImporter;
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportImdbFavouritesUserSelectionController();
             }
-            static importImdbUser(user) {
+            static importFavouritesImdbByUser(user) {
                 document.title = "IMDb lijsten selecteren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImdbListSelectionControllerController(user);
@@ -1886,6 +2067,16 @@ var SeriesfeedImporter;
                 document.title = "Time Wasted importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
                 new SeriesfeedImporter.Controllers.ImportTimeWastedController();
+            }
+            static importTimeWastedBierdopje() {
+                document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.ImportTimeWastedBierdopjeController();
+            }
+            static importTimeWastedBierdopjeByUsername(username) {
+                document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
+                Services.CardService.getCard().clear();
+                new SeriesfeedImporter.Controllers.ImportTimeWastedBierdopjeShowSelection(username);
             }
             static export() {
                 document.title = "Exporteren | Seriesfeed";
@@ -1901,7 +2092,7 @@ var SeriesfeedImporter;
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje)) {
                     const parts = url.split('/');
                     const username = parts[parts.length - 1];
-                    this.importBierdopjeUser(decodeURIComponent(username));
+                    this.importFavouritesBierdopjeByUsername(decodeURIComponent(username));
                     return;
                 }
                 if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb)) {
@@ -1909,7 +2100,13 @@ var SeriesfeedImporter;
                     const userId = parts[parts.length - 2];
                     const username = parts[parts.length - 1];
                     const user = new SeriesfeedImporter.Models.ImdbUser(userId, decodeURIComponent(username));
-                    this.importImdbUser(user);
+                    this.importFavouritesImdbByUser(user);
+                    return;
+                }
+                if (url.startsWith(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje)) {
+                    const parts = url.split('/');
+                    const username = parts[parts.length - 1];
+                    this.importTimeWastedBierdopjeByUsername(decodeURIComponent(username));
                     return;
                 }
             }
@@ -2013,6 +2210,7 @@ var SeriesfeedImporter;
             ImportFavouritesBierdopje: "/series/import/favourites/bierdopje/",
             ImportFavouritesImdb: "/series/import/favourites/imdb/",
             ImportTimeWasted: "/series/import/timewasted/",
+            ImportTimeWastedBierdopje: "/series/import/timewasted/bierdopje/",
             Export: "/series/export/",
             ExportFavourites: "/series/export/favourites/"
         };
@@ -2725,17 +2923,30 @@ var SeriesfeedImporter;
                     + '        background-color: rgba(240, 248, 255, 1.00);'
                     + '    }'
                     + ''
-                    + '    .fa-flip {'
-                    + '        animation-name: flip;'
+                    + '    .fa-flip-x {'
+                    + '        animation-name: flipX;'
                     + '        animation-duration: 2s;'
                     + '        animation-iteration-count: infinite;'
                     + '        animation-direction: alternate;'
                     + '        animation-timing-function: ease-in-out;'
                     + '    }'
                     + ''
-                    + '    @keyframes flip {'
+                    + '    @keyframes flipX {'
                     + '        0% { transform: rotateX(0); }'
                     + '        50% { transform: rotateX(180deg); }'
+                    + '    }'
+                    + ''
+                    + '    .fa-flip-y {'
+                    + '        animation-name: flipY;'
+                    + '        animation-duration: 2s;'
+                    + '        animation-iteration-count: infinite;'
+                    + '        animation-direction: alternate;'
+                    + '        animation-timing-function: ease-in-out;'
+                    + '    }'
+                    + ''
+                    + '    @keyframes flipY {'
+                    + '        0% { transform: rotateY(0); }'
+                    + '        50% { transform: rotateY(180deg); }'
                     + '    }'
                     + ''
                     + '    .table.thicken-header thead {'

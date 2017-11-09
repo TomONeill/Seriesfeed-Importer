@@ -110,7 +110,7 @@ module SeriesfeedImporter.Services {
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
                 })
                 .catch((error) => {
-                    throw `Could not get series from ${listId}. ${error}`;
+                    throw `Could not get series for list id ${listId} from ${Config.ImdbBaseUrl}. ${error}`;
                 });
         }
 

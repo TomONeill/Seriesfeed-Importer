@@ -1543,7 +1543,7 @@ var SeriesfeedImporter;
                     return seriesList.sort((a, b) => b.name.localeCompare(a.name));
                 })
                     .catch((error) => {
-                    throw `Could not get series from ${listId}. ${error}`;
+                    throw `Could not get series for list id ${listId} from ${SeriesfeedImporter.Config.ImdbBaseUrl}. ${error}`;
                 });
             }
             static getSeriesByListIdAndUserId(listId, userId) {
@@ -1626,7 +1626,7 @@ var SeriesfeedImporter;
                     return show;
                 })
                     .catch((error) => {
-                    console.error(`Could not convert TVDB id ${theTvdbId} on Seriesfeed.com: ${error.responseText}`);
+                    console.error(`Could not convert The TVDB id ${theTvdbId} on ${SeriesfeedImporter.Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
             }
@@ -1646,7 +1646,7 @@ var SeriesfeedImporter;
                 };
                 return Services.AjaxService.post("/ajax/serie/favourite", postData)
                     .catch((error) => {
-                    console.error(`Could not favourite show Seriesfeed id ${showId}: ${error.responseText}`);
+                    console.error(`Could not favourite show id ${showId} on ${SeriesfeedImporter.Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
             }

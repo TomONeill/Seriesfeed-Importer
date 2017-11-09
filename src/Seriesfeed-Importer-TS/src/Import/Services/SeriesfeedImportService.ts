@@ -46,7 +46,7 @@ module SeriesfeedImporter.Services {
                     return show;
                 })
                 .catch((error) => {
-                    console.error(`Could not convert TVDB id ${theTvdbId} on Seriesfeed.com: ${error.responseText}`);
+                    console.error(`Could not convert The TVDB id ${theTvdbId} on ${Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
         }
@@ -71,7 +71,7 @@ module SeriesfeedImporter.Services {
 
             return Services.AjaxService.post("/ajax/serie/favourite", postData)
                 .catch((error) => {
-                    console.error(`Could not favourite show Seriesfeed id ${showId}: ${error.responseText}`);
+                    console.error(`Could not favourite show id ${showId} on ${Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
         }

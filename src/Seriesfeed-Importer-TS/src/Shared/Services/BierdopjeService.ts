@@ -61,7 +61,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        public static getTvdbIdByShowSlug(showSlug: string): Promise<string> {
+        public static getTheTvdbIdByShowSlug(showSlug: string): Promise<string> {
             const localTheTvdbId = this.getTvdbIdByShowSlugFromStorage(showSlug);
 
             if (localTheTvdbId != null) {

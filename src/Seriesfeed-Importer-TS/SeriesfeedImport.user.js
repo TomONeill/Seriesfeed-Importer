@@ -722,7 +722,7 @@ var SeriesfeedImporter;
                             if (isEnabled) {
                                 this._currentCalls.push(index);
                                 this.setCollectingData();
-                                SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
+                                SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
                                     show.theTvdbId = theTvdbId;
                                     const position = this._currentCalls.indexOf(index);
                                     this._currentCalls.splice(position, 1);
@@ -846,7 +846,7 @@ var SeriesfeedImporter;
             startImport() {
                 this._selectedShows.forEach((show, index) => {
                     const currentRow = this._table.getRow(index);
-                    SeriesfeedImporter.Services.SeriesfeedImportService.getShowIdByTheTvdbId(show.theTvdbId)
+                    SeriesfeedImporter.Services.SeriesfeedImportService.findShowByTheTvdbId(show.theTvdbId)
                         .then((seriesfeedShow) => SeriesfeedImporter.Services.SeriesfeedImportService.addFavouriteByShowId(seriesfeedShow.seriesfeedId))
                         .then(() => {
                         const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
@@ -893,9 +893,9 @@ var SeriesfeedImporter;
                 var MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
                 return new Promise((resolve) => {
                     const bdShowUrl = 'http://www.bierdopje.com';
-                    SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug("bdShowSlug")
+                    SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug("bdShowSlug")
                         .then((tvdbId) => {
-                        SeriesfeedImporter.Services.SeriesfeedImportService.getShowIdByTheTvdbId(tvdbId)
+                        SeriesfeedImporter.Services.SeriesfeedImportService.findShowByTheTvdbId(tvdbId)
                             .then((sfShowData) => {
                             let sfSeriesName = sfShowData.name;
                             const sfSeriesSlug = sfShowData.slug;
@@ -1586,19 +1586,10 @@ var SeriesfeedImporter;
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
-    var Models;
-    (function (Models) {
-        class SeriesfeedShow {
-        }
-        Models.SeriesfeedShow = SeriesfeedShow;
-    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
     var Services;
     (function (Services) {
         class SeriesfeedImportService {
-            static getShowIdByTheTvdbId(theTvdbId) {
+            static findShowByTheTvdbId(theTvdbId) {
                 const postData = {
                     type: 'tvdb_id',
                     data: theTvdbId
@@ -1625,17 +1616,6 @@ var SeriesfeedImporter;
                 return Services.AjaxService.post("/ajax/serie/favourite", postData)
                     .catch((error) => {
                     console.error(`Could not favourite show Seriesfeed id ${showId}: ${error.responseText}`);
-                    return error;
-                });
-            }
-            static findShowByTheTvdbId(theTvdbId) {
-                const postData = {
-                    type: 'tvdb_id',
-                    data: theTvdbId
-                };
-                return Services.AjaxService.post("/ajax/serie/find-by", postData)
-                    .catch((error) => {
-                    console.error(`Could not find show with tvdb id ${theTvdbId}: ${error.responseText}`);
                     return error;
                 });
             }
@@ -1808,12 +1788,12 @@ var SeriesfeedImporter;
                             if (isEnabled) {
                                 this._currentCalls.push(index);
                                 this.setCollectingData();
-                                SeriesfeedImporter.Services.BierdopjeService.getTvdbIdByShowSlug(show.slug)
+                                SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug)
                                     .then((theTvdbId) => {
                                     show.theTvdbId = theTvdbId;
                                     SeriesfeedImporter.Services.SeriesfeedImportService.findShowByTheTvdbId(show.theTvdbId)
                                         .then((result) => {
-                                        show.seriesfeedId = result.id;
+                                        show.seriesfeedId = result.seriesfeedId;
                                         const position = this._currentCalls.indexOf(index);
                                         this._currentCalls.splice(position, 1);
                                         this.setCollectingData();
@@ -2312,7 +2292,7 @@ var SeriesfeedImporter;
                     throw `Could not get favourites from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
-            static getTvdbIdByShowSlug(showSlug) {
+            static getTheTvdbIdByShowSlug(showSlug) {
                 const localTheTvdbId = this.getTvdbIdByShowSlugFromStorage(showSlug);
                 if (localTheTvdbId != null) {
                     return Promise.resolve(localTheTvdbId);

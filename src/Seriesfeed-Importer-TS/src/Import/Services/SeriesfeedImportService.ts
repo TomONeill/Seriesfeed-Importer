@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Services {
     export class SeriesfeedImportService {
-        public static getShowIdByTheTvdbId(theTvdbId: string): Promise<Models.Show> {
+        public static findShowByTheTvdbId(theTvdbId: string): Promise<Models.Show> {
             const postData = {
                 type: 'tvdb_id',
                 data: theTvdbId
@@ -32,19 +32,6 @@ module SeriesfeedImporter.Services {
             return Services.AjaxService.post("/ajax/serie/favourite", postData)
                 .catch((error) => {
                     console.error(`Could not favourite show Seriesfeed id ${showId}: ${error.responseText}`);
-                    return error;
-                });
-        }
-
-        public static findShowByTheTvdbId(theTvdbId: string): Promise<Models.SeriesfeedShow> {
-            const postData = {
-                type: 'tvdb_id',
-                data: theTvdbId
-            };
-
-            return Services.AjaxService.post("/ajax/serie/find-by", postData)
-                .catch((error) => {
-                    console.error(`Could not find show with tvdb id ${theTvdbId}: ${error.responseText}`);
                     return error;
                 });
         }

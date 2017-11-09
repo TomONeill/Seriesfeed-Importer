@@ -82,7 +82,7 @@ module SeriesfeedImporter.Controllers {
                             if (isEnabled) {
                                 this._currentCalls.push(index);
                                 this.setCollectingData();
-                                Services.BierdopjeService.getTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
+                                Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
                                     show.theTvdbId = theTvdbId;
                                     const position = this._currentCalls.indexOf(index);
                                     this._currentCalls.splice(position, 1);

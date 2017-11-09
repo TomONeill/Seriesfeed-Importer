@@ -122,33 +122,30 @@ module SeriesfeedImporter.Services {
                     const csv = result.responseText;
                     const entries = csv.split('\n') as Array<string>;
 
-                    const entryKeys = entries[0].split(',');
-                    const imdbSlugIndex = entryKeys.indexOf("\"const\"");
-                    const titleIndex = entryKeys.indexOf("\"Title\"");
-                    const titleTypeIndex = entryKeys.indexOf("\"Title type\"");
+                    const entryKeys = entries[0].split('","');
+                    const imdbSlugIndex = entryKeys.indexOf("const");
+                    const titleIndex = entryKeys.indexOf("Title");
+                    const titleTypeIndex = entryKeys.indexOf("Title type");
 
                     const shows = new Array<Models.Show>();
-                    const quoteRegex = new RegExp('"', 'g');
 
                     entries.forEach((entry, index) => {
                         if (index === 0) {
                             return;
                         }
 
-                        const entryValues = entry.split(',');
+                        const entryValues = entry.split('","');
                         const titleType = entryValues[titleTypeIndex];
-                        const slug = entryValues[imdbSlugIndex];
-                        const title = entryValues[titleIndex];
 
-                        if (titleType == null || slug == null || title == null) {
+                        if (titleType == null) {
                             return;
                         }
 
-                        if (titleType.replace(quoteRegex, '') !== "Feature Film") {
+                        if (titleType !== "Feature Film" && titleType !== "TV Movie") {
                             const show = new Models.Show();
-                            show.imdbType = titleType.replace(quoteRegex, '');
-                            show.slug = slug.replace(quoteRegex, '');
-                            show.name = title.replace(quoteRegex, '');
+                            show.imdbType = titleType;
+                            show.slug = entryValues[imdbSlugIndex];
+                            show.name = entryValues[titleIndex];
                             shows.push(show);
                         }
                     });

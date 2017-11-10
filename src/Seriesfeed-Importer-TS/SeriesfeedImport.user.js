@@ -1767,18 +1767,18 @@ var SeriesfeedImporter;
                 this.initialise();
             }
             initialiseCard() {
-                const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Bierdopje favorieten selecteren");
-                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje);
+                this._card = SeriesfeedImporter.Services.CardService.getCard();
+                this._card.setTitle("Bierdopje favorieten selecteren");
+                this._card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
                     new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje),
                     new SeriesfeedImporter.Models.Breadcrumb("Serieselectie", `${SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje}${this._username}`)
                 ];
-                card.setBreadcrumbs(breadcrumbs);
-                card.setWidth();
-                card.setContent();
+                this._card.setBreadcrumbs(breadcrumbs);
+                this._card.setWidth();
+                this._card.setContent();
             }
             initialiseCollectingData() {
                 this._collectingData = new SeriesfeedImporter.ViewModels.ReadMoreButton("Gegevens verzamelen...");
@@ -1791,19 +1791,20 @@ var SeriesfeedImporter;
             }
             initialise() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                const table = new SeriesfeedImporter.ViewModels.Table();
+                this._table = new SeriesfeedImporter.ViewModels.Table();
                 const checkboxAll = new SeriesfeedImporter.ViewModels.Checkbox('select-all');
                 checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
                 const selectAllColumn = $('<th/>').append(checkboxAll.instance);
                 const seriesColumn = $('<th/>').text('Serie');
-                table.addTheadItems([selectAllColumn, seriesColumn]);
+                const seriesStatusIcon = $('<th/>').text('Beschikbaarheid').css({ textAlign: 'center' });
+                this._table.addTheadItems([selectAllColumn, seriesColumn, seriesStatusIcon]);
                 const loadingData = $('<div/>');
                 const loadingShows = $('<h4/>').css({ padding: '15px' });
                 const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Shows ophalen...");
-                const starIcon = $('<i/>').addClass('fa fa-television fa-flip-y');
+                const showIcon = $('<i/>').addClass('fa fa-television fa-flip-y');
                 loadingData.append(loadingShows);
                 loadingShows
-                    .append(starIcon)
+                    .append(showIcon)
                     .append(loadingText);
                 cardContent
                     .append(loadingData)
@@ -1815,9 +1816,17 @@ var SeriesfeedImporter;
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>');
                         const showColumn = $('<td/>');
+                        const statusColumn = $('<td/>').css({ textAlign: 'center' });
+                        const loadingIcon = $("<i/>").addClass("fa fa-circle-o-notch fa-spin").css({ color: "#676767", fontSize: "16px" });
+                        const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
+                        const warningIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1px", cursor: 'pointer' });
+                        warningIcon.attr('title', "Deze serie staat nog niet op Seriesfeed.");
+                        warningIcon.click(() => window.open(SeriesfeedImporter.Config.BaseUrl + "/series/suggest", '_blank'));
+                        statusColumn.append("<i/>");
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
+                                statusColumn.find("i").replaceWith(loadingIcon);
                                 this._currentCalls.push(index);
                                 this.setCollectingData();
                                 SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug)
@@ -1826,14 +1835,13 @@ var SeriesfeedImporter;
                                     SeriesfeedImporter.Services.SeriesfeedImportService.findShowByTheTvdbId(show.theTvdbId)
                                         .then((result) => {
                                         show.seriesfeedId = result.seriesfeedId;
-                                        const position = this._currentCalls.indexOf(index);
-                                        this._currentCalls.splice(position, 1);
-                                        this.setCollectingData();
+                                        statusColumn.find("i").replaceWith(checkmarkIcon);
+                                        this.spliceCurrentCall(index);
                                     })
                                         .catch(() => {
-                                        const position = this._currentCalls.indexOf(index);
-                                        this._currentCalls.splice(position, 1);
-                                        this.setCollectingData();
+                                        checkbox.uncheck();
+                                        statusColumn.find("i").replaceWith(warningIcon);
+                                        this.spliceCurrentCall(index);
                                     });
                                 });
                                 this._selectedShows.push(show);
@@ -1850,10 +1858,16 @@ var SeriesfeedImporter;
                         showColumn.append(showLink);
                         row.append(selectColumn);
                         row.append(showColumn);
-                        table.addRow(row);
+                        row.append(statusColumn);
+                        this._table.addRow(row);
                     });
-                    loadingData.replaceWith(table.instance);
+                    loadingData.replaceWith(this._table.instance);
                 });
+            }
+            spliceCurrentCall(index) {
+                const position = this._currentCalls.indexOf(index);
+                this._currentCalls.splice(position, 1);
+                this.setCollectingData();
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {

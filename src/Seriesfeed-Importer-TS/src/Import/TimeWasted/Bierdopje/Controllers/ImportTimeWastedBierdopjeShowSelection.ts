@@ -4,10 +4,12 @@ module SeriesfeedImporter.Controllers {
     export class ImportTimeWastedBierdopjeShowSelection {
         private _username: string;
         private _selectedShows: Array<Models.Show>;
+        private _card: ViewModels.Card;
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
         private _collectingData: ViewModels.ReadMoreButton;
         private _currentCalls: Array<number>;
+        private _table: ViewModels.Table;
 
         constructor(username: string) {
             this._username = username;
@@ -22,18 +24,18 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseCard(): void {
-            const card = Services.CardService.getCard();
-            card.setTitle("Bierdopje favorieten selecteren");
-            card.setBackButtonUrl(Enums.ShortUrl.ImportTimeWastedBierdopje);
+            this._card = Services.CardService.getCard();
+            this._card.setTitle("Bierdopje favorieten selecteren");
+            this._card.setBackButtonUrl(Enums.ShortUrl.ImportTimeWastedBierdopje);
             const breadcrumbs = [
                 new Models.Breadcrumb("Time Wasted importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportTimeWasted),
                 new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportTimeWastedBierdopje),
                 new Models.Breadcrumb("Serieselectie", `${Enums.ShortUrl.ImportTimeWastedBierdopje}${this._username}`)
             ];
-            card.setBreadcrumbs(breadcrumbs);
-            card.setWidth();
-            card.setContent();
+            this._card.setBreadcrumbs(breadcrumbs);
+            this._card.setWidth();
+            this._card.setContent();
         }
 
         private initialiseCollectingData(): void {
@@ -50,20 +52,21 @@ module SeriesfeedImporter.Controllers {
         private initialise(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
-            const table = new ViewModels.Table();
+            this._table = new ViewModels.Table();
             const checkboxAll = new ViewModels.Checkbox('select-all');
             checkboxAll.subscribe((isEnabled) => this.toggleAllCheckboxes(isEnabled));
             const selectAllColumn = $('<th/>').append(checkboxAll.instance);
             const seriesColumn = $('<th/>').text('Serie');
-            table.addTheadItems([selectAllColumn, seriesColumn]);
+            const seriesStatusIcon = $('<th/>').text('Beschikbaarheid').css({ textAlign: 'center' });
+            this._table.addTheadItems([selectAllColumn, seriesColumn, seriesStatusIcon]);
 
             const loadingData = $('<div/>');
             const loadingShows = $('<h4/>').css({ padding: '15px' });
             const loadingText = $('<span/>').css({ marginLeft: '10px' }).text("Shows ophalen...");
-            const starIcon = $('<i/>').addClass('fa fa-television fa-flip-y');
+            const showIcon = $('<i/>').addClass('fa fa-television fa-flip-y');
             loadingData.append(loadingShows);
             loadingShows
-                .append(starIcon)
+                .append(showIcon)
                 .append(loadingText);
             cardContent
                 .append(loadingData)
@@ -76,10 +79,20 @@ module SeriesfeedImporter.Controllers {
                         const row = $('<tr/>');
                         const selectColumn = $('<td/>');
                         const showColumn = $('<td/>');
+                        const statusColumn = $('<td/>').css({ textAlign: 'center' });
+                        const loadingIcon = $("<i/>").addClass("fa fa-circle-o-notch fa-spin").css({ color: "#676767", fontSize: "16px" });
+                        const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
+                        const warningIcon = $("<i/>").addClass("fa fa-exclamation-triangle").css({ color: "#8e6c2f", fontSize: "16px", marginLeft: "-1px", cursor: 'pointer' });
+                        warningIcon.attr('title', "Deze serie staat nog niet op Seriesfeed.");
+                        warningIcon.click(() => window.open(Config.BaseUrl + "/series/suggest", '_blank'));
+                        
+                        statusColumn.append("<i/>");
 
                         const checkbox = new ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
+                                statusColumn.find("i").replaceWith(loadingIcon);
+
                                 this._currentCalls.push(index);
                                 this.setCollectingData();
                                 Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug)
@@ -89,14 +102,15 @@ module SeriesfeedImporter.Controllers {
                                         Services.SeriesfeedImportService.findShowByTheTvdbId(show.theTvdbId)
                                             .then((result) => {
                                                 show.seriesfeedId = result.seriesfeedId;
-                                                const position = this._currentCalls.indexOf(index);
-                                                this._currentCalls.splice(position, 1);
-                                                this.setCollectingData();
+                                                statusColumn.find("i").replaceWith(checkmarkIcon);
+
+                                                this.spliceCurrentCall(index);
                                             })
                                             .catch(() => {
-                                                const position = this._currentCalls.indexOf(index);
-                                                this._currentCalls.splice(position, 1);
-                                                this.setCollectingData();
+                                                checkbox.uncheck();
+                                                statusColumn.find("i").replaceWith(warningIcon);
+
+                                                this.spliceCurrentCall(index);
                                             });
                                     });
                                 this._selectedShows.push(show);
@@ -116,11 +130,18 @@ module SeriesfeedImporter.Controllers {
 
                         row.append(selectColumn);
                         row.append(showColumn);
+                        row.append(statusColumn);
 
-                        table.addRow(row);
+                        this._table.addRow(row);
                     });
-                    loadingData.replaceWith(table.instance);
+                    loadingData.replaceWith(this._table.instance);
                 });
+        }
+
+        private spliceCurrentCall(index: number): void {
+            const position = this._currentCalls.indexOf(index);
+            this._currentCalls.splice(position, 1);
+            this.setCollectingData();
         }
 
         private toggleAllCheckboxes(isEnabled: boolean): void {

@@ -105,12 +105,14 @@ module SeriesfeedImporter.Controllers {
                                                 statusColumn.find("i").replaceWith(checkmarkIcon);
 
                                                 this.spliceCurrentCall(index);
+                                                this.setCollectingData();
                                             })
                                             .catch(() => {
                                                 checkbox.uncheck();
                                                 statusColumn.find("i").replaceWith(warningIcon);
 
                                                 this.spliceCurrentCall(index);
+                                                this.setCollectingData();
                                             });
                                     });
                                 this._selectedShows.push(show);
@@ -141,7 +143,6 @@ module SeriesfeedImporter.Controllers {
         private spliceCurrentCall(index: number): void {
             const position = this._currentCalls.indexOf(index);
             this._currentCalls.splice(position, 1);
-            this.setCollectingData();
         }
 
         private toggleAllCheckboxes(isEnabled: boolean): void {

@@ -1837,11 +1837,13 @@ var SeriesfeedImporter;
                                         show.seriesfeedId = result.seriesfeedId;
                                         statusColumn.find("i").replaceWith(checkmarkIcon);
                                         this.spliceCurrentCall(index);
+                                        this.setCollectingData();
                                     })
                                         .catch(() => {
                                         checkbox.uncheck();
                                         statusColumn.find("i").replaceWith(warningIcon);
                                         this.spliceCurrentCall(index);
+                                        this.setCollectingData();
                                     });
                                 });
                                 this._selectedShows.push(show);
@@ -1867,7 +1869,6 @@ var SeriesfeedImporter;
             spliceCurrentCall(index) {
                 const position = this._currentCalls.indexOf(index);
                 this._currentCalls.splice(position, 1);
-                this.setCollectingData();
             }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {

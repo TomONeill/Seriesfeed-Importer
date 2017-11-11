@@ -31,7 +31,7 @@ module SeriesfeedImporter.Controllers {
                 new Models.Breadcrumb("Time Wasted importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("Bierdopje", Enums.ShortUrl.ImportTimeWasted),
                 new Models.Breadcrumb(this._username, Enums.ShortUrl.ImportTimeWastedBierdopje),
-                new Models.Breadcrumb("Serieselectie", `${Enums.ShortUrl.ImportTimeWastedBierdopje}${this._username}`)
+                new Models.Breadcrumb("Serieselectie", Enums.ShortUrl.ImportTimeWastedBierdopje + this._username)
             ];
             this._card.setBreadcrumbs(breadcrumbs);
             this._card.setWidth();
@@ -45,7 +45,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private initialiseNextButton(): void {
-            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => { } /* new FakeController(this._username, this._selectedShows) */);
+            this._nextButton = new ViewModels.ReadMoreButton("Importeren", () => new ImportTimeWastedBierdopjeController(this._username, this._selectedShows));
             this._nextButton.instance.hide();
         }
 

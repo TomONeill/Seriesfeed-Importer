@@ -676,7 +676,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportFavourites),
                     new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje),
-                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje}${this._username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje + this._username)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
@@ -814,7 +814,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportFavourites),
                     new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje),
-                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje}${this._username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesBierdopje + this._username)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth('600px');
@@ -1148,7 +1148,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("IMDb", SeriesfeedImporter.Enums.ShortUrl.ImportFavourites),
                     new SeriesfeedImporter.Models.Breadcrumb(this._user.username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb),
-                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb}${this._user.username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb + this._user.username)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth();
@@ -1252,7 +1252,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Favorieten importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("IMDb", SeriesfeedImporter.Enums.ShortUrl.ImportFavourites),
                     new SeriesfeedImporter.Models.Breadcrumb(this._user.username, SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb),
-                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", `${SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb}${this._user.id}/${this._user.username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", SeriesfeedImporter.Enums.ShortUrl.ImportFavouritesImdb + this._user.id + "/" + this._user.username)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
                 card.setWidth('650px');
@@ -1696,6 +1696,46 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
+        class ImportTimeWastedBierdopjeController {
+            constructor(username, selectedShows) {
+                this._username = username;
+                this._selectedShows = selectedShows;
+                window.scrollTo(0, 0);
+                this.initialiseCard();
+                this.initialise();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje favorieten selecteren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje + this._username);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
+                    new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje),
+                    new SeriesfeedImporter.Models.Breadcrumb("Serieselectie", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje + this._username),
+                    new SeriesfeedImporter.Models.Breadcrumb("Importeren", null)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+                card.setWidth('600px');
+                card.setContent();
+            }
+            initialise() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this._table = new SeriesfeedImporter.ViewModels.Table();
+                const seriesColumn = $('<th/>').text('Serie');
+                const seasonColumn = $('<th/>').text('Seizoen');
+                const episodeColumn = $('<th/>').text('Aflevering');
+                this._table.addTheadItems([seriesColumn, seasonColumn, episodeColumn]);
+                cardContent.append(this._table.instance);
+            }
+        }
+        Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
         class ImportTimeWastedBierdopjeShowSelectionController {
             constructor(username) {
                 this._username = username;
@@ -1715,7 +1755,7 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
                     new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
                     new SeriesfeedImporter.Models.Breadcrumb(this._username, SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje),
-                    new SeriesfeedImporter.Models.Breadcrumb("Serieselectie", `${SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje}${this._username}`)
+                    new SeriesfeedImporter.Models.Breadcrumb("Serieselectie", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje + this._username)
                 ];
                 this._card.setBreadcrumbs(breadcrumbs);
                 this._card.setWidth();
@@ -1727,7 +1767,7 @@ var SeriesfeedImporter;
                 this._collectingData.instance.hide();
             }
             initialiseNextButton() {
-                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => { });
+                this._nextButton = new SeriesfeedImporter.ViewModels.ReadMoreButton("Importeren", () => new Controllers.ImportTimeWastedBierdopjeController(this._username, this._selectedShows));
                 this._nextButton.instance.hide();
             }
             initialise() {

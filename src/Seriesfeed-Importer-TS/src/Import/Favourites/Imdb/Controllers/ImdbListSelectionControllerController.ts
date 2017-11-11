@@ -40,7 +40,7 @@ module SeriesfeedImporter.Controllers {
                 new Models.Breadcrumb("Favorieten importeren", Enums.ShortUrl.Import),
                 new Models.Breadcrumb("IMDb", Enums.ShortUrl.ImportFavourites),
                 new Models.Breadcrumb(this._user.username, Enums.ShortUrl.ImportFavouritesImdb),
-                new Models.Breadcrumb("Importeren", `${Enums.ShortUrl.ImportFavouritesImdb}${this._user.id}/${this._user.username}`)
+                new Models.Breadcrumb("Importeren", Enums.ShortUrl.ImportFavouritesImdb + this._user.id + "/" + this._user.username)
             ];
             card.setBreadcrumbs(breadcrumbs);
             card.setWidth('650px');

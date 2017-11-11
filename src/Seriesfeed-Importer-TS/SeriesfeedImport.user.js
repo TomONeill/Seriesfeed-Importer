@@ -1696,66 +1696,7 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
-        class ImportTimeWastedBierdopjeController {
-            constructor() {
-                this.initialiseCard();
-                this.initialiseCurrentUser();
-            }
-            initialiseCard() {
-                const card = SeriesfeedImporter.Services.CardService.getCard();
-                card.setTitle("Bierdopje Time Wasted importeren");
-                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted);
-                const breadcrumbs = [
-                    new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
-                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
-                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje)
-                ];
-                card.setBreadcrumbs(breadcrumbs);
-            }
-            initialiseCurrentUser() {
-                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
-                this._user = new SeriesfeedImporter.ViewModels.User();
-                this._user.setUsername("Laden...");
-                this._user.instance.css({ marginRight: '1%' });
-                cardContent.append(this._user.instance);
-                const refreshButtonAction = (event) => {
-                    event.stopPropagation();
-                    this.loadUser();
-                };
-                const refreshButton = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
-                refreshButton.instance.css({
-                    position: 'absolute',
-                    left: '0',
-                    bottom: '0'
-                });
-                this._user.instance.append(refreshButton.instance);
-                this.loadUser();
-            }
-            loadUser() {
-                SeriesfeedImporter.Services.BierdopjeService.getUsername()
-                    .then((username) => {
-                    if (username == null) {
-                        this._user.onClick = null;
-                        this._user.setAvatarUrl();
-                        this._user.setUsername("Niet ingelogd");
-                    }
-                    else {
-                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje + username);
-                        this._user.setUsername(username);
-                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
-                            .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
-                    }
-                });
-            }
-        }
-        Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;
-    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
-})(SeriesfeedImporter || (SeriesfeedImporter = {}));
-var SeriesfeedImporter;
-(function (SeriesfeedImporter) {
-    var Controllers;
-    (function (Controllers) {
-        class ImportTimeWastedBierdopjeShowSelection {
+        class ImportTimeWastedBierdopjeShowSelectionController {
             constructor(username) {
                 this._username = username;
                 this._selectedShows = [];
@@ -1913,7 +1854,66 @@ var SeriesfeedImporter;
                 }
             }
         }
-        Controllers.ImportTimeWastedBierdopjeShowSelection = ImportTimeWastedBierdopjeShowSelection;
+        Controllers.ImportTimeWastedBierdopjeShowSelectionController = ImportTimeWastedBierdopjeShowSelectionController;
+    })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Controllers;
+    (function (Controllers) {
+        class ImportTimeWastedBierdopjeUserSelectionController {
+            constructor() {
+                this.initialiseCard();
+                this.initialiseCurrentUser();
+            }
+            initialiseCard() {
+                const card = SeriesfeedImporter.Services.CardService.getCard();
+                card.setTitle("Bierdopje Time Wasted importeren");
+                card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted);
+                const breadcrumbs = [
+                    new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),
+                    new SeriesfeedImporter.Models.Breadcrumb("Bierdopje", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWasted),
+                    new SeriesfeedImporter.Models.Breadcrumb("Gebruiker", SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje)
+                ];
+                card.setBreadcrumbs(breadcrumbs);
+            }
+            initialiseCurrentUser() {
+                const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
+                this._user = new SeriesfeedImporter.ViewModels.User();
+                this._user.setUsername("Laden...");
+                this._user.instance.css({ marginRight: '1%' });
+                cardContent.append(this._user.instance);
+                const refreshButtonAction = (event) => {
+                    event.stopPropagation();
+                    this.loadUser();
+                };
+                const refreshButton = new SeriesfeedImporter.ViewModels.Button(SeriesfeedImporter.Enums.ButtonType.Link, "fa-refresh", null, refreshButtonAction);
+                refreshButton.instance.css({
+                    position: 'absolute',
+                    left: '0',
+                    bottom: '0'
+                });
+                this._user.instance.append(refreshButton.instance);
+                this.loadUser();
+            }
+            loadUser() {
+                SeriesfeedImporter.Services.BierdopjeService.getUsername()
+                    .then((username) => {
+                    if (username == null) {
+                        this._user.onClick = null;
+                        this._user.setAvatarUrl();
+                        this._user.setUsername("Niet ingelogd");
+                    }
+                    else {
+                        this._user.onClick = () => SeriesfeedImporter.Services.RouterService.navigate(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje + username);
+                        this._user.setUsername(username);
+                        SeriesfeedImporter.Services.BierdopjeService.getAvatarUrlByUsername(username)
+                            .then((avatarUrl) => this._user.setAvatarUrl(avatarUrl));
+                    }
+                });
+            }
+        }
+        Controllers.ImportTimeWastedBierdopjeUserSelectionController = ImportTimeWastedBierdopjeUserSelectionController;
     })(Controllers = SeriesfeedImporter.Controllers || (SeriesfeedImporter.Controllers = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -2063,12 +2063,12 @@ var SeriesfeedImporter;
             static importTimeWastedBierdopje() {
                 document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImportTimeWastedBierdopjeController();
+                new SeriesfeedImporter.Controllers.ImportTimeWastedBierdopjeUserSelectionController();
             }
             static importTimeWastedBierdopjeByUsername(username) {
                 document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
                 Services.CardService.getCard().clear();
-                new SeriesfeedImporter.Controllers.ImportTimeWastedBierdopjeShowSelection(username);
+                new SeriesfeedImporter.Controllers.ImportTimeWastedBierdopjeShowSelectionController(username);
             }
             static export() {
                 document.title = "Exporteren | Seriesfeed";

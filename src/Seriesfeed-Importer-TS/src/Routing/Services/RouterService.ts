@@ -102,14 +102,14 @@ module SeriesfeedImporter.Services {
             document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImportTimeWastedBierdopjeController();
+            new Controllers.ImportTimeWastedBierdopjeUserSelectionController();
         }
 
         private static importTimeWastedBierdopjeByUsername(username: string): void {
             document.title = "Bierdopje Time Wasted importeren | Seriesfeed";
             CardService.getCard().clear();
 
-            new Controllers.ImportTimeWastedBierdopjeShowSelection(username);
+            new Controllers.ImportTimeWastedBierdopjeShowSelectionController(username);
         }
 
         private static export(): void {

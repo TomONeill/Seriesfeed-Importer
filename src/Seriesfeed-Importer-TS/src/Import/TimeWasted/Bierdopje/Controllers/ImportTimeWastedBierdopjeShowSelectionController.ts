@@ -1,7 +1,7 @@
 /// <reference path="../../../../typings/index.d.ts" />
 
 module SeriesfeedImporter.Controllers {
-    export class ImportTimeWastedBierdopjeShowSelection {
+    export class ImportTimeWastedBierdopjeShowSelectionController {
         private _username: string;
         private _selectedShows: Array<Models.Show>;
         private _card: ViewModels.Card;

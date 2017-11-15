@@ -1,24 +1,25 @@
 // ==UserScript==
 // @name         Seriesfeed Importer
 // @namespace    https://www.seriesfeed.com
-// @version      2.3.1
+// @version      2.4
 // @description  Allows you to import your favourites from Bierdopje.com.
-// @updateURL 	 https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js
 // @match        https://*.seriesfeed.com/*
-// @run-at       document-start
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
 // @connect      www.bierdopje.com
 // @domain       www.bierdopje.com
-// @require      http://code.jquery.com/jquery-1.12.2.min.js
+// @require  	   https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
+// @require      https://code.jquery.com/jquery-3.2.1.min.js
 // @author       Tom
 // @copyright    2016+, Tom
 // ==/UserScript==
 /* jshint -W097 */
-/* global $, GM_xmlhttpRequest, Promise, console */
+/* global $, GM.xmlHttpRequest, Promise, console */
 'use strict';
 
-$(function() {
+console.log($);
+(async function() {
 	// Add menu item to navigator.
 	$('<li><a href="/series/import/">Importeren</a></li>').insertAfter($('li > a[href="/series/suggest"]').parent());
 
@@ -135,13 +136,13 @@ $(function() {
 						var bdShowUrl = 'http://www.bierdopje.com/shows';
 
 						getTVDBIdByBierdopjeShowSlug(bdShowSlug).then(function(tvdbId) {
-							getSeriesfeedShowDataByTVDBId(tvdbId).success(function(sfShowData) {
+							getSeriesfeedShowDataByTVDBId(tvdbId).done(function(sfShowData) {
 								var sfSeriesId   = sfShowData.id;
 								var sfSeriesName = sfShowData.name;
 								var sfSeriesSlug = sfShowData.slug;
 								var sfSeriesUrl  = 'https://www.seriesfeed.com/series/';
 
-								addSeriesfeedFavouriteByShowId(sfSeriesId).success(function(result) {
+								addSeriesfeedFavouriteByShowId(sfSeriesId).done(function(result) {
 									var showUrl = sfSeriesUrl + sfSeriesSlug;
 									var status = "Toegevoegd als favoriet.";
 									var item = '<tr><td>' + sfSeriesId + '</td><td><a href="' + showUrl + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
@@ -152,7 +153,7 @@ $(function() {
 									progressBar.css('width', Math.round(progress) + "%");
 
 									resolve();
-								}).error(function(error) {
+								}).fail(function(error) {
 									if (error.status === 400) {
 										console.log("Series " + sfSeriesName + " with id " + sfSeriesId + " is already a favourite.");
 										const status = "Deze serie is mogelijk al een favoriet en is dus ongewijzigd.";
@@ -175,7 +176,7 @@ $(function() {
 									
 									resolve();
 								});
-							}).error(function(error) {
+							}).fail(function(error) {
 								if (error.status === 400) {
 									console.log("Could not convert " + tvdbId + " on Seriesfeed.");
 									const status = '<a href="https://www.seriesfeed.com/series/suggest/" target="_blank">Deze serie staat nog niet op Seriesfeed.</a>';
@@ -256,7 +257,7 @@ $(function() {
 
 	function getCurrentBierdopjeUsername() {
 		return new Promise(function(resolve, reject) {
-			GM_xmlhttpRequest({
+			GM.xmlHttpRequest({
 				method: "GET",
 				url: "http://www.bierdopje.com/stats",
 				onload: function(bdStatsPageData) {
@@ -318,7 +319,7 @@ $(function() {
 	
 	function getAllBierdopjeFavouritesByUsername(username) {
 		return new Promise(function(resolve, reject) {
-			GM_xmlhttpRequest({
+			GM.xmlHttpRequest({
 				method: "GET",
 				url: "http://www.bierdopje.com/users/" + username + "/shows",
 				onload: function(response) {
@@ -333,7 +334,7 @@ $(function() {
 	
 	function getTVDBIdByBierdopjeShowSlug(showSlug) {
 		return new Promise(function(resolve, reject) {
-			GM_xmlhttpRequest({
+			GM.xmlHttpRequest({
 				method: "GET",
 				url: "http://www.bierdopje.com" + showSlug,
 				onload: function(bdFavouritePageData) {
@@ -372,4 +373,4 @@ $(function() {
 			dataType: "json"
 		});
 	}
-});
+})();

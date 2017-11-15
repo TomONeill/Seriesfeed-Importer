@@ -18,7 +18,6 @@
 /* global $, GM.xmlHttpRequest, Promise, console */
 'use strict';
 
-console.log($);
 (async function() {
 	// Add menu item to navigator.
 	$('<li><a href="/series/import/">Importeren</a></li>').insertAfter($('li > a[href="/series/suggest"]').parent());

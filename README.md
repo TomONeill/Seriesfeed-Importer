@@ -3,7 +3,7 @@ Import your favourites from other sites like Bierdopje.com to Seriesfeed.com
 <BR/>
 Enjoy.
 <BR/><BR/>
-Version <strong>2.3.1</strong>
+Version <strong>2.4.0</strong>
 
 <A HREF="https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js">INSTALL</A>
 
@@ -24,6 +24,7 @@ Check out other userscripts for Seriesfeed by me:<BR/>
     <li><A HREF="https://github.com/TomONeill/Seriesfeed-Import-Time-Wasted">Import Time Wasted</A></li>
     <li><A HREF="https://github.com/TomONeill/Seriesfeed-Move">Move cards on frontpage</A></li>
     <li><A HREF="https://github.com/TomONeill/Seriesfeed-Season-Separator">Season Separator</A></li>
+	<li><A HREF="https://github.com/TomONeill/seriesfeed-episode-inverter">Episode Inverter</A></li>
 </ul>
 
 # Development

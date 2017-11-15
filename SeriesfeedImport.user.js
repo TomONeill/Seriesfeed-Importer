@@ -3,13 +3,14 @@
 // @namespace    https://www.seriesfeed.com
 // @version      2.4
 // @description  Allows you to import your favourites from Bierdopje.com.
+// @updateURL 	 https://github.com/TomONeill/Seriesfeed-Importer/raw/master/SeriesfeedImport.user.js
 // @match        https://*.seriesfeed.com/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @grant        GM.xmlHttpRequest
 // @connect      www.bierdopje.com
 // @domain       www.bierdopje.com
-// @require  	   https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
+// @require  	 https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
 // @require      https://code.jquery.com/jquery-3.2.1.min.js
 // @author       Tom
 // @copyright    2016+, Tom

@@ -12,6 +12,8 @@ module SeriesfeedImporter.Controllers {
             const localStorageBlock = this.getLocalStorageBlock();
 
             settingBlocks.append(localStorageBlock);
+
+            // TODO: Sync Bierdopje to Seriesfeed here?
         }
 
         private getLocalStorageBlock(): JQuery<HTMLElement> {

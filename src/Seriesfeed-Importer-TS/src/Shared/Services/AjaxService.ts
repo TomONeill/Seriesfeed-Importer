@@ -2,23 +2,43 @@
 
 module SeriesfeedImporter.Services {
     export class AjaxService {
+        private static _currentCalls = 0;
+
         public static get(url: string): Promise<any> {
-            return new Promise((resolve, reject) => {
+            const request = new Promise((resolve, reject) => {
                 GM_xmlhttpRequest({
                     method: "GET",
                     url: url,
-                    onload: function (pageData) {
+                    onload: (pageData) => {
                         resolve(pageData);
                     },
-                    onerror: function (error) {
+                    onerror: (error) => {
                         reject(error);
                     }
                 });
             });
+
+            return this.queue(request);
+        }
+
+        private static queue(request: Promise<any>): Promise<any> {
+            if (this._currentCalls < Config.MaxAsyncCalls) {
+                this._currentCalls++;
+                return request.then((result) => {
+                    this._currentCalls--;
+                    return result;
+                });
+            }
+
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(this.queue(request));
+                }, 300);
+            });
         }
 
         public static post(url: string, data: {}): Promise<any> {
-            return new Promise((resolve, reject) => {
+            const request = new Promise((resolve, reject) => {
                 $.ajax({
                     type: "POST",
                     url: url,
@@ -30,6 +50,8 @@ module SeriesfeedImporter.Services {
                     reject(error);
                 });
             });
+
+            return this.queue(request);
         }
     }
 }

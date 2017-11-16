@@ -29,7 +29,7 @@ var SeriesfeedImporter;
             CardContent: "cardContent"
         };
         Config.MaxRetries = 3;
-        Config.MaxAsyncCalls = 3;
+        Config.MaxAsyncCalls = 10;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -2294,21 +2294,36 @@ var SeriesfeedImporter;
     (function (Services) {
         class AjaxService {
             static get(url) {
-                return new Promise((resolve, reject) => {
+                const request = new Promise((resolve, reject) => {
                     GM_xmlhttpRequest({
                         method: "GET",
                         url: url,
-                        onload: function (pageData) {
+                        onload: (pageData) => {
                             resolve(pageData);
                         },
-                        onerror: function (error) {
+                        onerror: (error) => {
                             reject(error);
                         }
                     });
                 });
+                return this.queue(request);
+            }
+            static queue(request) {
+                if (this._currentCalls < SeriesfeedImporter.Config.MaxAsyncCalls) {
+                    this._currentCalls++;
+                    return request.then((result) => {
+                        this._currentCalls--;
+                        return result;
+                    });
+                }
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(this.queue(request));
+                    }, 300);
+                });
             }
             static post(url, data) {
-                return new Promise((resolve, reject) => {
+                const request = new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
                         url: url,
@@ -2320,8 +2335,10 @@ var SeriesfeedImporter;
                         reject(error);
                     });
                 });
+                return this.queue(request);
             }
         }
+        AjaxService._currentCalls = 0;
         Services.AjaxService = AjaxService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));

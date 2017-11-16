@@ -661,7 +661,7 @@ var SeriesfeedImporter;
                 this._username = username;
                 this._selectedShows = [];
                 this._checkboxes = [];
-                this._currentCalls = [];
+                this._currentCalls = 0;
                 this.initialiseCard();
                 this.initialiseCollectingData();
                 this.initialiseNextButton();
@@ -719,12 +719,17 @@ var SeriesfeedImporter;
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                this._currentCalls.push(index);
+                                this._currentCalls++;
                                 this.setCollectingData();
-                                SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
+                                SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug)
+                                    .then((theTvdbId) => {
                                     show.theTvdbId = theTvdbId;
-                                    const position = this._currentCalls.indexOf(index);
-                                    this._currentCalls.splice(position, 1);
+                                    this._currentCalls--;
+                                    this.setCollectingData();
+                                })
+                                    .catch(() => {
+                                    checkbox.uncheck();
+                                    this._currentCalls--;
                                     this.setCollectingData();
                                 });
                                 this._selectedShows.push(show);
@@ -757,13 +762,13 @@ var SeriesfeedImporter;
                 });
             }
             setCollectingData() {
-                if (this._currentCalls.length === 1) {
-                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
+                if (this._currentCalls === 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} serie)...`;
                     this._collectingData.instance.show();
                     return;
                 }
-                else if (this._currentCalls.length > 1) {
-                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} series)...`;
+                else if (this._currentCalls > 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} series)...`;
                     this._collectingData.instance.show();
                 }
                 else {
@@ -772,7 +777,7 @@ var SeriesfeedImporter;
                 }
             }
             setNextButton() {
-                if (this._currentCalls.length > 0) {
+                if (this._currentCalls > 0) {
                     this._nextButton.instance.hide();
                     return;
                 }
@@ -1132,7 +1137,7 @@ var SeriesfeedImporter;
                 this._user = user;
                 this._checkboxes = [];
                 this._selectedLists = [];
-                this._currentCalls = [];
+                this._currentCalls = 0;
                 this.initialiseNextButton();
                 this.initialiseCollectingData();
                 this.initialiseCard();
@@ -1190,13 +1195,17 @@ var SeriesfeedImporter;
                         const checkbox = new SeriesfeedImporter.ViewModels.Checkbox(`list_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                this._currentCalls.push(index);
+                                this._currentCalls++;
                                 this.setCollectingData();
                                 SeriesfeedImporter.Services.ImdbImportService.getSeriesByListIdAndUserId(imdbList.id, this._user.id)
                                     .then((shows) => {
                                     imdbList.shows = shows;
-                                    const position = this._currentCalls.indexOf(index);
-                                    this._currentCalls.splice(position, 1);
+                                    this._currentCalls--;
+                                    this.setCollectingData();
+                                })
+                                    .catch(() => {
+                                    checkbox.uncheck();
+                                    this._currentCalls--;
                                     this.setCollectingData();
                                 });
                                 this._selectedLists.push(imdbList);
@@ -1236,13 +1245,13 @@ var SeriesfeedImporter;
                 });
             }
             setCollectingData() {
-                if (this._currentCalls.length === 1) {
-                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} lijst)...`;
+                if (this._currentCalls === 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} lijst)...`;
                     this._collectingData.instance.show();
                     return;
                 }
-                else if (this._currentCalls.length > 1) {
-                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} lijsten)...`;
+                else if (this._currentCalls > 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} lijsten)...`;
                     this._collectingData.instance.show();
                 }
                 else {
@@ -1251,7 +1260,7 @@ var SeriesfeedImporter;
                 }
             }
             setNextButton() {
-                if (this._currentCalls.length > 0) {
+                if (this._currentCalls > 0) {
                     this._nextButton.instance.hide();
                     return;
                 }
@@ -1644,7 +1653,7 @@ var SeriesfeedImporter;
                 this._username = username;
                 this._selectedShows = [];
                 this._checkboxes = [];
-                this._currentCalls = [];
+                this._currentCalls = 0;
                 this.initialiseCard();
                 this.initialiseCollectingData();
                 this.initialiseNextButton();
@@ -1711,7 +1720,7 @@ var SeriesfeedImporter;
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
                                 statusColumn.find("i").replaceWith(loadingIcon);
-                                this._currentCalls.push(index);
+                                this._currentCalls++;
                                 this.setCollectingData();
                                 SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug)
                                     .then((theTvdbId) => {
@@ -1720,13 +1729,13 @@ var SeriesfeedImporter;
                                         .then((result) => {
                                         show.seriesfeedId = result.seriesfeedId;
                                         statusColumn.find("i").replaceWith(checkmarkIcon);
-                                        this.spliceCurrentCall(index);
+                                        this._currentCalls--;
                                         this.setCollectingData();
                                     })
                                         .catch(() => {
                                         checkbox.uncheck();
                                         statusColumn.find("i").replaceWith(warningIcon);
-                                        this.spliceCurrentCall(index);
+                                        this._currentCalls--;
                                         this.setCollectingData();
                                     });
                                 });
@@ -1750,10 +1759,6 @@ var SeriesfeedImporter;
                     loadingData.replaceWith(this._table.instance);
                 });
             }
-            spliceCurrentCall(index) {
-                const position = this._currentCalls.indexOf(index);
-                this._currentCalls.splice(position, 1);
-            }
             toggleAllCheckboxes(isEnabled) {
                 this._checkboxes.forEach((checkbox) => {
                     if (isEnabled) {
@@ -1765,13 +1770,13 @@ var SeriesfeedImporter;
                 });
             }
             setCollectingData() {
-                if (this._currentCalls.length === 1) {
-                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
+                if (this._currentCalls === 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} serie)...`;
                     this._collectingData.instance.show();
                     return;
                 }
-                else if (this._currentCalls.length > 1) {
-                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} series)...`;
+                else if (this._currentCalls > 1) {
+                    this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} series)...`;
                     this._collectingData.instance.show();
                 }
                 else {
@@ -1780,7 +1785,7 @@ var SeriesfeedImporter;
                 }
             }
             setNextButton() {
-                if (this._currentCalls.length > 0) {
+                if (this._currentCalls > 0) {
                     this._nextButton.instance.hide();
                     return;
                 }

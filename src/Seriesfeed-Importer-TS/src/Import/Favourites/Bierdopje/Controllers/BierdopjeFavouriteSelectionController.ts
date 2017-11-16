@@ -7,13 +7,13 @@ module SeriesfeedImporter.Controllers {
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
         private _collectingData: ViewModels.ReadMoreButton;
-        private _currentCalls: Array<number>;
+        private _currentCalls: number;
 
         constructor(username: string) {
             this._username = username;
             this._selectedShows = [];
             this._checkboxes = [];
-            this._currentCalls = [];
+            this._currentCalls = 0;
 
             this.initialiseCard();
             this.initialiseCollectingData();
@@ -80,14 +80,20 @@ module SeriesfeedImporter.Controllers {
                         const checkbox = new ViewModels.Checkbox(`show_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                this._currentCalls.push(index);
+                                this._currentCalls++;
                                 this.setCollectingData();
-                                Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug).then((theTvdbId) => {
-                                    show.theTvdbId = theTvdbId;
-                                    const position = this._currentCalls.indexOf(index);
-                                    this._currentCalls.splice(position, 1);
-                                    this.setCollectingData();
-                                });
+                                Services.BierdopjeService.getTheTvdbIdByShowSlug(show.slug)
+                                    .then((theTvdbId) => {
+                                        show.theTvdbId = theTvdbId;
+                                        this._currentCalls--;
+                                        this.setCollectingData();
+                                    })
+                                    .catch(() => {
+                                        checkbox.uncheck();
+                                        
+                                        this._currentCalls--;
+                                        this.setCollectingData();
+                                    });
                                 this._selectedShows.push(show);
                             } else {
                                 const position = this._selectedShows.map((show) => show.name).indexOf(show.name);
@@ -123,12 +129,12 @@ module SeriesfeedImporter.Controllers {
         }
 
         private setCollectingData(): void {
-            if (this._currentCalls.length === 1) {
-                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} serie)...`;
+            if (this._currentCalls === 1) {
+                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} serie)...`;
                 this._collectingData.instance.show();
                 return;
-            } else if (this._currentCalls.length > 1) {
-                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} series)...`;
+            } else if (this._currentCalls > 1) {
+                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} series)...`;
                 this._collectingData.instance.show();
             } else {
                 this._collectingData.instance.hide();
@@ -137,7 +143,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private setNextButton(): void {
-            if (this._currentCalls.length > 0) {
+            if (this._currentCalls > 0) {
                 this._nextButton.instance.hide();
                 return;
             }

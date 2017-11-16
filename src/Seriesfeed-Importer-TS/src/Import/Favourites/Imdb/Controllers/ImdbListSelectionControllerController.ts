@@ -7,13 +7,13 @@ module SeriesfeedImporter.Controllers {
         private _checkboxes: Array<ViewModels.Checkbox>;
         private _nextButton: ViewModels.ReadMoreButton;
         private _collectingData: ViewModels.ReadMoreButton;
-        private _currentCalls: Array<number>;
+        private _currentCalls: number;
 
         constructor(user: Models.ImdbUser) {
             this._user = user;
             this._checkboxes = [];
             this._selectedLists = [];
-            this._currentCalls = [];
+            this._currentCalls = 0;
 
             this.initialiseNextButton();
             this.initialiseCollectingData();
@@ -79,13 +79,18 @@ module SeriesfeedImporter.Controllers {
                         const checkbox = new ViewModels.Checkbox(`list_${index}`);
                         checkbox.subscribe((isEnabled) => {
                             if (isEnabled) {
-                                this._currentCalls.push(index);
+                                this._currentCalls++;
                                 this.setCollectingData();
                                 Services.ImdbImportService.getSeriesByListIdAndUserId(imdbList.id, this._user.id)
                                     .then((shows) => {
                                         imdbList.shows = shows;
-                                        const position = this._currentCalls.indexOf(index);
-                                        this._currentCalls.splice(position, 1);
+                                        this._currentCalls--;
+                                        this.setCollectingData();
+                                    })
+                                    .catch(() => {
+                                        checkbox.uncheck();
+                                        
+                                        this._currentCalls--;
                                         this.setCollectingData();
                                     });
                                 this._selectedLists.push(imdbList);
@@ -130,12 +135,12 @@ module SeriesfeedImporter.Controllers {
         }
 
         private setCollectingData(): void {
-            if (this._currentCalls.length === 1) {
-                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} lijst)...`;
+            if (this._currentCalls === 1) {
+                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} lijst)...`;
                 this._collectingData.instance.show();
                 return;
-            } else if (this._currentCalls.length > 1) {
-                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls.length} lijsten)...`;
+            } else if (this._currentCalls > 1) {
+                this._collectingData.text = `Gegevens verzamelen (${this._currentCalls} lijsten)...`;
                 this._collectingData.instance.show();
             } else {
                 this._collectingData.instance.hide();
@@ -144,7 +149,7 @@ module SeriesfeedImporter.Controllers {
         }
 
         private setNextButton(): void {
-            if (this._currentCalls.length > 0) {
+            if (this._currentCalls > 0) {
                 this._nextButton.instance.hide();
                 return;
             }

@@ -28,7 +28,6 @@ var SeriesfeedImporter;
             MainContent: "mainContent",
             CardContent: "cardContent"
         };
-        Config.MaxRetries = 3;
         Config.MaxAsyncCalls = 10;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -888,102 +887,6 @@ var SeriesfeedImporter;
                     default:
                         return $("<span/>").text("Kon deze serie niet als favoriet instellen.");
                 }
-            }
-            a(index) {
-                var MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
-                return new Promise((resolve) => {
-                    const bdShowUrl = 'http://www.bierdopje.com';
-                    SeriesfeedImporter.Services.BierdopjeService.getTheTvdbIdByShowSlug("bdShowSlug")
-                        .then((tvdbId) => {
-                        SeriesfeedImporter.Services.SeriesfeedImportService.findShowByTheTvdbId(tvdbId)
-                            .then((sfShowData) => {
-                            let sfSeriesName = sfShowData.name;
-                            const sfSeriesSlug = sfShowData.slug;
-                            const sfSeriesUrl = 'https://www.seriesfeed.com/series/';
-                            const MAX_RETRIES = SeriesfeedImporter.Config.MaxRetries;
-                            let current_retries = 0;
-                            function addFavouriteByShowId(sfSeriesId) {
-                                SeriesfeedImporter.Services.SeriesfeedImportService.addFavouriteByShowId(sfSeriesId)
-                                    .then((result) => {
-                                    let item = "<tr></tr>";
-                                    let status = "-";
-                                    let showUrl = sfSeriesUrl + sfSeriesSlug;
-                                    if (sfSeriesId === -1) {
-                                        sfSeriesId = "Onbekend";
-                                    }
-                                    if (!sfSeriesName) {
-                                    }
-                                    resolve();
-                                })
-                                    .catch(() => {
-                                    console.log(`Retrying to favourite ${sfSeriesName} (${sfSeriesId}). ${current_retries + 1}/${MAX_RETRIES})`);
-                                    current_retries++;
-                                    if (current_retries === MAX_RETRIES) {
-                                        const status = "Kon deze serie niet als favoriet instellen.";
-                                        const item = '<tr class="row-error"><td>' + sfSeriesId + '</td><td><a href="' + sfSeriesUrl + sfSeriesSlug + '" target="_blank">' + sfSeriesName + '</a></td><td>' + status + '</td></tr>';
-                                        resolve();
-                                    }
-                                    else {
-                                        addFavouriteByShowId(index);
-                                        resolve();
-                                    }
-                                });
-                            }
-                        }).catch(() => {
-                            const status = 'Het id kan niet van Seriesfeed worden opgehaald.</a>';
-                            resolve();
-                        });
-                    }).catch((error) => {
-                        const status = 'Deze serie kan niet gevonden worden op Bierdopje.';
-                        resolve();
-                    });
-                });
-            }
-            old(username) {
-                const favImportBtn = $(event.currentTarget);
-                const outerProgress = $('<div/>').addClass('progress');
-                const progressBar = $('<div/>').addClass('progress-bar progress-bar-striped active');
-                favImportBtn.prop('disabled', true).attr('value', "Bezig met importeren...");
-                outerProgress.append(progressBar);
-                const favourites = $('#details');
-                SeriesfeedImporter.Services.BierdopjeService.getFavouritesByUsername(username)
-                    .then((bdFavouriteLinks) => {
-                    const bdFavouritesLength = bdFavouriteLinks.length;
-                    var MAX_ASYNC_CALLS = SeriesfeedImporter.Config.MaxAsyncCalls;
-                    let current_async_calls = 0;
-                    Promise.resolve(1)
-                        .then(function loop(i) {
-                        if (current_async_calls < MAX_ASYNC_CALLS) {
-                            if (i < bdFavouritesLength) {
-                                current_async_calls += 1;
-                                return loop(i + 1);
-                            }
-                        }
-                        else {
-                            return new Promise((resolve) => {
-                                setTimeout(() => {
-                                    resolve(loop(i));
-                                }, 80);
-                            });
-                        }
-                    })
-                        .then(() => {
-                        function checkActiveCalls() {
-                            if (current_async_calls === 0) {
-                                favImportBtn.prop('disabled', false);
-                                favImportBtn.attr('value', "Favorieten Importeren");
-                                outerProgress.removeClass('progress');
-                                progressBar.replaceWith("Importeren voltooid.");
-                            }
-                            else {
-                                setTimeout(checkActiveCalls, 80);
-                            }
-                        }
-                        checkActiveCalls();
-                    }).catch((error) => {
-                        throw `Unknown error: ${error}`;
-                    });
-                });
             }
         }
         Controllers.ImportBierdopjeFavouritesController = ImportBierdopjeFavouritesController;

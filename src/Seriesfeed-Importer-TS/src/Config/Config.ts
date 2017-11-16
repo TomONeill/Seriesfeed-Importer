@@ -9,6 +9,5 @@ module SeriesfeedImporter.Config {
         MainContent: "mainContent",
         CardContent: "cardContent"
     };
-    export const MaxRetries = 3;
     export const MaxAsyncCalls = 10;
 }

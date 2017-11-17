@@ -7,5 +7,6 @@ module SeriesfeedImporter.Models {
         public imdbType: string;
         public name: string;
         public slug: string;
+        public seasons: Array<Models.Season>;
     }
 }

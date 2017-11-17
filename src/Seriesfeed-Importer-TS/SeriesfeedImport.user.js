@@ -2217,6 +2217,15 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Models;
     (function (Models) {
+        class Episode {
+        }
+        Models.Episode = Episode;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
         class Season {
         }
         Models.Season = Season;
@@ -2439,6 +2448,28 @@ var SeriesfeedImporter;
                 })
                     .catch((error) => {
                     throw `Could not get seasons for show ${showSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
+                });
+            }
+            static getBierdopjeShowSeasonEpisodesBySeasonUrl(seasonSlug) {
+                const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + seasonSlug;
+                return Services.AjaxService.get(url)
+                    .then((result) => {
+                    const episodesPageData = $(result.responseText);
+                    const episodesData = episodesPageData.find('.content .listing tr');
+                    const episodes = new Array();
+                    episodesData.each((index, episodeData) => {
+                        const episode = new SeriesfeedImporter.Models.Episode();
+                        episode.tag = $(episodeData).find("td:eq(1)").text();
+                        const acquiredStatus = $(episodeData).find('.AquiredItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;
+                        episode.acquired = acquiredStatus === 1;
+                        const seenStatus = $(episodeData).find('.SeenItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;
+                        episode.seen = seenStatus === 1;
+                        episodes.push(episode);
+                    });
+                    return episodes;
+                })
+                    .catch((error) => {
+                    throw `Could not get episodes for show ${seasonSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
         }

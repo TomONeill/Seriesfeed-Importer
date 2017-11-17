@@ -12,7 +12,7 @@ module SeriesfeedImporter.Controllers {
             window.scrollTo(0, 0);
 
             this.initialiseCard();
-            this.initialise();
+            this.initialiseTable();
             this.startImport();
         }
 
@@ -31,14 +31,14 @@ module SeriesfeedImporter.Controllers {
             card.setContent();
         }
 
-        private initialise(): void {
+        private initialiseTable(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
             this._table = new ViewModels.Table();
-            const seriesStatusIcon = $('<th/>');
+            const statusIconColumn = $('<th/>');
             const seriesColumn = $('<th/>').text('Serie');
             const statusColumn = $('<th/>').text('Status');
-            this._table.addTheadItems([seriesStatusIcon, seriesColumn, statusColumn]);
+            this._table.addTheadItems([statusIconColumn, seriesColumn, statusColumn]);
 
             this._selectedShows.forEach((show) => {
                 const row = $('<tr/>');

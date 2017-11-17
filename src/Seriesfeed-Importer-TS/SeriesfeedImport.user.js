@@ -807,7 +807,7 @@ var SeriesfeedImporter;
                 this._selectedShows = SeriesfeedImporter.Services.ShowSorterService.sort(selectedShows, "name");
                 window.scrollTo(0, 0);
                 this.initialiseCard();
-                this.initialise();
+                this.initialiseTable();
                 this.startImport();
             }
             initialiseCard() {
@@ -824,13 +824,13 @@ var SeriesfeedImporter;
                 card.setWidth('600px');
                 card.setContent();
             }
-            initialise() {
+            initialiseTable() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 this._table = new SeriesfeedImporter.ViewModels.Table();
-                const seriesStatusIcon = $('<th/>');
+                const statusIconColumn = $('<th/>');
                 const seriesColumn = $('<th/>').text('Serie');
                 const statusColumn = $('<th/>').text('Status');
-                this._table.addTheadItems([seriesStatusIcon, seriesColumn, statusColumn]);
+                this._table.addTheadItems([statusIconColumn, seriesColumn, statusColumn]);
                 this._selectedShows.forEach((show) => {
                     const row = $('<tr/>');
                     const showStatusIcon = $('<td/>');
@@ -1614,7 +1614,8 @@ var SeriesfeedImporter;
                 this._selectedShows = selectedShows;
                 window.scrollTo(0, 0);
                 this.initialiseCard();
-                this.initialise();
+                this.initialiseTable();
+                this.startImport();
             }
             initialiseCard() {
                 const card = SeriesfeedImporter.Services.CardService.getCard();
@@ -1631,14 +1632,38 @@ var SeriesfeedImporter;
                 card.setWidth('600px');
                 card.setContent();
             }
-            initialise() {
+            initialiseTable() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 this._table = new SeriesfeedImporter.ViewModels.Table();
+                const statusColumn = $('<th/>');
                 const seriesColumn = $('<th/>').text('Serie');
                 const seasonColumn = $('<th/>').text('Seizoen');
                 const episodeColumn = $('<th/>').text('Aflevering');
-                this._table.addTheadItems([seriesColumn, seasonColumn, episodeColumn]);
+                this._table.addTheadItems([statusColumn, seriesColumn, seasonColumn, episodeColumn]);
+                this._selectedShows.forEach((show) => {
+                    const row = $('<tr/>');
+                    const statusColumn = $('<td/>');
+                    const showColumn = $('<td/>');
+                    const seasonColumn = $('<td/>');
+                    const episodeColumn = $('<td/>');
+                    const loadingIcon = $("<i/>").addClass("fa fa-circle-o-notch fa-spin").css({ color: "#676767", fontSize: "16px" });
+                    statusColumn.append(loadingIcon);
+                    const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                    showColumn.append(showLink);
+                    row.append(statusColumn);
+                    row.append(showColumn);
+                    row.append(seasonColumn);
+                    row.append(episodeColumn);
+                    this._table.addRow(row);
+                });
                 cardContent.append(this._table.instance);
+            }
+            startImport() {
+                this._selectedShows.forEach((show) => {
+                    SeriesfeedImporter.Services.BierdopjeService.getShowSeasonsByShowSlug(show.slug).then((seasons) => {
+                        console.log("seasons", seasons);
+                    });
+                });
             }
         }
         Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;
@@ -2174,6 +2199,15 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Models;
     (function (Models) {
+        class Season {
+        }
+        Models.Season = Season;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
         class Show {
         }
         Models.Show = Show;
@@ -2257,8 +2291,8 @@ var SeriesfeedImporter;
         class BierdopjeService {
             static getUsername() {
                 return Services.AjaxService.get(SeriesfeedImporter.Config.BierdopjeBaseUrl + "/stats")
-                    .then((statsPageData) => {
-                    const statsData = $(statsPageData.responseText);
+                    .then((result) => {
+                    const statsData = $(result.responseText);
                     return statsData.find("#userbox_loggedin").find("h4").html();
                 })
                     .catch((error) => {
@@ -2267,8 +2301,8 @@ var SeriesfeedImporter;
             }
             static isExistingUser(username) {
                 return Services.AjaxService.get(SeriesfeedImporter.Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
-                    .then((pageData) => {
-                    const data = $(pageData.responseText);
+                    .then((result) => {
+                    const data = $(result.responseText);
                     return data.find("#page .maincontent .content-links .content h3").html() !== "Fout - Pagina niet gevonden";
                 })
                     .catch((error) => {
@@ -2277,8 +2311,8 @@ var SeriesfeedImporter;
             }
             static getAvatarUrlByUsername(username) {
                 return Services.AjaxService.get(SeriesfeedImporter.Config.BierdopjeBaseUrl + "/user/" + username + "/profile")
-                    .then((pageData) => {
-                    const data = $(pageData.responseText);
+                    .then((result) => {
+                    const data = $(result.responseText);
                     return data.find('img.avatar').attr('src');
                 })
                     .catch((error) => {
@@ -2288,8 +2322,8 @@ var SeriesfeedImporter;
             static getFavouritesByUsername(username) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + "/users/" + username + "/shows";
                 return Services.AjaxService.get(url)
-                    .then((pageData) => {
-                    const data = $(pageData.responseText);
+                    .then((result) => {
+                    const data = $(result.responseText);
                     const dataRow = data.find(".content").find("ul").find("li").find("a");
                     const favourites = new Array();
                     dataRow.each((index, favourite) => {
@@ -2330,8 +2364,8 @@ var SeriesfeedImporter;
             static getTvdbIdByShowSlugFromApi(showSlug) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + showSlug;
                 return Services.AjaxService.get(url)
-                    .then((pageData) => {
-                    const favouriteData = $(pageData.responseText);
+                    .then((result) => {
+                    const favouriteData = $(result.responseText);
                     const theTvdbId = favouriteData.find(`a[href^='${SeriesfeedImporter.Config.TheTvdbBaseUrl}']`).html();
                     return theTvdbId;
                 })
@@ -2350,8 +2384,8 @@ var SeriesfeedImporter;
             static getTimeWastedByUsername(username) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + "/user/" + username + "/timewasted";
                 return Services.AjaxService.get(url)
-                    .then((pageData) => {
-                    const bdTimeWastedData = $(pageData.responseText);
+                    .then((result) => {
+                    const bdTimeWastedData = $(result.responseText);
                     const timeWastedRows = bdTimeWastedData.find('table tr');
                     const shows = new Array();
                     timeWastedRows.each((index, timeWastedRow) => {
@@ -2367,6 +2401,26 @@ var SeriesfeedImporter;
                 })
                     .catch((error) => {
                     throw `Could not get Time Wasted for user ${username} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
+                });
+            }
+            static getShowSeasonsByShowSlug(showSlug) {
+                const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + showSlug + "/episodes/season/";
+                return Services.AjaxService.get(url)
+                    .then((result) => {
+                    const seasonsPageData = $(result.responseText);
+                    const seasonsData = seasonsPageData.find('#page .maincontent .content .rightfloat select option');
+                    const seasons = new Array();
+                    seasonsData.each((index, seasonData) => {
+                        const season = new SeriesfeedImporter.Models.Season();
+                        const seasonIdMatches = $(seasonData).text().match(/\d+/);
+                        season.id = seasonIdMatches != null ? seasonIdMatches[0] : "0";
+                        season.slug = $(seasonData).attr('value');
+                        seasons.push(season);
+                    });
+                    return seasons;
+                })
+                    .catch((error) => {
+                    throw `Could not get seasons for show ${showSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
         }

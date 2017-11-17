@@ -12,7 +12,8 @@ module SeriesfeedImporter.Controllers {
 
             window.scrollTo(0, 0);
             this.initialiseCard();
-            this.initialise();
+            this.initialiseTable();
+            this.startImport();
         }
 
         private initialiseCard(): void {
@@ -31,16 +32,46 @@ module SeriesfeedImporter.Controllers {
             card.setContent();
         }
 
-        private initialise(): void {
+        private initialiseTable(): void {
             const cardContent = $('#' + Config.Id.CardContent);
 
             this._table = new ViewModels.Table();
+            const statusColumn = $('<th/>');
             const seriesColumn = $('<th/>').text('Serie');
             const seasonColumn = $('<th/>').text('Seizoen');
             const episodeColumn = $('<th/>').text('Aflevering');
-            this._table.addTheadItems([seriesColumn, seasonColumn, episodeColumn]);
+            this._table.addTheadItems([statusColumn, seriesColumn, seasonColumn, episodeColumn]);
+            
+            this._selectedShows.forEach((show) => {
+                const row = $('<tr/>');
+                const statusColumn = $('<td/>');
+                const showColumn = $('<td/>');
+                const seasonColumn = $('<td/>');
+                const episodeColumn = $('<td/>');
+
+                const loadingIcon = $("<i/>").addClass("fa fa-circle-o-notch fa-spin").css({ color: "#676767", fontSize: "16px" });
+                statusColumn.append(loadingIcon);
+                
+                const showLink = $('<a/>').attr('href', Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
+                showColumn.append(showLink);
+
+                row.append(statusColumn);
+                row.append(showColumn);
+                row.append(seasonColumn);
+                row.append(episodeColumn);
+
+                this._table.addRow(row);
+            });
 
             cardContent.append(this._table.instance);
+        }
+
+        private startImport(): void {
+            this._selectedShows.forEach((show) => {
+                Services.BierdopjeService.getShowSeasonsByShowSlug(show.slug).then((seasons) => {
+                    console.log("seasons", seasons);
+                });
+            });
         }
     }
 }

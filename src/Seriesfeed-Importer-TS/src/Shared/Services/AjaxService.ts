@@ -24,10 +24,15 @@ module SeriesfeedImporter.Services {
         private static queue(request: Promise<any>): Promise<any> {
             if (this._currentCalls < Config.MaxAsyncCalls) {
                 this._currentCalls++;
-                return request.then((result) => {
-                    this._currentCalls--;
-                    return result;
-                });
+                return request
+                    .then((result) => {
+                        this._currentCalls--;
+                        return result;
+                    })
+                    .catch((error) => {
+                        this._currentCalls--;
+                        return error;
+                    });
             }
 
             return new Promise((resolve) => {

@@ -159,7 +159,15 @@ module SeriesfeedImporter.Controllers {
                         return;
                     }
 
-                    // Loose episodes.
+                    season.episodes.forEach((episode) => {
+                        if (episode.seen) {
+                            const promise = Services.SeriesfeedImportService.markEpisode(episode.id, Enums.MarkType.Seen);
+                            promises.push(promise);
+                        } else if (episode.acquired) {
+                            const promise = Services.SeriesfeedImportService.markEpisode(episode.id, Enums.MarkType.Obtained);
+                            promises.push(promise);
+                        }
+                    });
                 });
             });
 

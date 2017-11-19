@@ -1616,6 +1616,18 @@ var SeriesfeedImporter;
                     return error;
                 });
             }
+            static markEpisode(episodeId, type) {
+                const postData = {
+                    episode: episodeId,
+                    type: type,
+                    status: 'no'
+                };
+                return Services.AjaxService.post("/ajax/serie/episode/mark/", postData)
+                    .catch((error) => {
+                    console.error(`Could not mark episode ${episodeId} as ${type} on ${SeriesfeedImporter.Config.BaseUrl}: ${error.responseText}`);
+                    return error;
+                });
+            }
         }
         Services.SeriesfeedImportService = SeriesfeedImportService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
@@ -1792,6 +1804,16 @@ var SeriesfeedImporter;
                             promises.push(promise);
                             return;
                         }
+                        season.episodes.forEach((episode) => {
+                            if (episode.seen) {
+                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Seen);
+                                promises.push(promise);
+                            }
+                            else if (episode.acquired) {
+                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Obtained);
+                                promises.push(promise);
+                            }
+                        });
                     });
                 });
                 Promise.all(promises)

@@ -142,5 +142,19 @@ module SeriesfeedImporter.Services {
                     return error;
                 });
         }
+
+        public static markEpisode(episodeId: number, type: Enums.MarkType): Promise<void> {
+            const postData = {
+                episode: episodeId,
+                type: type,
+                status: 'no'
+            };
+
+            return Services.AjaxService.post("/ajax/serie/episode/mark/", postData)
+                .catch((error) => {
+                    console.error(`Could not mark episode ${episodeId} as ${type} on ${Config.BaseUrl}: ${error.responseText}`);
+                    return error;
+                });
+        }
     }
 }

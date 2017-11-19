@@ -1680,6 +1680,7 @@ var SeriesfeedImporter;
                 this.ShowNameColumnIndex = 1;
                 this.SeasonColumnIndex = 2;
                 this.EpisodeColumnIndex = 3;
+                this.Separator = '/';
                 this._username = username;
                 this._selectedShows = selectedShows;
                 window.scrollTo(0, 0);
@@ -1794,23 +1795,31 @@ var SeriesfeedImporter;
                     show.seasons.forEach((season, seasonIndex) => {
                         const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
                         if (hasSeenAllEpisodes) {
-                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Seen);
+                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Seen)
+                                .then(() => this.updateEpisodeColumn(rowIndex, season.episodes.length))
+                                .catch(() => this.updateEpisodeColumn(rowIndex, season.episodes.length));
                             promises.push(promise);
                             return;
                         }
                         const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
                         if (hasAcquiredAllEpisodes) {
-                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Obtained);
+                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Obtained)
+                                .then(() => this.updateEpisodeColumn(rowIndex, season.episodes.length))
+                                .catch(() => this.updateEpisodeColumn(rowIndex, season.episodes.length));
                             promises.push(promise);
                             return;
                         }
                         season.episodes.forEach((episode) => {
                             if (episode.seen) {
-                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Seen);
+                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Seen)
+                                    .then(() => this.updateEpisodeColumn(rowIndex, 1))
+                                    .catch(() => this.updateEpisodeColumn(rowIndex, 1));
                                 promises.push(promise);
                             }
                             else if (episode.acquired) {
-                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Obtained);
+                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Obtained)
+                                    .then(() => this.updateEpisodeColumn(rowIndex, 1))
+                                    .catch(() => this.updateEpisodeColumn(rowIndex, 1));
                                 promises.push(promise);
                             }
                         });
@@ -1820,6 +1829,26 @@ var SeriesfeedImporter;
                     .then(() => {
                     console.log("all done.", this._selectedShows);
                 });
+            }
+            updateSeasonColumn(rowId, seasonsDone) {
+                const currentRow = this._table.getRow(rowId);
+                const seasonColumn = currentRow.children().get(this.SeasonColumnIndex);
+                const seasonColumnParts = $(seasonColumn).text().split(this.Separator);
+                const currentSeasonsDoneText = seasonColumnParts[0];
+                const totalSeasonsText = seasonColumnParts[1];
+                let currentSeasonsDone = isNaN(+currentSeasonsDoneText) ? 0 : +currentSeasonsDoneText;
+                currentSeasonsDone += seasonsDone;
+                $(seasonColumn).text(currentSeasonsDone + this.Separator + totalSeasonsText);
+            }
+            updateEpisodeColumn(rowId, episodesDone) {
+                const currentRow = this._table.getRow(rowId);
+                const episodeColumn = currentRow.children().get(this.EpisodeColumnIndex);
+                const episodeColumnParts = $(episodeColumn).text().split(this.Separator);
+                const currentEpisodesDoneText = episodeColumnParts[0];
+                const totalEpisodesText = episodeColumnParts[1];
+                let currentEpisodesDone = isNaN(+currentEpisodesDoneText) ? 0 : +currentEpisodesDoneText;
+                currentEpisodesDone += episodesDone;
+                $(episodeColumn).text(currentEpisodesDone + this.Separator + totalEpisodesText);
             }
         }
         Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;

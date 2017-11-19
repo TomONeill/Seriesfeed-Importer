@@ -1798,14 +1798,14 @@ var SeriesfeedImporter;
                         const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
                         if (hasSeenAllEpisodes) {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Seen)
-                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
-                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
+                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length))
+                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length));
                             seasonPromises.push(promise);
                         }
                         else if (hasAcquiredAllEpisodes) {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Obtained)
-                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
-                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
+                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length))
+                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length));
                             seasonPromises.push(promise);
                         }
                         else {

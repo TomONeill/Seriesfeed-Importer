@@ -1905,7 +1905,7 @@ var SeriesfeedImporter;
             }
             initialiseCard() {
                 this._card = SeriesfeedImporter.Services.CardService.getCard();
-                this._card.setTitle("Bierdopje favorieten selecteren");
+                this._card.setTitle("Bierdopje series selecteren");
                 this._card.setBackButtonUrl(SeriesfeedImporter.Enums.ShortUrl.ImportTimeWastedBierdopje);
                 const breadcrumbs = [
                     new SeriesfeedImporter.Models.Breadcrumb("Time Wasted importeren", SeriesfeedImporter.Enums.ShortUrl.Import),

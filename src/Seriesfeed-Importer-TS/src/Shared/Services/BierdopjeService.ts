@@ -20,7 +20,7 @@ module SeriesfeedImporter.Services {
                     return data.find("#page .maincontent .content-links .content h3").html() !== "Fout - Pagina niet gevonden";
                 })
                 .catch((error) => {
-                    throw `Could not check for existing user on ${Config.BierdopjeBaseUrl}: ${error}`;
+                    throw `Could not check for existing user ${username} on ${Config.BierdopjeBaseUrl}: ${error}`;
                 });
         }
 
@@ -31,7 +31,7 @@ module SeriesfeedImporter.Services {
                     return data.find('img.avatar').attr('src');
                 })
                 .catch((error) => {
-                    throw `Could not get avatar url from ${Config.BierdopjeBaseUrl}. ${error}`;
+                    throw `Could not get avatar url for user ${username} from ${Config.BierdopjeBaseUrl}. ${error}`;
                 });
         }
 
@@ -57,7 +57,7 @@ module SeriesfeedImporter.Services {
                 })
                 .catch((error) => {
                     window.alert(`Kan geen favorieten vinden voor ${username}. Dit kan komen doordat de gebruiker niet bestaat, geen favorieten heeft of er is iets mis met je verbinding.`);
-                    throw `Could not get favourites from ${Config.BierdopjeBaseUrl}. ${error}`;
+                    throw `Could not get favourites for ${username} from ${Config.BierdopjeBaseUrl}. ${error}`;
                 });
         }
 
@@ -181,7 +181,7 @@ module SeriesfeedImporter.Services {
                         if (index === 0) {
                             return;
                         }
-                        
+
                         const episode = new Models.Episode();
                         episode.tag = $(episodeData).find("td:eq(1)").text();
                         const acquiredStatus = $(episodeData).find('.AquiredItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;

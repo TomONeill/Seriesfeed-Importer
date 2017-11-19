@@ -127,5 +127,20 @@ module SeriesfeedImporter.Services {
             localEpisodes.push(localEpisode);
             Services.StorageService.set(Enums.LocalStorageKey.SeriesfeedEpisodes, localEpisodes);
         }
+
+        public static markSeasonEpisodes(showId: number, seasonId: number, type: Enums.MarkType): Promise<void> {
+            const postData = {
+                series: showId,
+                season: seasonId,
+                seen: true,
+                type: type
+            };
+
+            return Services.AjaxService.post("/ajax/serie/episode/mark/all", postData)
+                .catch((error) => {
+                    console.error(`Could not mark all episodes as ${type} for show id ${showId} and season id ${seasonId} on ${Config.BaseUrl}: ${error.responseText}`);
+                    return error;
+                });
+        }
     }
 }

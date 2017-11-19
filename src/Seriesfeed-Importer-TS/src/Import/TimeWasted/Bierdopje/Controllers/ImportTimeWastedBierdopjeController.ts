@@ -135,9 +135,13 @@ module SeriesfeedImporter.Controllers {
                         show.seasons.map((season) => episodeCount += season.episodes.length);
                         $(episodeColumn).text('-/' + episodeCount);
                         
-                        console.log("all done.", this._selectedShows);
+                        setTimeout(this.markEpisodes(), Config.CooldownInMs);
                     });
             });
+        }
+
+        private markEpisodes(): void {
+            console.log("todo marking episodes");
         }
     }
 }

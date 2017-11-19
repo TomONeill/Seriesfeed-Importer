@@ -1603,6 +1603,19 @@ var SeriesfeedImporter;
                 localEpisodes.push(localEpisode);
                 Services.StorageService.set(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedEpisodes, localEpisodes);
             }
+            static markSeasonEpisodes(showId, seasonId, type) {
+                const postData = {
+                    series: showId,
+                    season: seasonId,
+                    seen: true,
+                    type: type
+                };
+                return Services.AjaxService.post("/ajax/serie/episode/mark/all", postData)
+                    .catch((error) => {
+                    console.error(`Could not mark all episodes as ${type} for show id ${showId} and season id ${seasonId} on ${SeriesfeedImporter.Config.BaseUrl}: ${error.responseText}`);
+                    return error;
+                });
+            }
         }
         Services.SeriesfeedImportService = SeriesfeedImportService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
@@ -1759,9 +1772,12 @@ var SeriesfeedImporter;
                         let episodeCount = 0;
                         show.seasons.map((season) => episodeCount += season.episodes.length);
                         $(episodeColumn).text('-/' + episodeCount);
-                        console.log("all done.", this._selectedShows);
+                        setTimeout(this.markEpisodes(), SeriesfeedImporter.Config.CooldownInMs);
                     });
                 });
+            }
+            markEpisodes() {
+                console.log("todo marking episodes");
             }
         }
         Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;
@@ -2238,6 +2254,16 @@ var SeriesfeedImporter;
             BierdopjeShows: "bierdopje.shows",
             SeriesfeedShows: "seriesfeed.shows",
             SeriesfeedEpisodes: "seriesfeed.episodes"
+        };
+    })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Enums;
+    (function (Enums) {
+        Enums.MarkType = {
+            Obtained: "obtain",
+            Seen: "seen"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));

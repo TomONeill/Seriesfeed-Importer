@@ -1,3 +1,6 @@
+# DEPRECATION WARNING
+This userscript is deprecated. Please install <A HREF="https://github.com/TomONeill/seriesfeed-transporter">Seriesfeed Transporter</A> instead.
+
 # Seriesfeed Importer
 Import your favourites from other sites like Bierdopje.com to Seriesfeed.com
 <BR/>
@@ -21,10 +24,10 @@ Your username will be filled in automatically if you are logged onto Bierdopje.c
 # Other userscripts
 Check out other userscripts for Seriesfeed by me:<BR/>
 <ul>
-    <li><A HREF="https://github.com/TomONeill/Seriesfeed-Import-Time-Wasted">Import Time Wasted</A></li>
-    <li><A HREF="https://github.com/TomONeill/Seriesfeed-Move">Move cards on frontpage</A></li>
-    <li><A HREF="https://github.com/TomONeill/Seriesfeed-Season-Separator">Season Separator</A></li>
-	<li><A HREF="https://github.com/TomONeill/seriesfeed-episode-inverter">Episode Inverter</A></li>
+    <li><A HREF="https://github.com/TomONeill/seriesfeed-transporter">Seriesfeed Transporter</A>: Import and export your favourites and time wasted.</li>
+    <li><A HREF="https://github.com/TomONeill/Seriesfeed-Move">Seriesfeed Move</A>: drag and drop frontpage items to your liking.</li>
+    <li><A HREF="https://github.com/TomONeill/seriesfeed-episode-inverter">Seriesfeed Episode Inverter</A>: Choose whether episodes are sorted ascending or descending.</li>
+    <li><A HREF="https://github.com/TomONeill/Seriesfeed-Season-Separator">Seriesfeed Season Separator</A>: Draws a thick line between seasons.</li>
 </ul>
 
 # Development

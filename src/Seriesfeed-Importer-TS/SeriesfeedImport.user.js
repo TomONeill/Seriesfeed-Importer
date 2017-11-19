@@ -1674,12 +1674,17 @@ var SeriesfeedImporter;
 (function (SeriesfeedImporter) {
     var Controllers;
     (function (Controllers) {
+        let Column;
+        (function (Column) {
+            Column[Column["Status"] = 0] = "Status";
+            Column[Column["ShowName"] = 1] = "ShowName";
+            Column[Column["Season"] = 2] = "Season";
+            Column[Column["EpisodesAcquired"] = 3] = "EpisodesAcquired";
+            Column[Column["EpisodesSeen"] = 4] = "EpisodesSeen";
+            Column[Column["EpisodeTotal"] = 5] = "EpisodeTotal";
+        })(Column || (Column = {}));
         class ImportTimeWastedBierdopjeController {
             constructor(username, selectedShows) {
-                this.StatusColumnIndex = 0;
-                this.ShowNameColumnIndex = 1;
-                this.SeasonColumnIndex = 2;
-                this.EpisodeColumnIndex = 3;
                 this.Separator = '/';
                 this._username = username;
                 this._selectedShows = selectedShows;
@@ -1700,35 +1705,41 @@ var SeriesfeedImporter;
                     new SeriesfeedImporter.Models.Breadcrumb("Importeren", null)
                 ];
                 card.setBreadcrumbs(breadcrumbs);
-                card.setWidth('600px');
+                card.setWidth('650px');
                 card.setContent();
             }
             initialiseTable() {
                 const cardContent = $('#' + SeriesfeedImporter.Config.Id.CardContent);
                 this._table = new SeriesfeedImporter.ViewModels.Table();
-                const statusColumn = $('<th/>');
-                const seriesColumn = $('<th/>').text('Serie');
-                const seasonColumn = $('<th/>').text('Seizoen').css({ textAlign: "center" });
-                const episodeColumn = $('<th/>').text('Aflevering').css({ textAlign: "center" });
-                this._table.addTheadItems([statusColumn, seriesColumn, seasonColumn, episodeColumn]);
+                const statusColumn = $('<th/>').css({ verticalAlign: "middle" });
+                const seriesColumn = $('<th/>').text('Serie').css({ verticalAlign: "middle" });
+                const seasonColumn = $('<th/>').text('Seizoen').css({ textAlign: "center", verticalAlign: "middle" });
+                const episodesAcquiredColumn = $('<th/>').html("Afleveringen<br/>verkregen").css({ textAlign: "center", verticalAlign: "middle" });
+                const episodesSeenColumn = $('<th/>').html("Afleveringen<br/>gezien").css({ textAlign: "center", verticalAlign: "middle" });
+                const episodeTotalColumn = $('<th/>').html("Totaal<br/>afleveringen").css({ textAlign: "center", verticalAlign: "middle" });
+                this._table.addTheadItems([statusColumn, seriesColumn, seasonColumn, episodesAcquiredColumn, episodesSeenColumn, episodeTotalColumn]);
                 this._selectedShows.forEach((show) => {
                     const row = $('<tr/>');
                     const statusColumn = $('<td/>');
                     const showColumn = $('<td/>');
                     const seasonColumn = $('<td/>').css({ textAlign: "center" });
-                    ;
-                    const episodeColumn = $('<td/>').css({ textAlign: "center" });
-                    ;
+                    const episodesAcquiredColumn = $('<td/>').css({ textAlign: "center" });
+                    const episodesSeenColumn = $('<td/>').css({ textAlign: "center" });
+                    const episodeTotalColumn = $('<td/>').css({ textAlign: "center" });
                     const loadingIcon = $("<i/>").addClass("fa fa-circle-o-notch fa-spin").css({ color: "#676767", fontSize: "16px" });
                     statusColumn.append(loadingIcon.clone());
                     seasonColumn.append(loadingIcon.clone());
-                    episodeColumn.append(loadingIcon.clone());
+                    episodesAcquiredColumn.append(loadingIcon.clone());
+                    episodesSeenColumn.append(loadingIcon.clone());
+                    episodeTotalColumn.append(loadingIcon.clone());
                     const showLink = $('<a/>').attr('href', SeriesfeedImporter.Config.BierdopjeBaseUrl + show.slug).attr('target', '_blank').text(show.name);
                     showColumn.append(showLink);
                     row.append(statusColumn);
                     row.append(showColumn);
                     row.append(seasonColumn);
-                    row.append(episodeColumn);
+                    row.append(episodesAcquiredColumn);
+                    row.append(episodesSeenColumn);
+                    row.append(episodeTotalColumn);
                     this._table.addRow(row);
                 });
                 cardContent.append(this._table.instance);
@@ -1740,7 +1751,7 @@ var SeriesfeedImporter;
                         .then((seasons) => {
                         show.seasons = seasons;
                         const currentRow = this._table.getRow(index);
-                        const seasonColumn = currentRow.children().get(this.SeasonColumnIndex);
+                        const seasonColumn = currentRow.children().get(Column.Season);
                         $(seasonColumn).text('-' + this.Separator + show.seasons.length);
                     });
                     promises.push(promise);
@@ -1781,10 +1792,26 @@ var SeriesfeedImporter;
                     Promise.all(promises)
                         .then(() => {
                         const currentRow = this._table.getRow(rowIndex);
-                        const episodeColumn = currentRow.children().get(this.EpisodeColumnIndex);
+                        const episodesAcquiredColumn = currentRow.children().get(Column.EpisodesAcquired);
+                        const episodesSeenColumn = currentRow.children().get(Column.EpisodesSeen);
+                        const episodeTotalColumn = currentRow.children().get(Column.EpisodeTotal);
                         let episodeCount = 0;
-                        show.seasons.map((season) => episodeCount += season.episodes.length);
-                        $(episodeColumn).text('-' + this.Separator + episodeCount);
+                        let episodesAcquired = 0;
+                        let episodesSeen = 0;
+                        show.seasons.map((season) => {
+                            season.episodes.map((episode) => {
+                                if (episode.acquired) {
+                                    episodesAcquired++;
+                                }
+                                if (episode.seen) {
+                                    episodesSeen++;
+                                }
+                            });
+                            return episodeCount += season.episodes.length;
+                        });
+                        $(episodesAcquiredColumn).text('-' + this.Separator + episodesAcquired);
+                        $(episodesSeenColumn).text('-' + this.Separator + episodesSeen);
+                        $(episodeTotalColumn).text(episodeCount);
                         setTimeout(this.markEpisodes(), SeriesfeedImporter.Config.CooldownInMs);
                     });
                 });
@@ -1798,55 +1825,63 @@ var SeriesfeedImporter;
                         const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
                         if (hasSeenAllEpisodes) {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Seen)
-                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length))
-                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length));
+                                .then(() => this.updateCountColumn(rowIndex, Column.EpisodesSeen, season.episodes.length))
+                                .catch(() => this.updateCountColumn(rowIndex, Column.EpisodesSeen, season.episodes.length));
                             seasonPromises.push(promise);
                         }
                         else if (hasAcquiredAllEpisodes) {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Obtained)
-                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length))
-                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, season.episodes.length));
+                                .then(() => this.updateCountColumn(rowIndex, Column.EpisodesAcquired, season.episodes.length))
+                                .catch(() => this.updateCountColumn(rowIndex, Column.EpisodesAcquired, season.episodes.length));
                             seasonPromises.push(promise);
                         }
                         else {
                             season.episodes.forEach((episode) => {
                                 if (episode.seen) {
                                     const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Seen)
-                                        .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
-                                        .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
+                                        .then(() => this.updateCountColumn(rowIndex, Column.EpisodesSeen, 1))
+                                        .catch(() => this.updateCountColumn(rowIndex, Column.EpisodesSeen, 1));
                                     seasonPromises.push(promise);
                                 }
                                 else if (episode.acquired) {
                                     const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Obtained)
-                                        .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
-                                        .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
+                                        .then(() => this.updateCountColumn(rowIndex, Column.EpisodesAcquired, 1))
+                                        .catch(() => this.updateCountColumn(rowIndex, Column.EpisodesAcquired, 1));
                                     seasonPromises.push(promise);
                                 }
                             });
                         }
                         const seasonPromiseAll = Promise.all(seasonPromises)
-                            .then(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1))
-                            .catch(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1));
+                            .then(() => this.updateCountColumn(rowIndex, Column.Season, 1))
+                            .catch(() => this.updateCountColumn(rowIndex, Column.Season, 1));
                         promises.push(seasonPromiseAll);
                     });
                     Promise.all(promises)
                         .then(() => {
                         const currentRow = this._table.getRow(rowIndex);
-                        const statusColumn = currentRow.children().get(this.StatusColumnIndex);
+                        const statusColumn = currentRow.children().get(Column.Status);
                         const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
                         $(statusColumn).find("i").replaceWith(checkmarkIcon);
-                        console.log("show done.", show);
                     });
                 });
             }
-            updateCountColumn(rowId, columnId, seasonsDone) {
+            updateCountColumn(rowId, columnId, done) {
+                if (columnId === Column.EpisodesSeen) {
+                    this.updateActualCountColumn(rowId, Column.EpisodesSeen, done);
+                    this.updateActualCountColumn(rowId, Column.EpisodesAcquired, done);
+                }
+                else {
+                    this.updateActualCountColumn(rowId, columnId, done);
+                }
+            }
+            updateActualCountColumn(rowId, columnId, done) {
                 const row = this._table.getRow(rowId);
                 const column = row.children().get(columnId);
                 const columnsParts = $(column).text().split(this.Separator);
                 const currentDoneText = columnsParts[0];
                 const totalDoneText = columnsParts[1];
                 let currentDone = isNaN(+currentDoneText) ? 0 : +currentDoneText;
-                currentDone += seasonsDone;
+                currentDone += done;
                 $(column).text(currentDone + this.Separator + totalDoneText);
             }
         }

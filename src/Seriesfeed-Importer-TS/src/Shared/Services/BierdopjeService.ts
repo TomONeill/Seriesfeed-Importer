@@ -155,7 +155,7 @@ module SeriesfeedImporter.Services {
                     seasonsData.each((index, seasonData) => {
                         const season = new Models.Season();
                         const seasonIdMatches = $(seasonData).text().match(/\d+/);
-                        season.id = seasonIdMatches != null ? seasonIdMatches[0] : "0";
+                        season.id = seasonIdMatches != null ? +seasonIdMatches[0] : 0;
                         season.slug = $(seasonData).attr('value');
 
                         seasons.push(season);

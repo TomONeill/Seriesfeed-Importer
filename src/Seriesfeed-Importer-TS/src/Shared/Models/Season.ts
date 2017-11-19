@@ -2,7 +2,7 @@
 
 module SeriesfeedImporter.Models {
     export class Season {
-        public id: string;
+        public id: number;
         public slug: string;
         public episodes: Models.Episode[];
     }

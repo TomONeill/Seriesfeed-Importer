@@ -1777,7 +1777,27 @@ var SeriesfeedImporter;
                 });
             }
             markEpisodes() {
-                console.log("todo marking episodes");
+                const promises = new Array();
+                this._selectedShows.forEach((show, rowIndex) => {
+                    show.seasons.forEach((season, seasonIndex) => {
+                        const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
+                        if (hasSeenAllEpisodes) {
+                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Seen);
+                            promises.push(promise);
+                            return;
+                        }
+                        const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
+                        if (hasAcquiredAllEpisodes) {
+                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Obtained);
+                            promises.push(promise);
+                            return;
+                        }
+                    });
+                });
+                Promise.all(promises)
+                    .then(() => {
+                    console.log("all done.", this._selectedShows);
+                });
             }
         }
         Controllers.ImportTimeWastedBierdopjeController = ImportTimeWastedBierdopjeController;
@@ -2561,7 +2581,7 @@ var SeriesfeedImporter;
                     seasonsData.each((index, seasonData) => {
                         const season = new SeriesfeedImporter.Models.Season();
                         const seasonIdMatches = $(seasonData).text().match(/\d+/);
-                        season.id = seasonIdMatches != null ? seasonIdMatches[0] : "0";
+                        season.id = seasonIdMatches != null ? +seasonIdMatches[0] : 0;
                         season.slug = $(seasonData).attr('value');
                         seasons.push(season);
                     });

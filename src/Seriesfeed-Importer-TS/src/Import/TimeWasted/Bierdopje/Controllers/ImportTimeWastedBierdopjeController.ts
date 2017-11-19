@@ -134,14 +134,39 @@ module SeriesfeedImporter.Controllers {
                         let episodeCount = 0;
                         show.seasons.map((season) => episodeCount += season.episodes.length);
                         $(episodeColumn).text('-/' + episodeCount);
-                        
+
                         setTimeout(this.markEpisodes(), Config.CooldownInMs);
                     });
             });
         }
 
         private markEpisodes(): void {
-            console.log("todo marking episodes");
+            const promises = new Array<Promise<void>>();
+
+            this._selectedShows.forEach((show, rowIndex) => {
+                show.seasons.forEach((season, seasonIndex) => {
+                    const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
+                    if (hasSeenAllEpisodes) {
+                        const promise = Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, Enums.MarkType.Seen);
+                        promises.push(promise);
+                        return;
+                    }
+
+                    const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
+                    if (hasAcquiredAllEpisodes) {
+                        const promise = Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, Enums.MarkType.Obtained);
+                        promises.push(promise);
+                        return;
+                    }
+
+                    // Loose episodes.
+                });
+            });
+
+            Promise.all(promises)
+                .then(() => {
+                    console.log("all done.", this._selectedShows);
+                });
         }
     }
 }

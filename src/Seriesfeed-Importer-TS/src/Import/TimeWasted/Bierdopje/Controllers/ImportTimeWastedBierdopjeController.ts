@@ -142,9 +142,9 @@ module SeriesfeedImporter.Controllers {
         }
 
         private markEpisodes(): void {
-            const promises = new Array<Promise<void>>();
-
             this._selectedShows.forEach((show, rowIndex) => {
+                const promises = new Array<Promise<void>>();
+
                 show.seasons.forEach((season, seasonIndex) => {
                     const seasonPromises = new Array<Promise<void>>();
                     const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
@@ -179,14 +179,19 @@ module SeriesfeedImporter.Controllers {
                     const seasonPromiseAll = Promise.all(seasonPromises)
                         .then(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1))
                         .catch(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1));
-                    promises.concat(seasonPromiseAll);
+                    promises.push(seasonPromiseAll);
                 });
-            });
 
-            Promise.all(promises)
-                .then(() => {
-                    console.log("all done.", this._selectedShows);
-                });
+                Promise.all(promises)
+                    .then(() => {
+                        const currentRow = this._table.getRow(rowIndex);
+                        const statusColumn = currentRow.children().get(this.StatusColumnIndex);
+                        const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
+                        $(statusColumn).find("i").replaceWith(checkmarkIcon);
+
+                        console.log("show done.", show);
+                    });
+            });
         }
 
         private updateCountColumn(rowId: number, columnId: number, seasonsDone: number): void {

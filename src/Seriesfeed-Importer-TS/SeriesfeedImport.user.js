@@ -1790,8 +1790,8 @@ var SeriesfeedImporter;
                 });
             }
             markEpisodes() {
-                const promises = new Array();
                 this._selectedShows.forEach((show, rowIndex) => {
+                    const promises = new Array();
                     show.seasons.forEach((season, seasonIndex) => {
                         const seasonPromises = new Array();
                         const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
@@ -1827,12 +1827,16 @@ var SeriesfeedImporter;
                         const seasonPromiseAll = Promise.all(seasonPromises)
                             .then(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1))
                             .catch(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1));
-                        promises.concat(seasonPromiseAll);
+                        promises.push(seasonPromiseAll);
                     });
-                });
-                Promise.all(promises)
-                    .then(() => {
-                    console.log("all done.", this._selectedShows);
+                    Promise.all(promises)
+                        .then(() => {
+                        const currentRow = this._table.getRow(rowIndex);
+                        const statusColumn = currentRow.children().get(this.StatusColumnIndex);
+                        const checkmarkIcon = $("<i/>").addClass("fa fa-check").css({ color: "#0d5f55", fontSize: "16px" });
+                        $(statusColumn).find("i").replaceWith(checkmarkIcon);
+                        console.log("show done.", show);
+                    });
                 });
             }
             updateCountColumn(rowId, columnId, seasonsDone) {

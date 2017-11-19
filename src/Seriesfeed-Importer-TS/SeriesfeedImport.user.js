@@ -29,6 +29,7 @@ var SeriesfeedImporter;
             CardContent: "cardContent"
         };
         Config.MaxAsyncCalls = 10;
+        Config.CooldownInMs = 100;
     })(Config = SeriesfeedImporter.Config || (SeriesfeedImporter.Config = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;
@@ -1562,6 +1563,18 @@ var SeriesfeedImporter;
                     return error;
                 });
             }
+            static getEpisodeId(showId, episodeTag) {
+                const postData = {
+                    type: 'series_season_episode',
+                    serie: showId,
+                    data: episodeTag
+                };
+                return Services.AjaxService.post("/ajax/serie/episode/find-by", postData)
+                    .catch((error) => {
+                    console.error(`Could not get episode for show id ${showId} with episode tag ${episodeTag} on ${SeriesfeedImporter.Config.BaseUrl}: ${error.responseText}`);
+                    return error;
+                });
+            }
         }
         Services.SeriesfeedImportService = SeriesfeedImportService;
     })(Services = SeriesfeedImporter.Services || (SeriesfeedImporter.Services = {}));
@@ -1679,8 +1692,47 @@ var SeriesfeedImporter;
                     promises.push(promise);
                 });
                 Promise.all(promises)
-                    .then(() => {
-                    console.log("all done");
+                    .then(() => setTimeout(this.getShowSeasonEpisodesBySeasonSlug(), SeriesfeedImporter.Config.CooldownInMs));
+            }
+            getShowSeasonEpisodesBySeasonSlug() {
+                const promises = new Array();
+                this._selectedShows.forEach((show, rowIndex) => {
+                    show.seasons.forEach((season, seasonIndex) => {
+                        const promise = SeriesfeedImporter.Services.BierdopjeService.getShowSeasonEpisodesBySeasonSlug(season.slug)
+                            .then((episodes) => {
+                            season.episodes = episodes;
+                        });
+                        promises.push(promise);
+                    });
+                });
+                Promise.all(promises)
+                    .then(() => setTimeout(this.aquireEpisodeIds(), SeriesfeedImporter.Config.CooldownInMs));
+            }
+            aquireEpisodeIds() {
+                const promises = new Array();
+                this._selectedShows.forEach((show, rowIndex) => {
+                    show.seasons.forEach((season, seasonIndex) => {
+                        season.episodes.forEach((episode, episodeIndex) => {
+                            const promise = SeriesfeedImporter.Services.SeriesfeedImportService.getEpisodeId(show.seriesfeedId, episode.tag)
+                                .then((episodeData) => {
+                                episode.id = episodeData.id;
+                            })
+                                .catch((error) => {
+                                const position = season.episodes.map((episode) => episode.tag).indexOf(episode.tag);
+                                season.episodes.splice(position, 1);
+                            });
+                            promises.push(promise);
+                        });
+                    });
+                    Promise.all(promises)
+                        .then(() => {
+                        const currentRow = this._table.getRow(rowIndex);
+                        const episodeColumn = currentRow.children().get(this.EpisodeColumnIndex);
+                        let episodeCount = 0;
+                        show.seasons.map((season) => episodeCount += season.episodes.length);
+                        $(episodeColumn).text('-/' + episodeCount);
+                        console.log("all done.", this._selectedShows);
+                    });
                 });
             }
         }
@@ -2280,9 +2332,14 @@ var SeriesfeedImporter;
             static queue(request) {
                 if (this._currentCalls < SeriesfeedImporter.Config.MaxAsyncCalls) {
                     this._currentCalls++;
-                    return request.then((result) => {
+                    return request
+                        .then((result) => {
                         this._currentCalls--;
                         return result;
+                    })
+                        .catch((error) => {
+                        this._currentCalls--;
+                        return error;
                     });
                 }
                 return new Promise((resolve) => {
@@ -2450,7 +2507,7 @@ var SeriesfeedImporter;
                     throw `Could not get seasons for show ${showSlug} from ${SeriesfeedImporter.Config.BierdopjeBaseUrl}. ${error}`;
                 });
             }
-            static getBierdopjeShowSeasonEpisodesBySeasonUrl(seasonSlug) {
+            static getShowSeasonEpisodesBySeasonSlug(seasonSlug) {
                 const url = SeriesfeedImporter.Config.BierdopjeBaseUrl + seasonSlug;
                 return Services.AjaxService.get(url)
                     .then((result) => {
@@ -2458,6 +2515,9 @@ var SeriesfeedImporter;
                     const episodesData = episodesPageData.find('.content .listing tr');
                     const episodes = new Array();
                     episodesData.each((index, episodeData) => {
+                        if (index === 0) {
+                            return;
+                        }
                         const episode = new SeriesfeedImporter.Models.Episode();
                         episode.tag = $(episodeData).find("td:eq(1)").text();
                         const acquiredStatus = $(episodeData).find('.AquiredItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;

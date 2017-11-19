@@ -19,7 +19,7 @@ module SeriesfeedImporter.Services {
 
         private static findShowByTheTvdbIdFromStorage(theTvdbId: string): Models.Show | null {
             const localShows = Services.StorageService.get(Enums.LocalStorageKey.SeriesfeedShows) as Array<Models.Show>;
-            
+
             if (localShows != null) {
                 for (let i = 0; i < localShows.length; i++) {
                     if (localShows[i].theTvdbId === theTvdbId) {
@@ -72,6 +72,20 @@ module SeriesfeedImporter.Services {
             return Services.AjaxService.post("/ajax/serie/favourite", postData)
                 .catch((error) => {
                     console.error(`Could not favourite show id ${showId} on ${Config.BaseUrl}: ${error.responseText}`);
+                    return error;
+                });
+        }
+
+        public static getEpisodeId(showId: number, episodeTag: string): Promise<any> {
+            const postData = {
+                type: 'series_season_episode',
+                serie: showId,
+                data: episodeTag
+            };
+
+            return Services.AjaxService.post("/ajax/serie/episode/find-by", postData)
+                .catch((error) => {
+                    console.error(`Could not get episode for show id ${showId} with episode tag ${episodeTag} on ${Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
         }

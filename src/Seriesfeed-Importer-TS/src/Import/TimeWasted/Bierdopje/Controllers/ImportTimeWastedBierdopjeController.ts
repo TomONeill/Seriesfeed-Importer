@@ -89,9 +89,55 @@ module SeriesfeedImporter.Controllers {
             });
 
             Promise.all(promises)
-                .then(() => {
-                    console.log("all done");
+                .then(() => setTimeout(this.getShowSeasonEpisodesBySeasonSlug(), Config.CooldownInMs));
+        }
+
+        private getShowSeasonEpisodesBySeasonSlug(): void {
+            const promises = new Array<Promise<void>>();
+
+            this._selectedShows.forEach((show, rowIndex) => {
+                show.seasons.forEach((season, seasonIndex) => {
+                    const promise = Services.BierdopjeService.getShowSeasonEpisodesBySeasonSlug(season.slug)
+                        .then((episodes) => {
+                            season.episodes = episodes;
+                        });
+                    promises.push(promise);
                 });
+            });
+
+            Promise.all(promises)
+                .then(() => setTimeout(this.aquireEpisodeIds(), Config.CooldownInMs));
+        }
+
+        private aquireEpisodeIds(): void {
+            const promises = new Array<Promise<void>>();
+
+            this._selectedShows.forEach((show, rowIndex) => {
+                show.seasons.forEach((season, seasonIndex) => {
+                    season.episodes.forEach((episode, episodeIndex) => {
+                        const promise = Services.SeriesfeedImportService.getEpisodeId(show.seriesfeedId, episode.tag)
+                            .then((episodeData) => {
+                                episode.id = episodeData.id;
+                            })
+                            .catch((error) => {
+                                const position = season.episodes.map((episode) => episode.tag).indexOf(episode.tag);
+                                season.episodes.splice(position, 1);
+                            });
+                        promises.push(promise);
+                    });
+                });
+
+                Promise.all(promises)
+                    .then(() => {
+                        const currentRow = this._table.getRow(rowIndex);
+                        const episodeColumn = currentRow.children().get(this.EpisodeColumnIndex);
+                        let episodeCount = 0;
+                        show.seasons.map((season) => episodeCount += season.episodes.length);
+                        $(episodeColumn).text('-/' + episodeCount);
+                        
+                        console.log("all done.", this._selectedShows);
+                    });
+            });
         }
     }
 }

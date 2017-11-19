@@ -168,31 +168,35 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        public static getBierdopjeShowSeasonEpisodesBySeasonUrl(seasonSlug: string): Promise<Models.Episode[]> {
+        public static getShowSeasonEpisodesBySeasonSlug(seasonSlug: string): Promise<Models.Episode[]> {
             const url = Config.BierdopjeBaseUrl + seasonSlug;
 
             return Services.AjaxService.get(url)
-            .then((result) => {
-                const episodesPageData = $(result.responseText);
-                const episodesData = episodesPageData.find('.content .listing tr');
+                .then((result) => {
+                    const episodesPageData = $(result.responseText);
+                    const episodesData = episodesPageData.find('.content .listing tr');
 
-                const episodes = new Array<Models.Episode>();
-                episodesData.each((index, episodeData) => {
-                    const episode = new Models.Episode();
-                    episode.tag = $(episodeData).find("td:eq(1)").text();
-                    const acquiredStatus = $(episodeData).find('.AquiredItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;
-                    episode.acquired = acquiredStatus === 1;
-                    const seenStatus = $(episodeData).find('.SeenItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;
-                    episode.seen = seenStatus === 1;
+                    const episodes = new Array<Models.Episode>();
+                    episodesData.each((index, episodeData) => {
+                        if (index === 0) {
+                            return;
+                        }
+                        
+                        const episode = new Models.Episode();
+                        episode.tag = $(episodeData).find("td:eq(1)").text();
+                        const acquiredStatus = $(episodeData).find('.AquiredItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;
+                        episode.acquired = acquiredStatus === 1;
+                        const seenStatus = $(episodeData).find('.SeenItem[src="http://cdn.bierdopje.eu/g/if/blob-green.png"]').length;
+                        episode.seen = seenStatus === 1;
 
-                    episodes.push(episode);
+                        episodes.push(episode);
+                    });
+
+                    return episodes;
+                })
+                .catch((error) => {
+                    throw `Could not get episodes for show ${seasonSlug} from ${Config.BierdopjeBaseUrl}. ${error}`;
                 });
-
-                return episodes;
-            })
-            .catch((error) => {
-                throw `Could not get episodes for show ${seasonSlug} from ${Config.BierdopjeBaseUrl}. ${error}`;
-            });
         }
     }
 }

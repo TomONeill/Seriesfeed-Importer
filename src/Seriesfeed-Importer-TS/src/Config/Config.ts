@@ -10,4 +10,5 @@ module SeriesfeedImporter.Config {
         CardContent: "cardContent"
     };
     export const MaxAsyncCalls = 10;
+    export const CooldownInMs = 100;
 }

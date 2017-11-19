@@ -151,8 +151,8 @@ module SeriesfeedImporter.Controllers {
                     const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
                     if (hasSeenAllEpisodes) {
                         const promise = Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, Enums.MarkType.Seen)
-                            .then(() => this.updateEpisodeColumn(rowIndex, season.episodes.length))
-                            .catch(() => this.updateEpisodeColumn(rowIndex, season.episodes.length));
+                            .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
+                            .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
                         seasonPromises.push(promise);
                         return;
                     }
@@ -160,8 +160,8 @@ module SeriesfeedImporter.Controllers {
                     const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
                     if (hasAcquiredAllEpisodes) {
                         const promise = Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, Enums.MarkType.Obtained)
-                            .then(() => this.updateEpisodeColumn(rowIndex, season.episodes.length))
-                            .catch(() => this.updateEpisodeColumn(rowIndex, season.episodes.length));
+                            .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
+                            .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
                         seasonPromises.push(promise);
                         return;
                     }
@@ -169,18 +169,21 @@ module SeriesfeedImporter.Controllers {
                     season.episodes.forEach((episode) => {
                         if (episode.seen) {
                             const promise = Services.SeriesfeedImportService.markEpisode(episode.id, Enums.MarkType.Seen)
-                                .then(() => this.updateEpisodeColumn(rowIndex, 1))
-                                .catch(() => this.updateEpisodeColumn(rowIndex, 1));
+                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
+                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
                             seasonPromises.push(promise);
                         } else if (episode.acquired) {
                             const promise = Services.SeriesfeedImportService.markEpisode(episode.id, Enums.MarkType.Obtained)
-                                .then(() => this.updateEpisodeColumn(rowIndex, 1))
-                                .catch(() => this.updateEpisodeColumn(rowIndex, 1));
+                                .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
+                                .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
                             seasonPromises.push(promise);
                         }
                     });
 
-                    promises.concat(seasonPromises);
+                    const seasonPromiseAll = Promise.all(seasonPromises)
+                        .then(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1))
+                        .catch(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1));
+                    promises.concat(seasonPromiseAll);
                 });
             });
 
@@ -190,30 +193,17 @@ module SeriesfeedImporter.Controllers {
                 });
         }
 
-        private updateSeasonColumn(rowId: number, seasonsDone: number): void {
-            const currentRow = this._table.getRow(rowId);
-            const seasonColumn = currentRow.children().get(this.SeasonColumnIndex);
-            const seasonColumnParts = $(seasonColumn).text().split(this.Separator);
-            const currentSeasonsDoneText = seasonColumnParts[0];
-            const totalSeasonsText = seasonColumnParts[1];
+        private updateCountColumn(rowId: number, columnId: number, seasonsDone: number): void {
+            const row = this._table.getRow(rowId);
+            const column = row.children().get(columnId);
+            const columnsParts = $(column).text().split(this.Separator);
+            const currentDoneText = columnsParts[0];
+            const totalDoneText = columnsParts[1];
 
-            let currentSeasonsDone = isNaN(+currentSeasonsDoneText) ? 0 : +currentSeasonsDoneText;
-            currentSeasonsDone += seasonsDone;
+            let currentDone = isNaN(+currentDoneText) ? 0 : +currentDoneText;
+            currentDone += seasonsDone;
 
-            $(seasonColumn).text(currentSeasonsDone + this.Separator + totalSeasonsText);
-        }
-
-        private updateEpisodeColumn(rowId: number, episodesDone: number): void {
-            const currentRow = this._table.getRow(rowId);
-            const episodeColumn = currentRow.children().get(this.EpisodeColumnIndex);
-            const episodeColumnParts = $(episodeColumn).text().split(this.Separator);
-            const currentEpisodesDoneText = episodeColumnParts[0];
-            const totalEpisodesText = episodeColumnParts[1];
-
-            let currentEpisodesDone = isNaN(+currentEpisodesDoneText) ? 0 : +currentEpisodesDoneText;
-            currentEpisodesDone += episodesDone;
-
-            $(episodeColumn).text(currentEpisodesDone + this.Separator + totalEpisodesText);
+            $(column).text(currentDone + this.Separator + totalDoneText);
         }
     }
 }

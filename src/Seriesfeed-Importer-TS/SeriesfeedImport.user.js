@@ -1503,7 +1503,7 @@ var SeriesfeedImporter;
     (function (Services) {
         class SeriesfeedImportService {
             static findShowByTheTvdbId(theTvdbId) {
-                const localShow = this.findShowByTheTvdbIdFromStorage(theTvdbId);
+                const localShow = this.findShowByTheTvdbIdInStorage(theTvdbId);
                 if (localShow != null) {
                     return Promise.resolve(localShow);
                 }
@@ -1514,7 +1514,7 @@ var SeriesfeedImporter;
                     return show;
                 });
             }
-            static findShowByTheTvdbIdFromStorage(theTvdbId) {
+            static findShowByTheTvdbIdInStorage(theTvdbId) {
                 const localShows = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedShows);
                 if (localShows != null) {
                     return localShows.find((show) => show.theTvdbId === theTvdbId);
@@ -1560,16 +1560,48 @@ var SeriesfeedImporter;
                 });
             }
             static getEpisodeId(showId, episodeTag) {
+                const localEpisodeId = this.findEpisodeIdInStorage(showId, episodeTag);
+                if (localEpisodeId != null) {
+                    return Promise.resolve(localEpisodeId);
+                }
+                return this.getEpisodeIdFromApi(showId, episodeTag)
+                    .then((episodeId) => {
+                    const localEpisode = new SeriesfeedImporter.Models.LocalEpisode();
+                    localEpisode.showId = showId;
+                    localEpisode.episodeId = episodeId;
+                    localEpisode.episodeTag = episodeTag;
+                    this.addEpisodeToStorage(localEpisode);
+                    return episodeId;
+                });
+            }
+            static findEpisodeIdInStorage(showId, episodeTag) {
+                const localEpisodes = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedEpisodes);
+                if (localEpisodes != null) {
+                    const localEpisode = localEpisodes.find((episode) => episode.showId === showId && episode.episodeTag === episodeTag);
+                    return localEpisode != null ? localEpisode.episodeId : null;
+                }
+                return null;
+            }
+            static getEpisodeIdFromApi(showId, episodeTag) {
                 const postData = {
                     type: 'series_season_episode',
                     serie: showId,
                     data: episodeTag
                 };
                 return Services.AjaxService.post("/ajax/serie/episode/find-by", postData)
+                    .then((episodeData) => episodeData.id)
                     .catch((error) => {
                     console.error(`Could not get episode for show id ${showId} with episode tag ${episodeTag} on ${SeriesfeedImporter.Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
+            }
+            static addEpisodeToStorage(localEpisode) {
+                let localEpisodes = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedEpisodes);
+                if (localEpisodes == null) {
+                    localEpisodes = new Array();
+                }
+                localEpisodes.push(localEpisode);
+                Services.StorageService.set(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedEpisodes, localEpisodes);
             }
         }
         Services.SeriesfeedImportService = SeriesfeedImportService;
@@ -1710,8 +1742,8 @@ var SeriesfeedImporter;
                     show.seasons.forEach((season, seasonIndex) => {
                         season.episodes.forEach((episode, episodeIndex) => {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.getEpisodeId(show.seriesfeedId, episode.tag)
-                                .then((episodeData) => {
-                                episode.id = episodeData.id;
+                                .then((episodeId) => {
+                                episode.id = episodeId;
                             })
                                 .catch((error) => {
                                 const position = season.episodes.map((episode) => episode.tag).indexOf(episode.tag);
@@ -2204,7 +2236,8 @@ var SeriesfeedImporter;
     (function (Enums) {
         Enums.LocalStorageKey = {
             BierdopjeShows: "bierdopje.shows",
-            SeriesfeedShows: "seriesfeed.shows"
+            SeriesfeedShows: "seriesfeed.shows",
+            SeriesfeedEpisodes: "seriesfeed.episodes"
         };
     })(Enums = SeriesfeedImporter.Enums || (SeriesfeedImporter.Enums = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
@@ -2268,6 +2301,15 @@ var SeriesfeedImporter;
         class Episode {
         }
         Models.Episode = Episode;
+    })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
+})(SeriesfeedImporter || (SeriesfeedImporter = {}));
+var SeriesfeedImporter;
+(function (SeriesfeedImporter) {
+    var Models;
+    (function (Models) {
+        class LocalEpisode {
+        }
+        Models.LocalEpisode = LocalEpisode;
     })(Models = SeriesfeedImporter.Models || (SeriesfeedImporter.Models = {}));
 })(SeriesfeedImporter || (SeriesfeedImporter = {}));
 var SeriesfeedImporter;

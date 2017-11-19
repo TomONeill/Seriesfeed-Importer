@@ -116,8 +116,8 @@ module SeriesfeedImporter.Controllers {
                 show.seasons.forEach((season, seasonIndex) => {
                     season.episodes.forEach((episode, episodeIndex) => {
                         const promise = Services.SeriesfeedImportService.getEpisodeId(show.seriesfeedId, episode.tag)
-                            .then((episodeData) => {
-                                episode.id = episodeData.id;
+                            .then((episodeId) => {
+                                episode.id = episodeId;
                             })
                             .catch((error) => {
                                 const position = season.episodes.map((episode) => episode.tag).indexOf(episode.tag);

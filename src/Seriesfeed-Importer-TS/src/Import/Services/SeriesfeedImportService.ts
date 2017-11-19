@@ -3,8 +3,8 @@
 module SeriesfeedImporter.Services {
     export class SeriesfeedImportService {
         public static findShowByTheTvdbId(theTvdbId: string): Promise<Models.Show> {
-            const localShow = this.findShowByTheTvdbIdFromStorage(theTvdbId);
-            
+            const localShow = this.findShowByTheTvdbIdInStorage(theTvdbId);
+
             if (localShow != null) {
                 return Promise.resolve(localShow);
             }
@@ -17,7 +17,7 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        private static findShowByTheTvdbIdFromStorage(theTvdbId: string): Models.Show | null {
+        private static findShowByTheTvdbIdInStorage(theTvdbId: string): Models.Show | null {
             const localShows = Services.StorageService.get(Enums.LocalStorageKey.SeriesfeedShows) as Array<Models.Show>;
 
             if (localShows != null) {
@@ -72,7 +72,37 @@ module SeriesfeedImporter.Services {
                 });
         }
 
-        public static getEpisodeId(showId: number, episodeTag: string): Promise<any> {
+        public static getEpisodeId(showId: number, episodeTag: string): Promise<number> {
+            const localEpisodeId = this.findEpisodeIdInStorage(showId, episodeTag);
+
+            if (localEpisodeId != null) {
+                return Promise.resolve(localEpisodeId);
+            }
+
+            return this.getEpisodeIdFromApi(showId, episodeTag)
+                .then((episodeId) => {
+                    const localEpisode = new Models.LocalEpisode();
+                    localEpisode.showId = showId;
+                    localEpisode.episodeId = episodeId;
+                    localEpisode.episodeTag = episodeTag;
+                    this.addEpisodeToStorage(localEpisode);
+
+                    return episodeId;
+                });
+        }
+
+        private static findEpisodeIdInStorage(showId: number, episodeTag: string): number | null {
+            const localEpisodes = Services.StorageService.get(Enums.LocalStorageKey.SeriesfeedEpisodes) as Array<Models.LocalEpisode>;
+
+            if (localEpisodes != null) {
+                const localEpisode = localEpisodes.find((episode) => episode.showId === showId && episode.episodeTag === episodeTag);
+                return localEpisode != null ? localEpisode.episodeId : null;
+            }
+
+            return null;
+        }
+
+        public static getEpisodeIdFromApi(showId: number, episodeTag: string): Promise<number> {
             const postData = {
                 type: 'series_season_episode',
                 serie: showId,
@@ -80,10 +110,22 @@ module SeriesfeedImporter.Services {
             };
 
             return Services.AjaxService.post("/ajax/serie/episode/find-by", postData)
+                .then((episodeData) => episodeData.id)
                 .catch((error) => {
                     console.error(`Could not get episode for show id ${showId} with episode tag ${episodeTag} on ${Config.BaseUrl}: ${error.responseText}`);
                     return error;
                 });
+        }
+
+        private static addEpisodeToStorage(localEpisode: Models.LocalEpisode): void {
+            let localEpisodes = Services.StorageService.get(Enums.LocalStorageKey.SeriesfeedEpisodes) as Array<Models.LocalEpisode> | null;
+
+            if (localEpisodes == null) {
+                localEpisodes = new Array<Models.LocalEpisode>();
+            }
+
+            localEpisodes.push(localEpisode);
+            Services.StorageService.set(Enums.LocalStorageKey.SeriesfeedEpisodes, localEpisodes);
         }
     }
 }

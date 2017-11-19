@@ -24,7 +24,7 @@ module SeriesfeedImporter.Controllers {
 
         private initialiseCard(): void {
             const card = Services.CardService.getCard();
-            card.setTitle("Bierdopje favorieten selecteren");
+            card.setTitle("Bierdopje Time Wasted importeren");
             card.setBackButtonUrl(Enums.ShortUrl.ImportTimeWastedBierdopje + this._username);
             const breadcrumbs = [
                 new Models.Breadcrumb("Time Wasted importeren", Enums.ShortUrl.Import),
@@ -146,12 +146,14 @@ module SeriesfeedImporter.Controllers {
 
             this._selectedShows.forEach((show, rowIndex) => {
                 show.seasons.forEach((season, seasonIndex) => {
+                    const seasonPromises = new Array<Promise<void>>();
+
                     const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
                     if (hasSeenAllEpisodes) {
                         const promise = Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, Enums.MarkType.Seen)
                             .then(() => this.updateEpisodeColumn(rowIndex, season.episodes.length))
                             .catch(() => this.updateEpisodeColumn(rowIndex, season.episodes.length));
-                        promises.push(promise);
+                        seasonPromises.push(promise);
                         return;
                     }
 
@@ -160,7 +162,7 @@ module SeriesfeedImporter.Controllers {
                         const promise = Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, Enums.MarkType.Obtained)
                             .then(() => this.updateEpisodeColumn(rowIndex, season.episodes.length))
                             .catch(() => this.updateEpisodeColumn(rowIndex, season.episodes.length));
-                        promises.push(promise);
+                        seasonPromises.push(promise);
                         return;
                     }
 
@@ -169,14 +171,16 @@ module SeriesfeedImporter.Controllers {
                             const promise = Services.SeriesfeedImportService.markEpisode(episode.id, Enums.MarkType.Seen)
                                 .then(() => this.updateEpisodeColumn(rowIndex, 1))
                                 .catch(() => this.updateEpisodeColumn(rowIndex, 1));
-                            promises.push(promise);
+                            seasonPromises.push(promise);
                         } else if (episode.acquired) {
                             const promise = Services.SeriesfeedImportService.markEpisode(episode.id, Enums.MarkType.Obtained)
                                 .then(() => this.updateEpisodeColumn(rowIndex, 1))
                                 .catch(() => this.updateEpisodeColumn(rowIndex, 1));
-                            promises.push(promise);
+                            seasonPromises.push(promise);
                         }
                     });
+
+                    promises.concat(seasonPromises);
                 });
             });
 
@@ -205,7 +209,7 @@ module SeriesfeedImporter.Controllers {
             const episodeColumnParts = $(episodeColumn).text().split(this.Separator);
             const currentEpisodesDoneText = episodeColumnParts[0];
             const totalEpisodesText = episodeColumnParts[1];
-            
+
             let currentEpisodesDone = isNaN(+currentEpisodesDoneText) ? 0 : +currentEpisodesDoneText;
             currentEpisodesDone += episodesDone;
 

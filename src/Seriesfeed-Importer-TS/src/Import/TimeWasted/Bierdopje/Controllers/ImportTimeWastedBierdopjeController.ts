@@ -84,7 +84,7 @@ module SeriesfeedImporter.Controllers {
 
                         const currentRow = this._table.getRow(index);
                         const seasonColumn = currentRow.children().get(this.SeasonColumnIndex);
-                        $(seasonColumn).text('-/' + show.seasons.length);
+                        $(seasonColumn).text('-' + this.Separator + show.seasons.length);
                     });
                 promises.push(promise);
             });
@@ -134,7 +134,7 @@ module SeriesfeedImporter.Controllers {
                         const episodeColumn = currentRow.children().get(this.EpisodeColumnIndex);
                         let episodeCount = 0;
                         show.seasons.map((season) => episodeCount += season.episodes.length);
-                        $(episodeColumn).text('-/' + episodeCount);
+                        $(episodeColumn).text('-' + this.Separator + episodeCount);
 
                         setTimeout(this.markEpisodes(), Config.CooldownInMs);
                     });

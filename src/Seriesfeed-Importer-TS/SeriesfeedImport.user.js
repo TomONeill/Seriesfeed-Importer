@@ -1517,11 +1517,7 @@ var SeriesfeedImporter;
             static findShowByTheTvdbIdFromStorage(theTvdbId) {
                 const localShows = Services.StorageService.get(SeriesfeedImporter.Enums.LocalStorageKey.SeriesfeedShows);
                 if (localShows != null) {
-                    for (let i = 0; i < localShows.length; i++) {
-                        if (localShows[i].theTvdbId === theTvdbId) {
-                            return localShows[i];
-                        }
-                    }
+                    return localShows.find((show) => show.theTvdbId === theTvdbId);
                 }
                 return null;
             }

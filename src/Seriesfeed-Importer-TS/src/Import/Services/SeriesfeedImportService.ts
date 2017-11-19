@@ -4,7 +4,7 @@ module SeriesfeedImporter.Services {
     export class SeriesfeedImportService {
         public static findShowByTheTvdbId(theTvdbId: string): Promise<Models.Show> {
             const localShow = this.findShowByTheTvdbIdFromStorage(theTvdbId);
-
+            
             if (localShow != null) {
                 return Promise.resolve(localShow);
             }
@@ -21,11 +21,7 @@ module SeriesfeedImporter.Services {
             const localShows = Services.StorageService.get(Enums.LocalStorageKey.SeriesfeedShows) as Array<Models.Show>;
 
             if (localShows != null) {
-                for (let i = 0; i < localShows.length; i++) {
-                    if (localShows[i].theTvdbId === theTvdbId) {
-                        return localShows[i];
-                    }
-                }
+                return localShows.find((show) => show.theTvdbId === theTvdbId);
             }
 
             return null;

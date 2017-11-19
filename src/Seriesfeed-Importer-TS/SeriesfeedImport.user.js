@@ -1795,35 +1795,35 @@ var SeriesfeedImporter;
                     show.seasons.forEach((season, seasonIndex) => {
                         const seasonPromises = new Array();
                         const hasSeenAllEpisodes = season.episodes.every((episode) => episode.seen === true);
+                        const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
                         if (hasSeenAllEpisodes) {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Seen)
                                 .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
                                 .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
                             seasonPromises.push(promise);
-                            return;
                         }
-                        const hasAcquiredAllEpisodes = season.episodes.every((episode) => episode.acquired === true);
-                        if (hasAcquiredAllEpisodes) {
+                        else if (hasAcquiredAllEpisodes) {
                             const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markSeasonEpisodes(show.seriesfeedId, season.id, SeriesfeedImporter.Enums.MarkType.Obtained)
                                 .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
                                 .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
                             seasonPromises.push(promise);
-                            return;
                         }
-                        season.episodes.forEach((episode) => {
-                            if (episode.seen) {
-                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Seen)
-                                    .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
-                                    .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
-                                seasonPromises.push(promise);
-                            }
-                            else if (episode.acquired) {
-                                const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Obtained)
-                                    .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
-                                    .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
-                                seasonPromises.push(promise);
-                            }
-                        });
+                        else {
+                            season.episodes.forEach((episode) => {
+                                if (episode.seen) {
+                                    const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Seen)
+                                        .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
+                                        .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
+                                    seasonPromises.push(promise);
+                                }
+                                else if (episode.acquired) {
+                                    const promise = SeriesfeedImporter.Services.SeriesfeedImportService.markEpisode(episode.id, SeriesfeedImporter.Enums.MarkType.Obtained)
+                                        .then(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1))
+                                        .catch(() => this.updateCountColumn(rowIndex, this.EpisodeColumnIndex, 1));
+                                    seasonPromises.push(promise);
+                                }
+                            });
+                        }
                         const seasonPromiseAll = Promise.all(seasonPromises)
                             .then(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1))
                             .catch(() => this.updateCountColumn(rowIndex, this.SeasonColumnIndex, 1));
